@@ -4,6 +4,7 @@
 #ifndef TERROREXCHANGE_H
 #define TERROREXCHANGE_H
 #define byte unsigned char
+#define COEFFICIENT 31
 
 struct category
 {
@@ -48,5 +49,10 @@ struct user* user_create(char username[], char fname[], char lname[], byte age);
 
 struct post* post_create(size_t id, char creator[], char *text, unsigned short text_length, byte category, 
 		byte month, byte day, unsigned short year, bool qustion, size_t qid);
+
+// Anticipates static location for binary file
+bool client_sign_in_with_cache(void);
+
+bool client_create_login_cache(char uname[], char pass[]);
 
 #endif

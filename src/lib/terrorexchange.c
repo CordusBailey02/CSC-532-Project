@@ -128,3 +128,187 @@ struct post* post_create(size_t id, char creator[], char *text, unsigned short t
 	return new_post;
 }
 
+bool client_sign_in_with_cache(void)
+{
+	// Check for cache file
+	FILE *fh = fopen("/user/lcache.bin", "rb");
+	if(fh == NULL)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Login cache does not exist.\n");
+		return false;
+	}
+
+	// Begin reading file
+	unsigned short read_v;
+	size_t bytes_read = fread(&read_v, 2, 1, fh);
+
+	// Exit if file's data cannot be read
+	if(bytes_read != 2)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Failed to read contents of login cache. File was opened, but data cannot be read.\n");
+		fclose(fh);
+		return false;
+	}
+
+	// Exit if file's data is malformed
+	if(read_v != 2)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Unrecognized control character at start.\n");
+		fclose(fh);
+		return false;
+	}
+
+	// Read data item 1
+	unsigned short unumbers[16];
+	byte numbers_len = 0;
+	read_v = 0;
+	bytes_read = fread(&read_v, 2, 1, fh);
+	while(true)
+	{
+		// Bad data is read --- exit
+		if(bytes_read != 2)
+		{
+			fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected 2 bytes, but read something else.\n");
+			fclose(fh);
+			return false;
+		}
+
+		// end of current item
+		if(read_v == 3) 
+			break; 
+
+		// max length reached
+		if(numbers_len >= 15)
+		{
+			// force value of read_v to be appropriate control
+			// value for next loop
+			bytes_read = fread(&read_v, 2, 1, fh);
+			if(bytes_read != 2)
+			{
+				fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected 2 bytes, but read something else.\n");
+				fclose(fh);
+				return false;
+			}
+			break;
+		}
+
+		// insert into buffer
+		unumbers[numbers_len] = read_v;
+		numbers_len++;
+
+		// Read next value
+		bytes_read = fread(&read_v, 2, 1, fh);
+	}
+
+	// expected that we are resuming after reading a control value
+	if(read_v != 3)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected control value, but read something else.\n");
+		fclose(fh);
+		return false;
+	}
+
+	// expect to read next control value
+	bytes_read = fread(&read_v, 2, 1, fh);
+	if(bytes_read != 2)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected to read 2 bytes, but read something else.\n");
+		fclose(fh);
+		return false;
+	}
+
+	// check that control value was read demarcating start of next item
+	if(read_v != 2)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected to read control value, but read something else.\n");
+		fclose(fh);
+		return false;
+	}
+
+	// New buffer to read from
+	unsigned short pnumbers[16];
+	byte pnumbers_len = 0;
+	while(true)
+	{
+		// Bad data is read --- exit
+		if(bytes_read != 2)
+		{
+			fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected 2 bytes, but read something else.\n");
+			fclose(fh);
+			return false;
+		}
+
+		// end of current item
+		if(read_v == 3) 
+			break; 
+
+		// max length reached
+		if(pnumbers_len >= 15)
+		{
+			// force value of read_v to be appropriate control
+			// value for next loop
+			bytes_read = fread(&read_v, 2, 1, fh);
+			if(bytes_read != 2)
+			{
+				fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected 2 bytes, but read something else.\n");
+				fclose(fh);
+				return false;
+			}
+			break;
+		}
+
+		// insert into buffer
+		pnumbers[pnumbers_len] = read_v;
+		pnumbers_len++;
+
+		// Read next value
+		bytes_read = fread(&read_v, 2, 1, fh);
+	}
+
+	// Double-check that control value was read.
+	if(read_v != 3)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected to read control value, but read something else.\n");
+		fclose(fh);
+		return false;
+	}
+
+	// cache file no longer necessary, close it.
+	fclose(fh);
+
+	// Decode values
+	char *uname = malloc(sizeof(char) * (numbers_len + 1));
+	if(uname == NULL)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Failed to allocate memory for username credential.\n");
+		return false;	
+	}
+	
+	char *pbuf = malloc(sizeof(char) * (pnumbers_len + 1)); 
+	if(pbuf == NULL)
+	{
+		fprintf(stderr, "[client_sign_in_with_cache]: Failed to allocate memory for password credential.\n");
+		free(uname);
+		return false;
+	}
+
+	// decode uname
+	for(byte i = 0; i < numbers_len; i++)
+		uname[i] = unumbers[i] / 31;
+
+	// decode password
+	for(byte i = 0; i < pnumbers_len; i++)
+		pbuf[i] = pnumbers[i] / 31;
+
+	// insert null terminators
+	uname[numbers_len] = '\0';
+	pbuf[pnumbers_len] = '\0';
+
+	// Send credentials to server IMPLEMENT THIS LATER! 
+	free(uname);
+	free(pbuf);
+	return true;
+}
+
+bool client_create_login_cache(char uname[], char pass[]);
+
