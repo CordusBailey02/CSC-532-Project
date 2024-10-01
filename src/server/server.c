@@ -6,6 +6,16 @@
 #include <arpa/inet.h>
 #include  "../lib/terrorexchange.h"
 
+
+
+void thread(void* args)
+{
+	return;
+}
+
+
+
+
 int main(int argc, char **argv)
 {
 	// Create connection socket
