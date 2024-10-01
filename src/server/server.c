@@ -4,8 +4,40 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <semaphore.h>
+#include <pthread.h>
 #include  "../lib/terrorexchange.h"
 
+// arg parameter is the client's socket
+void* handle_client(void *arg)
+{
+	int client_socket = *(int *) arg; // dereference the argument casted as int ptr
+	free(arg);
+
+	size_t buffer_size = 4096;
+	void *buffer = malloc(4096);
+	long bytes_received;
+
+	// Maintain connection with client via loop
+	while(true)
+	{ 
+		memset(buffer, 0, buffer_size); // clear buffer
+
+		// Receive client data
+		bytes_received = recv(client_socket, buffer, buffer_size, 0);
+
+
+		// When bytes received is 0, the client terminated the connection
+		if(bytes_received == 0)
+		{
+			fprintf(stderr, "Client terminated the connection.\n");
+			break;
+		}
+
+		// When bytes received is -1, an error occurred
+	}
+}
+ 
 int main(int argc, char **argv)
 {
 	// Create connection socket
