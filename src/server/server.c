@@ -91,6 +91,14 @@ bool server_receive_parameters_from_client(int client_socket, struct message_par
 
 	struct message_parameter *current_parameter;
 
+	// For sending responses to client after each parameter is received
+	struct server_response_header response_header; 
+	unsigned char send_buffer[sizeof(response_header)];
+	size_t send_buffer_bytes_used = 0;
+	size_t send_buffer_capacity = sizeof(response_header);
+	bool set_buffer_status;
+	int send_status;
+
 	while( (*parameters_length) < parameters_expected )
 	{
 		// Receive individual member size
@@ -118,12 +126,49 @@ bool server_receive_parameters_from_client(int client_socket, struct message_par
 			return false;
 		}
 		current_parameter->data = malloc(member_size * member_count);
+		if(current_parameter->data == NULL)
+		{
+			fprintf(stderr, "[server_receive_parameters_from_client]: Failed to allocate %zu bytes for the data component of the parameter to be received (parameter %zu). Malloc returned NULL.\n", member_size * member_count, (*parameters_length) + 1);
+			return false;
+		}
 		
 		// Receive parameter --- into current parameter's buffer
 		bytes_expected = member_count * member_size;
 		bytes_received = recv(client_socket, current_parameter->data, bytes_expected, 0);
 		if(bytes_received != bytes_expected)
 		{
+			fprintf(stderr, "[server_receive_parameters_from_client]: Failed to receive expected number of bytes from client. Expected %zu bytes and received %d instead. Failed to receive parameter %zu from client. Failed to receive data component.\n", bytes_expected, bytes_received, (*parameters_length) + 1);
+
+			// If incorrect amount of bytes received, send FAILED message
+			response_header.response_type = FAILED;
+			response_header.parameter_count = 0;
+			response_header.bytes_to_send = 0;
+			set_buffer_status = set_buffer_with_response_header(send_buffer, &send_buffer_bytes_used, &send_buffer_capacity, &response_header);
+			if(set_buffer_status == false)
+				fprintf(stderr, "[server_receive_parameters_from_client]: Failed to set send buffer with FAILED response header. Call to [set_buffer_with_response_header] returned false.\n");
+
+			send_status = send(client_socket, send_buffer, send_buffer_bytes_used, 0);
+			if(send_status < 0)
+				fprintf(stderr, "[server_receive_parameters_from_client]: Failed to send FAILED response header to the client. Call to [send] returned a %d (wanted 0).\n", send_status);
+
+			return false;
+		}
+		
+		// Send response header to client
+		// --- known to be OK, because we have not returned false yet.
+		response_header.response_type = OK;
+		response_header.parameter_count = 0;
+		response_header.bytes_to_send = 0;
+		set_buffer_status = set_buffer_with_response_header(send_buffer, &send_buffer_bytes_used, &send_buffer_capacity, &response_header);
+		if(set_buffer_status == false)
+		{
+			fprintf(stderr, "[server_receive_parameters_from_client]: Failed to deserialize OK response header into a buffer to send to the client after receiving parameter %zu. Call to set_buffer_with_response_header returned false.\n", (*parameters_length) );
+			return false;
+		}
+		send_status = send(client_socket, send_buffer, send_buffer_bytes_used, 0);
+		if(send_status < 0)
+		{
+			fprintf(stderr, "[server_receive_parameters_from_client]: Failed to send OK response header to the client after receiving parameter %zu. Call to [send] returned a %d (wanted 0).\n", (*parameters_length) + 1, send_status);
 			return false;
 		}
 
