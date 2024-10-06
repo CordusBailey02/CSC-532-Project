@@ -6,6 +6,16 @@
 #define byte unsigned char
 #define COEFFICIENT 31
 
+enum client_requests {
+		GET_CATEGORY, GET_PROFILE, GET_POST, GET_NOTIFICATION, 
+		CREATE_POST, CREATE_ACCOUNT, CREATE_NOTIFICATION, CREATE_REPORT, 
+		CREATE_VERIFICATION_REQUEST,
+		DEVELOPER_TEST
+	      };
+
+enum server_responses {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED};
+
+
 struct category
 {
 	byte id; // initial assumption that there will not be
@@ -40,6 +50,29 @@ struct post
 	bool question;
 	size_t qid; // question id (foreign key to other posts)	
 };
+
+struct client_request_header
+{
+	enum client_requests request_type;
+	unsigned short parameter_count;
+	unsigned short bytes_to_send;
+};
+
+struct server_response_header
+{
+	enum server_responses response_type;
+	unsigned short parameter_count;
+	unsigned short bytes_to_send; 
+};
+
+struct message_parameter
+{
+	byte member_size;
+	unsigned short member_count;
+	void *data;
+};
+
+struct message_parameter* message_parameter_create(byte member_size, unsigned short member_count);
 
 bool server_confirm_user_existence(char username[]);
 

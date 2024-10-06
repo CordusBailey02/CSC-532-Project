@@ -4,6 +4,21 @@
 #include <string.h>
 #include "terrorexchange.h"
 
+struct message_parameter* message_parameter_create(byte member_size, unsigned short member_count)
+{
+	struct message_parameter *new_parameter = malloc(sizeof(struct message_parameter));
+	if(new_parameter == NULL)
+	{
+		fprintf(stderr, "[message_parameter_create]: Failed to allocate memory for new message_parameter.\n");
+		return NULL;
+	}
+
+	new_parameter->member_size = member_size;
+	new_parameter->member_count = member_count;
+
+	return new_parameter;
+}
+
 bool server_confirm_user_existence(char username[])
 {
 	// in the meantime, until DB is setup
