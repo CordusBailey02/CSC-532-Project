@@ -1,0 +1,76 @@
+<h1 id="note-about-sending-information-message-parameters">Note about Sending Information (Message Parameters)</h1>
+<p>Information is sent in the form of request/response headers, followed by up to 255 parameters. The number of parameters that will be sent is defined in the request/response header.</p>
+<p>A parameter is made of 3 pieces of information 1. <code>member_size</code>: The size in bytes of each member in the parameter’s <code>data</code> attribute. 2. <code>member_count</code>: The number of <code>member_size</code>-sized members in the parameter’s <code>data</code> attribute. 3. <code>data</code>: An array containing <code>member_count</code> items that are each of size <code>member_size</code>.</p>
+<p>A parameter is capable of representing a single piece of information (e.g. an int or a double), or an array of homogeneous elements (e.g. an array of ints or a string).</p>
+<p><strong>If hetergeneous data needs to be sent,</strong> then several parameters should be used.</p>
+<h1 id="calling-convention">Calling Convention</h1>
+<p>The caller is always expected to ensure that the data is properly setup before calling the functions.</p>
+<h1 id="sending-a-request-to-the-server">Sending a Request to the Server</h1>
+<ol class="incremental" type="1">
+<li>The client sends a request header to the server.</li>
+<li>The server acknowledges the request header with OK or an error message.</li>
+<li>The client sends a parameter (or parameters) to the server.</li>
+<li>The server acknowledges each individual parameter.</li>
+<li>The server processes the information provided to send the requested data to the client.</li>
+<li>The server sends a final response header to the client.</li>
+<li>The client acknowledges the response header.</li>
+<li>The server sends response parameters to the client.</li>
+<li>The client acknowledges each individual parameter.</li>
+</ol>
+<h2 id="sending-a-request-header-client">Sending a Request Header (Client)</h2>
+<p>This is done with 2 functions: <code>set_buffer_with_request_header(3)</code> and <code>send(4)</code>.</p>
+<p><code>bool set_buffer_with_request_header(void *buffer, size_t *buffer_bytes_used, struct client_request_header *header)</code> deserializes the <code>client_request_header</code> struct passed to it and sets it into the <code>buffer</code> passed to it. The value held by <code>buffer_bytes_used</code> is updated so that the variable may be used with the <code>send(4)</code> function afterwards. The function returns false if something goes wrong and true otherwise.</p>
+<p>The buffer is then set up to be used with <code>send(4)</code>.</p>
+<p><code>send(int sockfd, const void *buf, size_t length, int flags)</code> is used to send the request header to the server. The socket should already be known, and the <code>const void *buf</code> and <code>size_t length</code> parameters correspond to the <code>buffer</code> and <code>buffer_bytes_used</code> parameters previously passed into <code>set_buffer_with_request_header(3)</code>. The <code>flags</code> parameter can be usually be 0.’</p>
+<p>Example</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">struct</span> client_request_header header;</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>header.request_type = GET_POST;</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>header.parameter_count = <span class="dv">1</span>;</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>header.bytes_to_send = <span class="dv">11</span>; <span class="co">// 1 byte for param count, 2 bytes for param size, 8 bytes for param (64 bit int for post id)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="dt">void</span> *send_buffer = malloc(<span class="dv">256</span>);</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="cf">if</span>(send_buffer == NULL)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    exit(EXIT_FAILURE);</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="dt">size_t</span> send_buffer_bytes_used = <span class="dv">0</span>;</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="dt">size_t</span> send_buffer_capacity = <span class="dv">256</span>;</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="dt">bool</span> set_buffer_status;</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>set_buffer_status = set_buffer_with_request_header(send_buffer, &amp;send_buffer_bytes_used, &amp;header);</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="cf">if</span>(set_buffer_status == false)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>    exit(EXIT_FAILURE);</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="dt">int</span> send_status;</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>send_status = send(socket, send_buffer, send_buffer_bytes_used, <span class="dv">0</span>);</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="cf">if</span>(send_status &lt; <span class="dv">0</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>    exit(EXIT_FAILURE);</span></code></pre></div>
+<h2 id="sending-a-response-header-server">Sending a Response Header (Server)</h2>
+<p>This is done with 2 functions: <code>set_buffer_with_response_header(4)</code> and <code>send(4)</code>.</p>
+<p><code>bool set_buffer_with_response_header(void *buffer, size_t *buffer_bytes_used, size_t *buffer_capacity, struct server_response_header *header)</code> deserializes the <code>server_response_header</code> struct passed to it and sets it into the <code>buffer</code> passed to it. The value held by <code>buffer_bytes_used</code> is updated so that the variable may be used with the <code>send(4)</code> function afterwards. The function returns false if something goes wrong and true otherwise.<br />
+- The calling convention is the caller must ensure that the buffer is sufficiently large to deserialize the response header. This can be done with a simple <code>sizeof(enum server_response_header)</code> call when allocating the buffer.</p>
+<p>The buffer is then set up to be used with <code>send(4)</code>.</p>
+<p><code>send(int sockfd, const void *buf, size_t length, int flags)</code> is used to send the response header to the client. The client socket should already be known, and the <code>const void *buf</code> and <code>size_t length</code> parameters correspond to the <code>buffer</code> and <code>buffer_bytes_used</code> parameters previously passed into <code>set_buffer_with_response_header(4)</code>. The <code>flags</code> parameter can usually be 0.</p>
+<p>Example</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">struct</span> server_response_header header;</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>header.response_type = OK;</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>header.parameter_count = <span class="dv">0</span>;</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>header.bytes_to_send = <span class="dv">0</span>;</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="dt">void</span> *send_buffer = malloc(<span class="dv">256</span>);</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="cf">if</span>(send_buffer == NULL)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    exit(EXIT_FAILURE);</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="dt">size_t</span> send_buffer_bytes_used = <span class="dv">0</span>;</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="dt">size_t</span> send_buffer_capacity = <span class="dv">256</span>;</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="dt">bool</span> set_buffer_status;</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>set_buffer_status = set_buffer_with_response_header(send_buffer, &amp;send_buffer_bytes_used, &amp;send_buffer_capacity, &amp;header);</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="cf">if</span>(set_buffer_status == false)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>    exit(EXIT_FAILURE);</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a><span class="dt">int</span> send_status;</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>send_status = send(client_socket, send_buffer, send_buffer_bytes_used, <span class="dv">0</span>);</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a><span class="cf">if</span>(send_status &lt; <span class="dv">0</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>    exit(EXIT_FAILURE);</span></code></pre></div>
+<h2 id="sending-request-parameters-client">Sending Request Parameters (Client)</h2>
+<p>This is done with the function <code>client_send_parameters_to_server(3)</code>.</p>
+<p><code>bool client_send_parameters_to_server(int socket, struct message_parameter **parameters, size_t parameters_length)</code> is used to send the request parameters contained within <code>parameters</code> to the server. The function returns true if all of the parameters are received by the server and false otherwise.</p>
+<h2 id="sending-response-parameters-server">Sending Response Parameters (Server)</h2>
