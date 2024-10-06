@@ -71,6 +71,7 @@ bool server_receive_request_header(int client_socket, struct client_request_head
 	return true; // success
 }
 
+// this already has to be the correct size. Caller should make sure the data is good to go.
 bool server_receive_parameters_from_client(int client_socket, struct message_parameter **parameters, size_t *parameters_length, unsigned short parameters_expected)
 { 
 	if(parameters == NULL)
