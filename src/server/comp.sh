@@ -1,1 +1,1 @@
-gcc -o server server.c -L../lib -lterrorexchange
+gcc -o server server.c -L../lib -lterrorexchange -w
