@@ -73,6 +73,7 @@ bool client_receive_response_header(int socket, struct server_response_header *r
 	return true; // success
 }
 
+
 bool client_send_parameters_to_server(int socket, struct message_parameter **parameters, size_t parameters_length)
 {
 	if(parameters == NULL)
@@ -87,6 +88,11 @@ bool client_send_parameters_to_server(int socket, struct message_parameter **par
 	struct message_parameter *current_parameter;
 	size_t bytes_to_send;
 
+	// Receiving acknowledgements from server
+	int bytes_received;
+	struct server_response_header response_header;
+	bool receive_header_status;
+
 	while(parameters_sent < parameters_length)
 	{
 		// Grab current parameter
@@ -96,7 +102,6 @@ bool client_send_parameters_to_server(int socket, struct message_parameter **par
 		if(current_parameter->data == NULL)
 		{
 			fprintf(stderr, "[client_send_parameters_to_server]: Parameter %d has no data in its data member (void *data). Aborting parameter transmission (no further parameters will be sent).\n", parameters_sent);
-			free(send_buffer);
 			return false;
 		}
 
@@ -105,7 +110,6 @@ bool client_send_parameters_to_server(int socket, struct message_parameter **par
 		if(send_status < 0)
 		{
 			fprintf(stderr, "[client_send_parameters_to_server]: Failed to send member_size attribute of parameter %d to server.\n", parameters_sent);
-			free(send_buffer);
 			return false;
 		}
 
@@ -114,7 +118,6 @@ bool client_send_parameters_to_server(int socket, struct message_parameter **par
 		if(send_status < 0)
 		{
 			fprintf(stderr, "[client_send_parameters_to_server]: Failed to send member_count attribute of parameter %d to server.\n", parameters_sent);
-			free(send_buffer);
 			return false;
 		}
 
@@ -124,6 +127,21 @@ bool client_send_parameters_to_server(int socket, struct message_parameter **par
 		if(send_status < 0)
 		{
 			fprintf(stderr, "[client_send_parameters_to_server]: Failed to the data buffer (void *data) of parameter %d to the server. No further parameters will be sent.\n", parameters_sent);
+			return false;
+		}
+
+		// Receive response from server
+		receive_header_status = client_receive_response_header(socket, &response_header);
+		if(receive_header_status == false)
+		{
+			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive response header from client after sending parameter %d to server. Call to client_receive_response_header failed.\n", parameters_sent);
+			return false;
+		}
+	
+		// Check response is OK
+		if(response_header.response_type != OK)
+		{
+			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive OK (0) from server after sending parmameter %d. Response type was %d.\n", parameters_sent, response_header.response_type); 
 			return false;
 		}
 
@@ -225,7 +243,7 @@ int main(int argc, char **argv)
 				header->bytes_to_send = strlen(tokens[2]);
 
 				// send request header
-				//
+				
 				
 				// build request parameters
 				send_parameters[send_parameters_length] = message_parameter_create(1, header->bytes_to_send + 1);
