@@ -13,7 +13,7 @@ enum client_requests {
 		DEVELOPER_TEST
 	      };
 
-enum server_responses {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED};
+enum server_responses {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED, FAILED};
 
 
 struct category
