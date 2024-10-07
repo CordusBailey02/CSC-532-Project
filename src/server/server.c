@@ -109,11 +109,45 @@ bool server_receive_parameters_from_client(int client_socket, struct message_par
 			return false;
 		}
 
+		// Send OK to client for individual member size
+		response_header.response_type = OK;
+		response_header.parameter_count = 0;
+		response_header.bytes_to_send = 0;
+		set_buffer_status = set_buffer_with_response_header(send_buffer, &send_buffer_bytes_used, &send_buffer_capacity, &response_header);
+		if(set_buffer_status == false)
+		{
+			fprintf(stderr, "[server_receive_parameters_from_client]: Failed to set send buffer with OK response header after receiving the individual member size for parameter %zu. Call to [set_buffer_with_response_header(4)] returned false.\n", (*parameters_length) + 1);
+			return false;
+		}
+		send_status = send(client_socket, send_buffer, send_buffer_bytes_used, 0);
+		if(send_status < 0)
+		{
+			fprintf(stderr, "[server_receive_parameters_from_client]: Failed to send OK response header after receiving the individual member size for parameter %zu. Call to [send(4)] was less than 0.\n", (*parameters_length) + 1);
+			return false;
+		}
+
 		// Receive member count
 		bytes_expected = sizeof(member_count);
 		bytes_received = recv(client_socket, &member_count, bytes_expected, 0);
 		if(bytes_received != bytes_expected)
 		{
+			return false;
+		}
+
+		// Send OK to client for member count
+		response_header.response_type = OK;
+		response_header.parameter_count = 0;
+		response_header.bytes_to_send = 0;
+		set_buffer_status = set_buffer_with_response_header(send_buffer, &send_buffer_bytes_used, &send_buffer_capacity, &response_header);
+		if(set_buffer_status == false)
+		{
+			fprintf(stderr, "[server_receive_parameters_from_client]: Failed to set send buffer with OK response header after receiving the member count for parameter %zu. Call to [set_buffer_with_response_header(4)] returned false.\n", (*parameters_length) + 1);
+			return false;
+		}
+		send_status = send(client_socket, send_buffer, send_buffer_bytes_used, 0);
+		if(send_status < 0)
+		{
+			fprintf(stderr, "[server_receive_parameters_from_client]: Failed to send OK response header after receiving the member count for parameter %zu. Call to [send(4)] was less than 0.\n", (*parameters_length) + 1);
 			return false;
 		}
 
