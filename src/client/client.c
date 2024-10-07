@@ -73,7 +73,6 @@ bool client_receive_response_header(int socket, struct server_response_header *r
 	return true; // success
 }
 
-
 bool client_send_parameters_to_server(int socket, struct message_parameter **parameters, size_t parameters_length)
 {
 	if(parameters == NULL)
@@ -113,11 +112,37 @@ bool client_send_parameters_to_server(int socket, struct message_parameter **par
 			return false;
 		}
 
+		// Receive OK from server for individual member size
+		receive_header_status = client_receive_response_header(socket, &response_header);
+		if(receive_header_status == false)
+		{
+			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive a response header from the client after sending the individual member size of parameter %d. Call to client_receive_response_header(2) failed.\n", parameters_sent + 1);
+			return false;
+		}
+		if(response_header.response_type != OK)
+		{
+			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive OK from server after sending the individual member size of parameter %d. Response header has value %d instead.\n", parameters_sent + 1, response_header.response_type);
+			return false;
+		}
+
 		// Send member count
 		send_status = send(socket, &current_parameter->member_count, sizeof(current_parameter->member_count));
 		if(send_status < 0)
 		{
 			fprintf(stderr, "[client_send_parameters_to_server]: Failed to send member_count attribute of parameter %d to server.\n", parameters_sent);
+			return false;
+		}
+
+		// Receive OK from server for member count
+		receive_header_status = client_receive_response_header(socket, &response_header);
+		if(receive_header_status == false)
+		{
+			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive a response header from the client after sending the member count of parameter %d. Call to client_receive_response_header(2) failed.\n", parameters_sent + 1);
+			return false;
+		}
+		if(response_header.response_type != OK)
+		{
+			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive OK from server after sending the member count of parameter %d. Response header has value %d instead.\n", parameters_sent + 1, response_header.response_type);
 			return false;
 		}
 
@@ -130,24 +155,51 @@ bool client_send_parameters_to_server(int socket, struct message_parameter **par
 			return false;
 		}
 
-		// Receive response from server
+		// Receive response from server --- check OK for sending parameter data
 		receive_header_status = client_receive_response_header(socket, &response_header);
 		if(receive_header_status == false)
 		{
 			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive response header from client after sending parameter %d to server. Call to client_receive_response_header failed.\n", parameters_sent);
 			return false;
-		}
-	
-		// Check response is OK
+		}	
 		if(response_header.response_type != OK)
 		{
-			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive OK (0) from server after sending parmameter %d. Response type was %d.\n", parameters_sent, response_header.response_type); 
+			fprintf(stderr, "[client_send_parameters_to_server]: Failed to receive OK (0) from server after sending parmameter %d. Response type was %d.\n", parameters_sent + 1, response_header.response_type); 
 			return false;
 		}
 
 		// Increment parameters sent
 		parameters_sent++;
 	}
+	// Send ACKNOWLEDGE to server to indicate that previous OK was received.
+	// After the server receives this, it can begin preparing the response 
+	// header and parameters to deliver to the client for it to receive with
+	// client_receive_parameters
+	struct client_request_header request_header;
+	request_header.request_type = ACKNOWLEDGE; 
+	request_header.parameter_count = 0;
+	request_header.bytes_to_send = 0;
+
+	bool set_buffer_status;
+	unsigned char send_buffer[sizeof(struct client_request_header)];
+	size_t send_buffer_bytes_used = 0;
+	size_t send_buffer_capacity = sizeof(struct client_request_header);
+
+	// (1) deserialize request header into a buffer so it can be sent
+	set_buffer_status = set_buffer_with_request_header(send_buffer, &send_buffer_bytes_used, &send_buffer_capacity, &request_header);
+	if(set_buffer_status == false)
+	{
+		fprintf(stderr, "[client_send_parameters_to_server]: Failed to deserialize ACKNOWLEDGE request header into a buffer to send to client after sending all parameters to server. Call to [set_buffer_with_request_header(4)] failed.\n");
+		return false;
+	}
+	// (2) actually send the ACKNOWLEDGE request header
+	send_status = send(socket, send_buffer, send_buffer_bytes_used, 0);
+	if(send_status < 0)
+	{
+		fprintf(stderr, "[client_send_parameters_to_server]: Failed to send deserialized ACKNOWLEDGE request header to server. All parameters sent, but final ACKNOWLEDGE could not be sent. Call to [send(4)] returned a value less than 0.\n");
+		return false;
+	}
+
 	return true;
 }
 
