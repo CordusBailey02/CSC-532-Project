@@ -82,7 +82,8 @@ int main(int argc, char **argv)
 	}
 	printf("Client connection accepted.\n");
 
-	unsigned long long shared_secret;
+	// Perform handshake with the client
+	uint32_t shared_secret;
     if (server_handshake(client_socket, &shared_secret) < 0) {
         fprintf(stderr, "Server handshake failed.\n");
         close(client_socket);

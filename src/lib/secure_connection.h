@@ -2,17 +2,19 @@
 #define SECURE_CONNECTION_H
 
 typedef struct {
-    unsigned long long private_key;
-    unsigned long long public_key;
+    uint32_t private_key;
+    uint32_t public_key;
 } DHKeyPair;
 
-unsigned long long mod_exp(unsigned long long base, unsigned long long exp, unsigned long long mod);
-unsigned long long rand_range(unsigned long long min, unsigned long long max);
-unsigned long long generate_prime(int bits);
-int is_prime(unsigned long long n);
-DHKeyPair* create_keypair(unsigned long long g, unsigned long long p);
-unsigned long long compute_shared_secret(DHKeyPair *keypair, unsigned long long other_public_key, unsigned long long p);
-int client_handshake(int socket, unsigned long long *shared_secret);
-int server_handshake(int socket, unsigned long long *shared_secret);
+uint32_t mod_exp(uint32_t base, uint32_t exp, uint32_t mod);
+uint32_t rand_range(uint32_t min, uint32_t max);
+uint32_t generate_prime(int bits);
+bool is_prime(uint32_t n);
+
+DHKeyPair* create_keypair(uint32_t g, uint32_t p);
+
+uint32_t compute_shared_secret(DHKeyPair *keypair, uint32_t other_public_key, uint32_t p);
+int client_handshake(int socket, uint32_t *shared_secret);
+int server_handshake(int socket, uint32_t *shared_secret);
 
 #endif // SECURE_CONNECTION_H

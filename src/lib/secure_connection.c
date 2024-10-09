@@ -7,8 +7,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "secure_connection.h"
 
-#define MODULUS_BITS 16 // Adjust the bits for prime generation as needed
+#define MODULUS_BITS 16 
+#define HASH_SIZE 20
 
 // Function for modular exponentiation
 uint32_t mod_exp(uint32_t base, uint32_t exp, uint32_t mod) {
@@ -16,21 +18,21 @@ uint32_t mod_exp(uint32_t base, uint32_t exp, uint32_t mod) {
     base = base % mod;
 
     while (exp > 0) {
-        if (exp % 2 == 1) { // If exp is odd
+        if (exp % 2 == 1) { 
             result = (result * base) % mod;
         }
-        exp = exp >> 1; // Divide exp by 2
-        base = (base * base) % mod; // Square the base
+        exp = exp >> 1; 
+        base = (base * base) % mod; 
     }
     return result;
 }
 
-// Simple function to generate a random number in the range [min, max)
+// Function to return a random number between min and max
 uint32_t rand_range(uint32_t min, uint32_t max) {
     return min + (rand() % (max - min));
 }
 
-// A naive primality test
+// Test to check if a number is prime
 bool is_prime(uint32_t n) {
     if (n < 2) return false;
     for (uint32_t i = 2; i * i <= n; i++) {
@@ -39,7 +41,7 @@ bool is_prime(uint32_t n) {
     return true;
 }
 
-// Function to generate a simple prime (for educational purposes)
+// Function to generate a prime number
 uint32_t generate_prime(int bits) {
     uint32_t prime;
     do {
@@ -48,18 +50,17 @@ uint32_t generate_prime(int bits) {
     return prime;
 }
 
-// Structure for a key pair
-typedef struct {
-    uint32_t private_key;
-    uint32_t public_key;
-} DHKeyPair;
 
 // Function to create a new key pair
 DHKeyPair* create_keypair(uint32_t g, uint32_t p) {
     DHKeyPair *keypair = malloc(sizeof(DHKeyPair));
-    if (!keypair) return NULL; // Check for allocation failure
-    keypair->private_key = rand_range(1, p); // Generate a private key
-    keypair->public_key = mod_exp(g, keypair->private_key, p); // Compute public key
+
+    if (!keypair) return NULL;
+
+    // Compute private and public key
+    keypair->private_key = rand_range(1, p);
+    keypair->public_key = mod_exp(g, keypair->private_key, p); 
+
     return keypair;
 }
 
@@ -70,10 +71,11 @@ uint32_t compute_shared_secret(DHKeyPair *keypair, uint32_t other_public_key, ui
 
 // Function for client handshake
 int client_handshake(int socket, uint32_t *shared_secret) {
-    srand(time(NULL)); // Seed the random number generator
+    // Seed the random number generator
+    srand(time(NULL)); 
 
-    uint32_t p = generate_prime(MODULUS_BITS); // Example prime
-    uint32_t g = 2; // Primitive root
+    uint32_t p = generate_prime(MODULUS_BITS); 
+    uint32_t g = 2;
 
     // Create a new ephemeral key pair
     DHKeyPair *client_keypair = create_keypair(g, p);
@@ -105,10 +107,11 @@ int client_handshake(int socket, uint32_t *shared_secret) {
 
 // Function for server handshake
 int server_handshake(int socket, uint32_t *shared_secret) {
-    srand(time(NULL)); // Seed the random number generator
+    // Seed the random number generator
+    srand(time(NULL));
 
-    uint32_t p = generate_prime(MODULUS_BITS); // Example prime
-    uint32_t g = 2; // Primitive root
+    uint32_t p = generate_prime(MODULUS_BITS); 
+    uint32_t g = 2;
 
     // Create a new ephemeral key pair
     DHKeyPair *server_keypair = create_keypair(g, p);

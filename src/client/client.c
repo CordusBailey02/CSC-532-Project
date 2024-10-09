@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define SERVER_ADDR "142.93.199.100"
+#define SERVER_ADDR "127.0.0.1"
 #include "../lib/terrorexchange.h"
 #include "../lib/secure_connection.h"
 
@@ -32,7 +32,8 @@ int main(int argc, char **argv)
 
 	printf("Server connection established.\n\n");
 
-	unsigned long long shared_secret;
+	// Perform handshake with the server
+	uint32_t shared_secret;
     if (client_handshake(tcp_socket, &shared_secret) < 0) {
         fprintf(stderr, "Client handshake failed.\n");
         close(tcp_socket);
