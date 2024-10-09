@@ -91,6 +91,16 @@ int main(int argc, char **argv)
     }
 
 
+	char buffer[1024];
+    ssize_t bytes_received = secure_recv(client_socket, buffer, sizeof(buffer), 0, shared_secret);
+    
+	if (bytes_received < 0) {
+        perror("Receive failed");
+        exit(EXIT_FAILURE);
+    }
+    //buffer[bytes_received] = '\0'; // Null-terminate the string
+    printf("Received: %s\n", buffer);
+
 	// Cleanup
 	close(client_socket);
 	close(server_fd);

@@ -40,6 +40,14 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+	char message[] = "Hello, secure world! This works...";
+    ssize_t bytes_sent = secure_send(tcp_socket, message, strlen(message), 0, shared_secret);
+    if (bytes_sent < 0) {
+        perror("send");
+    }
+
+    printf("Sent encrypted message and signature.\n");
+
 	close(tcp_socket);
 	return 0;
 }
