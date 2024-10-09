@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include  "../lib/terrorexchange.h"
+#include  "../lib/secure_connection.h"
 
 // arg parameter is the client's socket
 void* handle_client(void *arg)
@@ -80,6 +81,13 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 	printf("Client connection accepted.\n");
+
+	unsigned long long shared_secret;
+    if (server_handshake(client_socket, &shared_secret) < 0) {
+        fprintf(stderr, "Server handshake failed.\n");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
 
 
 	// Cleanup
