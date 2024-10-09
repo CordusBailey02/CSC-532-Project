@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
+#include <string.h>
 #include <stdbool.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -10,7 +11,6 @@
 #include "secure_connection.h"
 
 #define MODULUS_BITS 16 
-#define HASH_SIZE 20
 
 // Function for modular exponentiation
 uint32_t mod_exp(uint32_t base, uint32_t exp, uint32_t mod) {
@@ -139,4 +139,37 @@ int server_handshake(int socket, uint32_t *shared_secret) {
     // Clean up
     free(server_keypair);
     return 0;
+}
+
+
+// XOR Encryption/Decryption
+void xor_encrypt_decrypt(uint8_t *data, size_t len, uint8_t *key, size_t key_len) {
+    for (size_t i = 0; i < len; i++) {
+        data[i] ^= key[i % key_len];
+    }
+}
+
+
+ssize_t secure_send(int sockfd, const void *buf, size_t len, int flags, uint32_t shared_secret) {
+    uint8_t *encrypted_buf = malloc(len);
+    if (!encrypted_buf) {
+        perror("Memory allocation failed");
+        return -1;
+    }
+
+    memcpy(encrypted_buf, buf, len);
+    xor_encrypt_decrypt(encrypted_buf, len, (uint8_t*)&shared_secret, sizeof(shared_secret));
+
+    ssize_t bytes_sent = send(sockfd, encrypted_buf, len, flags);
+    free(encrypted_buf);
+
+    return bytes_sent;
+}
+
+ssize_t secure_recv(int sockfd, void *buf, size_t len, int flags, uint32_t shared_secret) {
+    ssize_t bytes_received = recv(sockfd, buf, len, flags);
+    if (bytes_received > 0) {
+        xor_encrypt_decrypt((uint8_t*)buf, bytes_received, (uint8_t*)&shared_secret, sizeof(shared_secret));
+    }
+    return bytes_received;
 }

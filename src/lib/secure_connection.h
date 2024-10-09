@@ -17,4 +17,8 @@ uint32_t compute_shared_secret(DHKeyPair *keypair, uint32_t other_public_key, ui
 int client_handshake(int socket, uint32_t *shared_secret);
 int server_handshake(int socket, uint32_t *shared_secret);
 
+void xor_encrypt_decrypt(uint8_t *data, size_t len, uint8_t *key, size_t key_len);
+ssize_t secure_send(int sockfd, const void *buf, size_t len, int flags, uint32_t shared_secret);
+ssize_t secure_recv(int sockfd, void *buf, size_t len, int flags, uint32_t shared_secret);
+
 #endif // SECURE_CONNECTION_H
