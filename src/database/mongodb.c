@@ -10,6 +10,11 @@ const char *uri_string = "mongodb+srv://doadmin:QCZ5U26n479qEB01@stack-exchange-
 
 
 
+
+
+
+
+
 int main(int argc, char const *argv[])
 {
     mongoc_uri_t *uri;
