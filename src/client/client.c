@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define SERVER_ADDR "127.0.0.1"
+#define SERVER_ADDR "142.93.199.100"
 #include "../lib/terrorexchange.h"
 #include "../lib/secure_connection.h"
 
