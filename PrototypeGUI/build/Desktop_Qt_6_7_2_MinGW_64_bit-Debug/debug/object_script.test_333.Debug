@@ -1,0 +1,17 @@
+debug/comment_1.o
+debug/communitiestab.o
+debug/main.o
+debug/mainwindow.o
+debug/makecommentorpost.o
+debug/post_1.o
+debug/profile.o
+debug/searchresults.o
+debug/secdialog.o
+debug/moc_comment_1.o
+debug/moc_communitiestab.o
+debug/moc_mainwindow.o
+debug/moc_makecommentorpost.o
+debug/moc_post_1.o
+debug/moc_profile.o
+debug/moc_searchresults.o
+debug/moc_secdialog.o
