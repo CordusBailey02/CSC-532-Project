@@ -23,6 +23,8 @@ private slots:
 
     void on_listWidget_answersFromProfile_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_lineEdit_LinkedInLine_returnPressed();
+
 private:
     Ui::Profile *ui;
 };

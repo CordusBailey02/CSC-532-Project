@@ -12,6 +12,8 @@ SOURCES += \
     answerwindow.cpp \
     comment_1.cpp \
     communitiestab.cpp \
+    createaccount.cpp \
+    forgotpassword.cpp \
     main.cpp \
     mainwindow.cpp \
     makecommentorpost.cpp \
@@ -24,6 +26,8 @@ HEADERS += \
     answerwindow.h \
     comment_1.h \
     communitiestab.h \
+    createaccount.h \
+    forgotpassword.h \
     mainwindow.h \
     makecommentorpost.h \
     post_1.h \
@@ -35,6 +39,8 @@ FORMS += \
     answerwindow.ui \
     comment_1.ui \
     communitiestab.ui \
+    createaccount.ui \
+    forgotpassword.ui \
     mainwindow.ui \
     makecommentorpost.ui \
     post_1.ui \

@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "secdialog.h"
+#include "createAccount.h"
+#include "forgotpassword.h"
 #include <QMessageBox>
 #include <QPixmap>
 //#include <QtSql>
@@ -66,5 +68,25 @@ void MainWindow::on_pushButton_login_clicked()
     {
         QMessageBox::warning(this, "Login", "Incorrect username or password");
     }
+}
+
+
+void MainWindow::on_pushButton_createAcc_clicked()
+{
+    createAccount createAccount_1;
+    createAccount_1.exec();
+}
+
+
+void MainWindow::on_pushButton_forgotPw_clicked()
+{
+    forgotPassword forgotPassword_1;
+    forgotPassword_1.exec();
+}
+
+
+void MainWindow::on_lineEdit_username_returnPressed()
+{
+    ui->lineEdit_password->setFocus();
 }
 

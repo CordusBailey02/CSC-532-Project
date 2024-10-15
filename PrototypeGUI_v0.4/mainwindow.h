@@ -23,6 +23,12 @@ private slots:
 
     void on_pushButton_login_clicked();
 
+    void on_pushButton_createAcc_clicked();
+
+    void on_pushButton_forgotPw_clicked();
+
+    void on_lineEdit_username_returnPressed();
+
 private:
     Ui::MainWindow *ui;
     //SecDialog *secDialog;

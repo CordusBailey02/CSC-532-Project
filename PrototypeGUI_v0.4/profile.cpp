@@ -47,3 +47,11 @@ void Profile::on_listWidget_answersFromProfile_itemDoubleClicked(QListWidgetItem
     answerWindow_3.exec();
 }
 
+
+void Profile::on_lineEdit_LinkedInLine_returnPressed()
+{
+    // send Linkedin to client
+    // *send to client* ui->lineEdit_LinkedInLine->text();
+    ui->lineEdit_LinkedInLine->setReadOnly(true);
+}
+
