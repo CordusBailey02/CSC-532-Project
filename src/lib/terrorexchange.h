@@ -6,7 +6,7 @@
 #define byte unsigned char
 #define COEFFICIENT 31
 
-enum ACTION { GET, POST }; 
+enum ACTION { GET, SEND }; 
 enum SUBJECT { // Typical data objects
 	       CATEGORY, PROFILE, POST, NOTIFICATION, REPORT, DEVELOPER_TEST_MESSAGE,
 
@@ -14,6 +14,23 @@ enum SUBJECT { // Typical data objects
 	     };
 
 enum ACKNOWLEDGEMENT {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED, FAILED};
+
+struct request_header
+{
+	enum ACTION action;
+	enum SUBJECT subject;
+	size_t parameter_count;
+	size_t metadata_total_size;
+	size_t parameters_total_size;
+	size_t total_bytes;
+};
+
+struct payload
+{
+	size_t member_size;
+	size_t member_count;
+	void *data;
+};
 
 struct category
 {
@@ -50,28 +67,7 @@ struct post
 	size_t qid; // question id (foreign key to other posts)	
 };
 
-struct client_request_header
-{
-	enum client_requests request_type;
-	unsigned short parameter_count;
-	unsigned short bytes_to_send;
-};
-
-struct server_response_header
-{
-	enum server_responses response_type;
-	unsigned short parameter_count;
-	unsigned short bytes_to_send; 
-};
-
-struct message_parameter
-{
-	byte member_size;
-	unsigned short member_count;
-	void *data;
-};
-
-struct message_parameter* message_parameter_create(byte member_size, unsigned short member_count);
+struct payload* payload_create(size_t member_size, size_t member_count);
 
 bool server_confirm_user_existence(char username[]);
 

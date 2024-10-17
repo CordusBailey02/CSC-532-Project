@@ -4,19 +4,37 @@
 #include <string.h>
 #include "terrorexchange.h"
 
-struct message_parameter* message_parameter_create(byte member_size, unsigned short member_count)
+struct request_header* request_header_create(enum ACTION action, enum SUBJECT subject, size_t parameter_count, size_t metadata_total_size, size_t parameters_total_size, size_t total_bytes)
 {
-	struct message_parameter *new_parameter = malloc(sizeof(struct message_parameter));
-	if(new_parameter == NULL)
+	struct request_header *new_request_header = malloc(sizeof(struct request_header));
+	if(new_request_header == NULL)
 	{
-		fprintf(stderr, "[message_parameter_create]: Failed to allocate memory for new message_parameter.\n");
+		fprintf(stderr, "[request_header_create]: Failed to allocate memory for a new request header struct.\n");
+		return NULL;
+	}
+	new_request_header->action = action;
+	new_request_header->subject = subject;
+	new_request_header->parameter_count = parameter_count;
+	new_request_header->metadata_total_size = metadata_total_size;
+	new_request_header->parameters_total_size = parameters_total_size;
+	new_request_header->total_bytes = total_bytes;
+
+	return new_request_header;
+} 
+
+struct payload* payload_create(size_t member_size, size_t member_count)
+{
+	struct payload *new_payload = malloc(sizeof(struct payload));
+	if(new_payload == NULL)
+	{
+		fprintf(stderr, "[payload_create]: Failed to allocate memory for new payload struct.\n");
 		return NULL;
 	}
 
-	new_parameter->member_size = member_size;
-	new_parameter->member_count = member_count;
+	new_payload->member_size = member_size;
+	new_payload->member_count = member_count;
 
-	return new_parameter;
+	return new_payload;
 }
 
 bool server_confirm_user_existence(char username[])
