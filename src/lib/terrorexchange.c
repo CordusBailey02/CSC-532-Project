@@ -128,6 +128,46 @@ bool receive_request_header(int socket, struct request_header *header)
 	return true;
 }
 
+bool send_acknowledgement(int socket)
+{
+	// (1) Create acknowledgement request header
+	// (2) DO NOT convert to network byte order, because send_request_header 
+	//     function will do it.
+	struct request_header acknowledgement; 
+	acknowledgement.action = SEND;
+	acknowledgement.subject = ACKNOWLEDGEMENT;
+	acknowledgement.parameter_count = 0;
+	acknowledgement.metadata_total_size = 0;
+	acknowledgement.parameters_total_size = 0;
+	acknowledgement.total_bytes = 0;
+
+	// Send the acknowledgement
+	bool status;
+	status = send_request_header(socket, &acknowledgement);
+	if(status == false)
+		fprintf(stderr, "[send_acknowledgement]: Could not send acknowledgement. send_request_header() returned false.\n");
+
+	return status;
+}
+
+bool receive_acknowledgement(int socket, struct request_header *header);
+{
+
+	if(header == NULL)
+	{
+		fprintf(stderr, "[receive_acknowledgement]: Cannot read to-be-received request header into a request header struct that points to NULL. Argument is bad.\n");
+		return false;
+	}
+
+	// receive acknowledgement
+	bool status;
+	status = receive_request_header(socket, header);
+	if(status == false)
+		fprintf(stderr, "[receive_acknowledgement]: Failed to receive acknowledgement. receive_request_header returned false.\n");
+
+	return status;
+}
+
 bool server_confirm_user_existence(char username[])
 {
 	// in the meantime, until DB is setup
