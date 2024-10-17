@@ -69,6 +69,10 @@ struct post
 
 struct payload* payload_create(size_t member_size, size_t member_count);
 
+bool send_request_header(int socket, struct request_header *header);
+
+bool receive_request_header(int socket, struct request_header *header);
+
 bool server_confirm_user_existence(char username[]);
 
 bool validate_username(char username[]);

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <arpa/inet.h>
 #include "terrorexchange.h"
 
 struct request_header* request_header_create(enum ACTION action, enum SUBJECT subject, size_t parameter_count, size_t metadata_total_size, size_t parameters_total_size, size_t total_bytes)
@@ -35,6 +36,96 @@ struct payload* payload_create(size_t member_size, size_t member_count)
 	new_payload->member_count = member_count;
 
 	return new_payload;
+}
+
+bool send_request_header(int socket, struct request_header *header)
+{
+	if(header == NULL)
+	{
+		fprintf(stderr, "[send_request_header]: Cannot send request header that points to NULL.\n");
+		return false;
+	}
+
+	// Set the members to networ byte order so the recipient can receive OK 
+	// regardless of their system's endianness
+	header->action = htonl(header->action);
+	header->subject = htonl(header->subject);
+	header->parameter_count = htonl(header->parameter_count);
+	header->metadata_total_size = htonl(header->metadata_total_size);
+	header->parameters_total_size = htonl(header->parameters_total_size);
+	header->total_bytes = htonl(header->total_bytes);
+
+	ssize_t bytes_sent;
+	bytes_sent = send(socket, header, sizeof(struct request_header), 0);
+
+	// All data sent OK
+	if(bytes_sent == sizeof(struct request_header))
+		return true;
+
+	// Return false if bad connection
+	if(bytes_sent < 0)
+	{
+		fprintf(stderr, "[send_request_header]: Failed to send data. Send function returned -1.\n");
+		return false;
+	}
+
+	// Continue sending rest of bytes
+	ssize_t total_bytes_sent = bytes_sent;
+	while(total_bytes_sent < sizeof(struct request_header))
+	{
+		bytes_sent = send(socket, header + total_bytes_sent, sizeof(struct request_header) - total_bytes_sent, 0);
+		if(bytes_sent < 0)
+		{
+			fprintf(stderr, "[send_request_header]: Unable to send remaining bytes. Send function returned -1.\n");
+			return false;
+		}
+		total_bytes_sent += bytes_sent;
+	}
+	return true;
+}
+
+bool receive_request_header(int socket, struct request_header *header)
+{
+	if(header == NULL)
+	{
+		fprintf(stderr, "[receive_request_header]: Cannot load received request header into a request header struct that points to NULL. Argument provided is bad.\n");
+		return false;
+	}
+
+	ssize_t bytes_received;
+	bytes_received = recv(socket, header, sizeof(struct request_header), 0);
+	if(bytes_received < 0)
+	{
+		fprintf(stderr, "[receive_request_header]: Failed to receive data. Recv function returned -1.\n");
+		return false;
+	}
+
+	// Receive remaining bytes if all are not sent
+	if(bytes_received < sizeof(struct request_header))
+	{
+		ssize_t total_bytes_received = bytes_received;
+		while(total_bytes_received < sizeof(struct request_header))
+		{
+			bytes_received = recv(socket, header + total_bytes_received, sizeof(struct request_header) - total_bytes_received, 0);
+			if(bytes_received < 0)
+			{
+				fprintf(stderr, "[receive_request_header]: Failed to receive data. Recv function returned -1 while trying to receive remaining bytes.\n");
+				return false;
+			}
+
+			total_bytes_received += bytes_received;
+		}
+	}
+
+	// Set values to host order for endianness
+	header->action = ntohl(header->action);
+	header->subject = ntohl(header->subject);
+	header->parameter_count = ntohl(header->parameter_count); 
+	header->metadata_total_size = ntohl(header->metadata_total_size);
+	header->parameters_total_size = ntohl(header->parameters_total_size);
+	header->total_bytes = ntohl(header->total_bytes);
+
+	return true;
 }
 
 bool server_confirm_user_existence(char username[])
