@@ -10,6 +10,8 @@ enum ACTION { GET, SEND };
 enum SUBJECT { // Typical data objects
 	       CATEGORY, PROFILE, POST, NOTIFICATION, REPORT, DEVELOPER_TEST_MESSAGE,
 
+	       PAYLOAD_METADATA, PAYLOAD,
+
 	       ACKNOWLEDGEMENT
 	     };
 
@@ -73,7 +75,10 @@ bool send_request_header(int socket, struct request_header *header);
 bool receive_request_header(int socket, struct request_header *header);
 
 bool send_acknowledgement(int socket);
-bool receive_acknowledgement(int socket);
+bool receive_acknowledgement(int socket, struct request_header *header);
+
+bool send_payload_metadata(int socket, struct payload *outbound_payload);
+bool receive_payload_metadata(int socket, struct payload *inbound_payload);
 
 bool server_confirm_user_existence(char username[]);
 

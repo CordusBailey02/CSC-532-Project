@@ -150,9 +150,8 @@ bool send_acknowledgement(int socket)
 	return status;
 }
 
-bool receive_acknowledgement(int socket, struct request_header *header);
+bool receive_acknowledgement(int socket, struct request_header *header)
 {
-
 	if(header == NULL)
 	{
 		fprintf(stderr, "[receive_acknowledgement]: Cannot read to-be-received request header into a request header struct that points to NULL. Argument is bad.\n");
@@ -164,6 +163,59 @@ bool receive_acknowledgement(int socket, struct request_header *header);
 	status = receive_request_header(socket, header);
 	if(status == false)
 		fprintf(stderr, "[receive_acknowledgement]: Failed to receive acknowledgement. receive_request_header returned false.\n");
+
+	return status;
+}
+
+bool send_payload_metadata(int socket, struct payload *outbound_payload)
+{
+	if(outbound_payload == NULL)
+	{
+		fprintf(stderr, "[send_payload_metadata]: Cannot send the metadata of a payload struct that points to NULL. Bad argument.\n");
+		return false;
+	}
+
+	// (1) Create PAYLOAD METADATA request header
+	// (2) DO NOT convert to network byte order, because send_request_header 
+	//     function will do it.
+	struct request_header payload_metadata; 
+	payload_metadata.action = SEND;
+	payload_metadata.subject = PAYLOAD_METADATA;
+	payload_metadata.parameter_count = outbound_payload->member_count;
+	payload_metadata.metadata_total_size = 2 * sizeof(size_t);
+	payload_metadata.parameters_total_size = outbound_payload->member_count * outbound_payload->member_size;
+	payload_metadata.total_bytes = payload_metadata.parameters_total_size;
+
+	// Send the payload metadata 
+	bool status;
+	status = send_request_header(socket, &payload_metadata);
+	if(status == false)
+		fprintf(stderr, "[send_payload_metadata]: Could not send payload metadata. send_request_header() returned false.\n");
+
+	return status;
+}
+
+// receives a SEND PAYLOAD METADATA request header and uses that data to initialize a
+// payload (the inbound_payload parameter)
+bool receive_payload_metadata(int socket, struct payload *inbound_payload)
+{
+	if(inbound_payload == NULL)
+	{
+		fprintf(stderr, "[receive_payload_metadata]: Cannot read to-be-received payload into a payload struct that points to NULL. Argument is bad.\n");
+		return false;
+	}
+
+	// receive payload metadata 
+	struct request_header header;
+	bool status;
+	status = receive_request_header(socket, &header);
+	if(status == false)
+		fprintf(stderr, "[receive_payload_metadata]: Failed to receive payload metadata request header. receive_request_header returned false.\n");
+
+	// Set the inbound payload with the data of the request header
+	// NOTE: data is already in host format, as per the receive_request_header function.
+	inbound_payload->member_size = header.parameters_total_size / header.parameter_count;
+	inbound_payload->member_count = header.parameter_count;
 
 	return status;
 }
