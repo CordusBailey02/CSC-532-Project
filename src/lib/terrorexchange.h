@@ -5,6 +5,7 @@
 #define TERROREXCHANGE_H
 #define byte unsigned char
 #define COEFFICIENT 31
+#define CHUNK_SIZE 16384
 
 enum ACTION { GET, SEND }; 
 enum SUBJECT { // Typical data objects
@@ -79,6 +80,8 @@ bool receive_acknowledgement(int socket, struct request_header *header);
 
 bool send_payload_metadata(int socket, struct payload *outbound_payload);
 bool receive_payload_metadata(int socket, struct payload *inbound_payload);
+
+bool send_payload(int socket, struct payload *outbound_payload);
 
 bool server_confirm_user_existence(char username[]);
 

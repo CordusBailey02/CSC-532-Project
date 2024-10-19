@@ -150,6 +150,9 @@ bool send_acknowledgement(int socket)
 	return status;
 }
 
+// This is not guaranteed to receive an OK acknowledgement. 
+// You should check if the subject is ACKNOWLEDGEMENT afterwards; it might be NOT_FOUND
+// instead.
 bool receive_acknowledgement(int socket, struct request_header *header)
 {
 	if(header == NULL)
@@ -218,6 +221,101 @@ bool receive_payload_metadata(int socket, struct payload *inbound_payload)
 	inbound_payload->member_count = header.parameter_count;
 
 	return status;
+}
+
+bool send_payload(int socket, struct payload *outbound_payload)
+{
+	if(outbound_payload == NULL)
+	{
+		fprintf(stderr, "[send_payload]: Cannot send a payload struct that points to NULL. Bad argument provided.\n");
+		return false;
+	}
+
+	void *payload_data = outbound_payload->data;
+	ssize_t bytes_sent = 0;
+	size_t total_bytes_sent = 0;
+	size_t total_bytes_to_send = outbound_payload->member_size * outbound_payload->member_count;
+	// try to send data all at once - payload is smaller than one chunk
+	if(total_bytes_to_send <= CHUNK_SIZE)
+	{
+		bytes_sent = send(socket, payload_data, total_bytes_to_send, 0);
+
+		if(bytes_sent == total_bytes_to_send)
+			return true;
+
+		if(bytes_sent < 0)
+		{
+			fprintf(stderr, "[send_payload]: Failed to send payload with %zu bytes - send() returned -1.\n", total_bytes_to_send);
+			return false;
+		}
+
+		// Continue sending the rest of the bytes
+		total_bytes_sent = bytes_sent;
+		while(total_bytes_sent < total_bytes_to_send)
+		{
+			bytes_sent = send(socket, payload_data + total_bytes_sent, total_bytes_to_send - total_bytes_sent, 0);
+			if(bytes_sent < 0)
+			{
+				fprintf(stderr, "[send_payload]: Failed to send remaining %zu bytes of payload. Send() returned -1.\n", total_bytes_to_send - total_bytes_to_send);
+				return false;
+			}
+
+			total_bytes_sent += bytes_sent;
+		}
+		return true; // all bytes sent
+	}
+
+	// Send the data in chunks.
+	char chunk_buffer[CHUNK_SIZE];
+	size_t chunk_buffer_used = 0;
+	size_t bytes_remaining = total_bytes_to_send;
+	size_t total_chunk_bytes_sent;
+	bytes_sent = 0;
+	total_bytes_sent = 0;
+	while(bytes_remaining > 0)
+	{
+		// set chunk
+		if(bytes_remaining > CHUNK_SIZE)
+		{
+			memcpy(chunk_buffer, payload_data + total_bytes_sent, CHUNK_SIZE);
+			chunk_buffer_used = CHUNK_SIZE;
+		}
+		else
+		{
+			memcpy(chunk_buffer, payload_data + total_bytes_sent, bytes_remaining);
+			chunk_buffer_used = bytes_remaining;
+		}
+	
+		// send the chunk
+		bytes_sent = send(socket, chunk_buffer, chunk_buffer_used, 0);
+		if(bytes_sent < 0)
+		{
+			fprintf(stderr, "[payload_send]: Failed to send chunk of size %zu to recipient. %zu bytes of %zu bytes were sent in all (across all chunks). Send() function returned -1.\n", chunk_buffer_used, total_bytes_sent, total_bytes_to_send);
+			return false;
+		}
+
+		// keep sending the rest of the bytes in the chunk
+		// if not all were sent
+		total_chunk_bytes_sent = bytes_sent;
+		while(total_chunk_bytes_sent < chunk_buffer_used)
+		{
+			bytes_sent = send(socket, chunk_buffer + total_chunk_bytes_sent, chunk_buffer_used - total_chunk_bytes_sent, 0);
+			if(bytes_sent < 0)
+			{
+				fprintf(stderr, "[send_payload]: Failed to send %zu bytes of chunk buffer to recipient. %zu bytes of %zu were sent in total across all chunks. %zu bytes of the current chunk were sent. Send() function returned -1.\n", chunk_buffer_used - total_chunk_bytes_sent, total_bytes_sent, total_bytes_to_send, bytes_sent);
+				return false;
+			}
+
+			total_chunk_bytes_sent += bytes_sent;
+		}
+
+		// update remaining bytes to be sent across chunks
+		// and total bytes sent (offset for payload_data when 
+		// using memcpy to set chunks).
+		total_bytes_sent += total_chunk_bytes_sent;
+		bytes_remaining -= total_chunk_bytes_sent;
+	}
+	return true;
 }
 
 bool server_confirm_user_existence(char username[])
