@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #define SERVER_ADDR "142.93.199.100"
 #include "../lib/terrorexchange.h"
+#include "../lib/secure_connection.h"
 
 int main(int argc, char **argv)
 {
@@ -31,6 +32,7 @@ int main(int argc, char **argv)
 
 	printf("Server connection established.\n\n");
 
+<<<<<<< HEAD
 	// For getting user input
 	char *input_buffer = malloc(4096);
 	if(input_buffer == NULL)
@@ -145,6 +147,24 @@ int main(int argc, char **argv)
 			input_buffer_length++;
 		}
 	}
+=======
+	// Perform handshake with the server
+	uint32_t shared_secret;
+    if (client_handshake(tcp_socket, &shared_secret) < 0) {
+        fprintf(stderr, "Client handshake failed.\n");
+        close(tcp_socket);
+        exit(EXIT_FAILURE);
+    }
+
+	char message[] = "Hello, secure world! This works...";
+    ssize_t bytes_sent = secure_send(tcp_socket, message, strlen(message), 0, shared_secret);
+    if (bytes_sent < 0) {
+        perror("send");
+    }
+
+    printf("Sent encrypted message and signature.\n");
+
+>>>>>>> d62fcb76f2e6664762e90db84916487e114b5a10
 	close(tcp_socket);
 	return 0;
 }

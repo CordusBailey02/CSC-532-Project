@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include  "../lib/terrorexchange.h"
+#include  "../lib/secure_connection.h"
 
 bool set_buffer_with_response_header(void *buffer, size_t *buffer_bytes_used, size_t *buffer_capacity, struct server_response_header *header)
 {
@@ -433,6 +434,24 @@ int main(int argc, char **argv)
 	}
 	printf("Client connection accepted.\n");
 
+	// Perform handshake with the client
+	uint32_t shared_secret;
+    if (server_handshake(client_socket, &shared_secret) < 0) {
+        fprintf(stderr, "Server handshake failed.\n");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
+
+
+	char buffer[1024];
+    ssize_t bytes_received = secure_recv(client_socket, buffer, sizeof(buffer), 0, shared_secret);
+    
+	if (bytes_received < 0) {
+        perror("Receive failed");
+        exit(EXIT_FAILURE);
+    }
+    //buffer[bytes_received] = '\0'; // Null-terminate the string
+    printf("Received: %s\n", buffer);
 
 	// Cleanup
 	close(client_socket);
