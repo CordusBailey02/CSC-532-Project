@@ -10,7 +10,7 @@ Lucas Feazel <br>
 <ul>
 	<li><a href="categories-and-professions/index.html">Categories and Professions Documentation</a></li>
 	<li><a href="client-server-communication/index.html">Client and Server Communication Documentation</a></li>
-	<li><a href="">Security</a></li>
-	<li><a href="">Infrastructure</a></li>
+	<li><a href="secure-connection/index.html">Secure Connectivity</a></li>
+	<li><a href="cloud-infrastructure/index.html">Cloud Infrastructure</a></li>
 	<li><a href="">Database Documentation</a></li>
 </ul>
