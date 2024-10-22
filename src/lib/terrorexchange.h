@@ -7,7 +7,7 @@
 #define COEFFICIENT 31
 #define CHUNK_SIZE 16384
 
-enum ACTION { GET, SEND, ERROR};	// ERROR is for functions that return an ACTION
+enum ACTION { GET, SEND, ACTION_ERROR};	// ERROR is for functions that return an ACTION
 					// enum. If they run into an error, then ERROR
 					// is returned.
 enum SUBJECT { // Typical data objects
@@ -15,7 +15,9 @@ enum SUBJECT { // Typical data objects
 
 	       PAYLOAD_METADATA, PAYLOAD,
 
-	       ACKNOWLEDGEMENT
+	       ACKNOWLEDGEMENT, 
+
+	       SUBJECT_ERROR
 	     };
 
 enum ACKNOWLEDGEMENT {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED, FAILED};
