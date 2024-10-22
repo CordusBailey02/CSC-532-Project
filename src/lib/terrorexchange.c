@@ -318,6 +318,100 @@ bool send_payload(int socket, struct payload *outbound_payload)
 	return true;
 }
 
+bool receive_payload(int socket, struct payload *inbound_payload)
+{
+	if(inbound_payload == NULL) {
+		fprintf(stderr, "[receive_payload]: Cannot load incoming payload data into a payload struct that points to NULL.\n");
+		return false;
+	}
+	if(inbound_payload->data == NULL){
+		fprintf(stderr, "[receive_payload]: Cannot load incoming payload data into a payload struct with a data buffer that points to NULL.\n");
+		return false;
+	}
+	
+	size_t total_bytes_to_receive = inbound_payload->member_size * inbound_payload->member_count;
+	if(total_bytes_to_receive == 0)
+	{
+		fprintf(stderr, "[receive_payload]: Total bytes to receive was calculated as 0 bytes. The inbound payload struct may have incorrect metadata information. This could have happened if the metadata was not received or loaded into the payload struct correctly with previous calls to receive_payload_metadata().\n");
+		return false;
+	}
+	size_t total_bytes_received = 0;
+	ssize_t bytes_received = 0;
+
+	// Try to send all the data at once if chunking is not required.
+	if(total_bytes_to_receive <= CHUNK_SIZE)
+	{
+		// First try
+		bytes_received = recv(socket, inbound_payload->data, total_bytes_to_receive, 0);
+		if(bytes_received == total_bytes_to_receive)
+			return true;
+		if(bytes_received < 0)
+		{
+			fprintf(stderr, "[receive_payload]: Failed to receive payload with %zu bytes. Recv() returned -1.\n", total_bytes_to_receive);
+			return false;
+		}
+
+		// Continue sending the data that remains.
+		total_bytes_received = bytes_received;
+		while(total_bytes_received < total_bytes_to_receive)
+		{
+			bytes_received = recv(socket, inbound_payload->data + total_bytes_received, total_bytes_to_receive - total_bytes_received, 0);
+			if(bytes_received < 0)
+			{
+				fprintf(stderr, "[receive_payload]: Failed to receive remaining %zu bytes of payload. %zu bytes were received in total up until this failure. Send() returned -1.\n", total_bytes_to_receive - total_bytes_received, total_bytes_received);
+				return false;
+			}
+			total_bytes_received += bytes_received;
+		}
+		return true; // all bytes received in one chunk
+	}
+
+	// Send the data in chunks if size is greater than single chunk size.
+	char chunk_buffer[CHUNK_SIZE];
+	ssize_t chunk_buffer_amt_to_use = 0;
+	size_t bytes_remaining = total_bytes_to_receive;
+	size_t total_chunk_bytes_received = 0;
+	bytes_received = 0;
+	total_bytes_received = 0;
+	while(bytes_remaining > 0)
+	{
+		// Set anticipated amount of buffer
+		if(bytes_remaining > CHUNK_SIZE)
+			chunk_buffer_amt_to_use = CHUNK_SIZE;
+		else
+			chunk_buffer_amt_to_use = bytes_remaining;
+
+		// Receive data into the chunk buffer
+		bytes_received = recv(socket, chunk_buffer, chunk_buffer_amt_to_use, 0);
+		if(bytes_received < 0)
+		{
+			fprintf(stderr, "[receive_payload]: Failed to receive chunk of size %zu from sender. %zu bytes of %zu bytes were received in all (across all chunks). Recv() function returned -1.\n", chunk_buffer_amt_to_use, total_bytes_received, total_bytes_to_receive);
+			return false;
+		}
+
+		// keep receiving the rest of the bytes in the inbound chunk
+		total_chunk_bytes_received = bytes_received;
+		while(total_chunk_bytes_received < chunk_buffer_amt_to_use)
+		{
+			bytes_received = recv(socket, chunk_buffer + total_chunk_bytes_received, chunk_buffer_amt_to_use - total_chunk_bytes_received, 0);
+			if(bytes_received < 0)
+			{
+				fprintf(stderr, "[receive_payload]: Failed to receive %zu bytes of chunk buffer. %zu bytes of %zu were received in total across all bytes. %zu bytes of the current chunk were received. Recv() function returned -1.\n", chunk_buffer_amt_to_use - total_chunk_bytes_received, total_bytes_received, total_bytes_to_receive, total_chunk_bytes_received);
+				return false;
+			}
+			total_chunk_bytes_received += bytes_received;
+		}
+		// Set the inbound payload's data buffer with the memory of the chunk.
+		memcpy(inbound_payload->data + total_bytes_received, chunk_buffer, chunk_buffer_amt_to_use);
+
+		// update remaining bytes to be sent across chunks
+		// and total bytes sent (offset for payload_data when using memcpy)
+		total_bytes_received += total_chunk_bytes_received;
+		bytes_remaining -= total_chunk_bytes_received;
+	}
+	return true;
+}
+
 bool server_confirm_user_existence(char username[])
 {
 	// in the meantime, until DB is setup
