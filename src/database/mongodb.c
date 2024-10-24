@@ -166,14 +166,17 @@ int write_to_mongo(char *username, char *question)
 
 
 
-int _TEST_mongodb_write(char *question)
+int query_mongo(char *page_id)
 {
     bson_error_t error;
     bson_t *query;
     char *str;
     mongoc_cursor_t *cursor;
     mongoc_collection_t *collection;
-
+    bson_t *opts;
+    const bson_t *doc;
+    mongoc_read_prefs_t *read_prefs;
+    
     int fail = EXIT_FAILURE;
     int time_out = 10;
     struct timespec ts;
@@ -204,16 +207,15 @@ int _TEST_mongodb_write(char *question)
     printf("\nCollection Success...\n");
 
     query = bson_new();
-    // BSON_APPEND_UTF8(query, "question", question);
+    BSON_APPEND_UTF8(query, "_id", page_id);
+
     cursor = mongoc_collection_find_with_opts(collection, query, NULL, NULL);
 
     printf("\nQuery and Cursor Successfully created...\n");
 
-    const bson_t *doc = query;
-
     while (mongoc_cursor_next(cursor, &doc)) 
     {
-        str = bson_as_canonical_extended_json(query, NULL);
+        str = bson_as_canonical_extended_json(doc, NULL);
         printf("\n%s\n", str);
         bson_free(str);
     }
@@ -221,6 +223,7 @@ int _TEST_mongodb_write(char *question)
     printf("\nEnd query result...\n");
 
     bson_destroy(query);
+    mongoc_cursor_destroy(cursor);
     mongoc_collection_destroy(collection);
     cleanup_mongo();
 
@@ -247,17 +250,17 @@ int main(int argc, char const *argv[])
     // }
     
 
-    fail = _TEST_mongodb_write("What is water?");
+    // fail = query_mongo("What is water?");
 
-    if(fail)
-    {
-        printf("check_write_to_mongo FAILURE...\n");
-        return EXIT_FAILURE;
-    }
-    else
-    {
-        printf("check_write_to_mongo SUCCESS...\n");
-    }
+    // if(fail)
+    // {
+    //     printf("check_write_to_mongo FAILURE...\n");
+    //     return EXIT_FAILURE;
+    // }
+    // else
+    // {
+    //     printf("check_write_to_mongo SUCCESS...\n");
+    // }
     
     return EXIT_SUCCESS;
 }
