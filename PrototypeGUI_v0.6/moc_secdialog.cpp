@@ -38,15 +38,15 @@ namespace {
 struct qt_meta_stringdata_CLASSSecDialogENDCLASS_t {};
 constexpr auto qt_meta_stringdata_CLASSSecDialogENDCLASS = QtMocHelpers::stringData(
     "SecDialog",
-    "on_pushButton_2_clicked",
+    "on_pushButton_profileButton_clicked",
     "",
-    "on_listWidget_itemDoubleClicked",
+    "on_listWidget_defaultList_itemDoubleClicked",
     "QListWidgetItem*",
     "item",
-    "on_listWidget_3_itemDoubleClicked",
-    "on_pushButton_clicked",
-    "on_listWidget_2_itemDoubleClicked",
-    "on_pushButton_3_clicked"
+    "on_listWidget_favoriteList_itemDoubleClicked",
+    "on_pushButton_askAQuestion_clicked",
+    "on_listWidget_communitiesList_itemDoubleClicked",
+    "on_pushButton_searchButton_clicked"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -94,20 +94,20 @@ Q_CONSTINIT const QMetaObject SecDialog::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSSecDialogENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<SecDialog, std::true_type>,
-        // method 'on_pushButton_2_clicked'
+        // method 'on_pushButton_profileButton_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_listWidget_itemDoubleClicked'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<QListWidgetItem *, std::false_type>,
-        // method 'on_listWidget_3_itemDoubleClicked'
+        // method 'on_listWidget_defaultList_itemDoubleClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QListWidgetItem *, std::false_type>,
-        // method 'on_pushButton_clicked'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_listWidget_2_itemDoubleClicked'
+        // method 'on_listWidget_favoriteList_itemDoubleClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QListWidgetItem *, std::false_type>,
-        // method 'on_pushButton_3_clicked'
+        // method 'on_pushButton_askAQuestion_clicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'on_listWidget_communitiesList_itemDoubleClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<QListWidgetItem *, std::false_type>,
+        // method 'on_pushButton_searchButton_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
@@ -119,12 +119,12 @@ void SecDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         auto *_t = static_cast<SecDialog *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->on_pushButton_2_clicked(); break;
-        case 1: _t->on_listWidget_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
-        case 2: _t->on_listWidget_3_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
-        case 3: _t->on_pushButton_clicked(); break;
-        case 4: _t->on_listWidget_2_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
-        case 5: _t->on_pushButton_3_clicked(); break;
+        case 0: _t->on_pushButton_profileButton_clicked(); break;
+        case 1: _t->on_listWidget_defaultList_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
+        case 2: _t->on_listWidget_favoriteList_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
+        case 3: _t->on_pushButton_askAQuestion_clicked(); break;
+        case 4: _t->on_listWidget_communitiesList_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
+        case 5: _t->on_pushButton_searchButton_clicked(); break;
         default: ;
         }
     }

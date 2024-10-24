@@ -7,6 +7,7 @@ release/forgotpassword.o
 release/main.o
 release/mainwindow.o
 release/makecommentorpost.o
+release/makequestion.o
 release/post_1.o
 release/profile.o
 release/searchresults.o
@@ -19,6 +20,7 @@ release/moc_createaccount.o
 release/moc_forgotpassword.o
 release/moc_mainwindow.o
 release/moc_makecommentorpost.o
+release/moc_makequestion.o
 release/moc_post_1.o
 release/moc_profile.o
 release/moc_searchresults.o
