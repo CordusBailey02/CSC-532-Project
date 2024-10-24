@@ -5,6 +5,35 @@
 #define TERROREXCHANGE_H
 #define byte unsigned char
 #define COEFFICIENT 31
+#define CHUNK_SIZE 16384
+
+enum ACTION { GET, SEND }; 
+enum SUBJECT { // Typical data objects
+	       CATEGORY, PROFILE, POST, NOTIFICATION, REPORT, DEVELOPER_TEST_MESSAGE,
+
+	       PAYLOAD_METADATA, PAYLOAD,
+
+	       ACKNOWLEDGEMENT
+	     };
+
+enum ACKNOWLEDGEMENT {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED, FAILED};
+
+struct request_header
+{
+	enum ACTION action;
+	enum SUBJECT subject;
+	size_t parameter_count;
+	size_t metadata_total_size;
+	size_t parameters_total_size;
+	size_t total_bytes;
+};
+
+struct payload
+{
+	size_t member_size;
+	size_t member_count;
+	void *data;
+};
 
 struct category
 {
@@ -40,6 +69,19 @@ struct post
 	bool question;
 	size_t qid; // question id (foreign key to other posts)	
 };
+
+struct payload* payload_create(size_t member_size, size_t member_count);
+
+bool send_request_header(int socket, struct request_header *header);
+bool receive_request_header(int socket, struct request_header *header);
+
+bool send_acknowledgement(int socket);
+bool receive_acknowledgement(int socket, struct request_header *header);
+
+bool send_payload_metadata(int socket, struct payload *outbound_payload);
+bool receive_payload_metadata(int socket, struct payload *inbound_payload);
+
+bool send_payload(int socket, struct payload *outbound_payload);
 
 bool server_confirm_user_existence(char username[]);
 
