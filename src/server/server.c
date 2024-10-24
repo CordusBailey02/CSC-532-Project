@@ -37,6 +37,12 @@ void* handle_client(void *arg)
 	}
 	bool send_status;
 
+	struct payload **inbound_payloads = malloc(sizeof(struct payload*) * 5);
+	size_t inbound_payloads_length = 0;
+	size_t inbound_payloads_capacity = 5;
+	size_t payloads_expected = 0;
+	size_t payloads_received = 0;
+
 	// Maintain connection with client via loop
 	// The entire process of 1st receiving the request type and the number of
 	// parameters to be received, 2nd receiving the first parameter, ... finally 
@@ -51,6 +57,56 @@ void* handle_client(void *arg)
 		memset(outbound_buffer, 0, outbound_buffer_capacity);
 
 		// Receive the request header
+		receive_status = receive_request_header(client_socket, &inbound_request_header);
+		if(receive_status == false)
+		{
+			fprintf(stderr, "[handle_client] Unable to receive request header from client. Call to receive_request_header returned false.\n");
+			continue;
+		}
+
+		// Acknowledge that you received it
+		send_status = send_acknowledgement(client_socket);
+		if(send_status == false)
+		{
+			fprintf(stderr, "[handle_client] Unable to send acknowledgement to client.\n");
+			continue;
+		}
+		
+		// Setup inbound payloads buffer
+		payloads_expected = inbound_request_header.parameter_count;
+		payloads_received = 0;
+		if(inbound_payloads_capacity < payloads_expected)
+		{
+			inbound_payloads_capacity = payloads_expected + 5;
+			inbound_payloads = realloc(inbound_payloads, sizeof(struct payload*) * inbound_payloads_capacity);
+			if(inbound_payloads == NULL)
+			{
+				fprintf(stderr, "[handle_client] Failed to realloc more memory so that the inbound payloads buffer could store %zu payload pointers.\n", inbound_payloads_capacity);
+				// PUT CLEAN UP ROUTINE HERE LATER.
+				break; 
+			}
+		}
+
+		// Receive payloads
+		struct payload *current_inbound_payload;
+		
+		while(payloads_received < payloads_expected)
+		{
+			current_inbound_payload = inbound_payloads[payloads_received];
+			
+			receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
+
+			send_status = send_acknowledgement(client_socket);
+
+			// Ensure current inbound payload can actually store the data
+			current_inbound_payload->data = malloc(current_inbound_payload->parameters_total_size);
+			if(current_inbound_payload->data == NULL)
+			{
+				fprintf(stderr, "[handle_client] Failed to allocate %zu bytes for the data buffer of the current inbound payload (payload %zu)\n", current_inbound_payload.parameters_total_size, payloads_received);
+				break;
+			}
+			receive_status = receive_payload(client_socket, current_inbound_payload);
+		}
 	}
 
 	close(client_socket);
