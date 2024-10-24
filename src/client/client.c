@@ -33,9 +33,12 @@ enum SUBJECT string_to_request_header_subject(char *str, size_t str_length)
 	else if(strcmp(str, "PROFILE") == 0) return PROFILE;
 	else if(strcmp(str, "POST") == 0) return POST;
 	else if(strcmp(str, "NOTIFICATION") == 0) return NOTIFICATION;
-	else if(strcmp(str, "PROFILE") == 0) return PROFILE;
-	else if(strcmp(str, "PROFILE") == 0) return PROFILE;
-	else if(strcmp(str, "PROFILE") == 0) return PROFILE;
+	else if(strcmp(str, "REPORT") == 0) return REPORT;
+	else if(strcmp(str, "DEVELOPER_TEST_MESSAGE") == 0) return DEVELOPER_TEST_MESSAGE;
+	else if(strcmp(str, "PAYLOAD_METADATA") == 0) return PAYLOAD_METADATA;	
+	else if(strcmp(str, "PAYLOAD") == 0) return PAYLOAD;
+	else if(strcmp(str, "ACKNOWLEDGEMENT") == 0) return ACKNOWLEDGEMENT;
+	else return SUBJECT_ERROR;
 }
 
 int main(int argc, char **argv)
@@ -68,11 +71,29 @@ int main(int argc, char **argv)
 	size_t input_buffer_capacity = 4096;
 	struct outbound_request_header; 
 	struct inbound_request_header;
+	char *action_type;
+	char *subject_type;
+	char *data;
 	while(true)
 	{
 		fgets(input_buffer, 4096, stdin);
-		input_buffer_length = strlen(input_buffer); 
-
+		input_buffer_length = strlen(input_buffer);
+		action_type = strtok(input_buffer, " ");
+		if(action_type == NULL)
+		{
+			fprintf(stderr, "Unable to parse input. Action type is incorrect.\n");
+			break;
+		}
+		subject_type = strtok(NULL, " ");
+		if(action_type == NULL)
+		{
+			fprintf(stderr, "Unable to parse input. Subject type is incorrect.\n");
+			break;
+		}
+		data = subject_type + strlen(subject_type) + 1; // pointer arithmetic.
+		printf("Got action as \"%s\".\n", action_type);
+		printf("Got subject as \"%s\".\n", subject_type);
+		printf("Got data as \"%s\".\n", data);
 	}
 
 	// Perform handshake with the server
