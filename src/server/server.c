@@ -9,6 +9,22 @@
 #include  "../lib/terrorexchange.h"
 #include  "../lib/secure_connection.h"
 
+void clean_payload_buffer(struct payload **payload_buffer, size_t *length)
+{
+	if(length == NULL)
+		return;
+
+	struct payload *current;
+	for(size_t i = 0; i < (*length); i++)
+	{
+		current = payload_buffer[i];
+		if(current->data != NULL)
+			free(current->data);
+		
+		free(current);
+	}
+}
+
 // arg parameter is the client's socket
 void* handle_client(void *arg)
 {
@@ -26,7 +42,8 @@ void* handle_client(void *arg)
 	}
 	size_t inbound_buffer_length = 0;
 	size_t inbound_buffer_capacity = 4096;
-	bool receive_status; 
+	bool receive_status;
+	int receive_attempts = 0;
 
 	void *outbound_buffer = malloc(4096);
 	if(outbound_buffer == NULL)
@@ -35,7 +52,10 @@ void* handle_client(void *arg)
 		free(inbound_buffer);
 		return;
 	}
+	size_t outbound_buffer_length = 0;
+	size_t outbound_buffer_capacity = 4096;
 	bool send_status;
+	int send_attempts = 0;
 
 	struct payload **inbound_payloads = malloc(sizeof(struct payload*) * 5);
 	size_t inbound_payloads_length = 0;
@@ -56,23 +76,38 @@ void* handle_client(void *arg)
 		memset(inbound_buffer, 0, inbound_buffer_capacity);
 		memset(outbound_buffer, 0, outbound_buffer_capacity);
 
+		receive_attempts = 0;
+		send_attempts = 0;
+
 		// Receive the request header
 		receive_status = receive_request_header(client_socket, &inbound_request_header);
-		if(receive_status == false)
+		while(receive_status == false && receive_attempts < 10)
+		{
+			receive_status = receive_request_header(client_socket, &inbound_request_header);
+			receive_attempts++;
+		}
+		if(receive_attempts >= 10)
 		{
 			fprintf(stderr, "[handle_client] Unable to receive request header from client. Call to receive_request_header returned false.\n");
 			continue;
 		}
+		receive_attempts = 0;
 
 		// Acknowledge that you received it
-		send_status = send_acknowledgement(client_socket);
-		if(send_status == false)
+		send_status = send_acknowledgement(client_socket, OK);
+		while(send_status == false && send_attempts < 10)
 		{
-			fprintf(stderr, "[handle_client] Unable to send acknowledgement to client.\n");
+			send_status = send_acknowledgement(client_scoket, OK);
+			send_attempts++;
+		}
+		if(send_attempts >= 10)
+		{
+			fprintf(stderr, "[handle_client] Unable to send acknowledgement to client. Send attempts reached or exceeded 10 (send_acknowledgement returned false)\n");
 			continue;
 		}
+		send_attempts = 0;
 		
-		// Setup inbound payloads buffer
+		// Setup inbound payloads buffer (to store all payloads) 
 		payloads_expected = inbound_request_header.parameter_count;
 		payloads_received = 0;
 		if(inbound_payloads_capacity < payloads_expected)
@@ -87,14 +122,25 @@ void* handle_client(void *arg)
 			}
 		}
 
-		// Receive payloads
-		struct payload *current_inbound_payload;
-		
+		// Receive payloads (metadata, then payload itself)
+		struct payload *current_inbound_payload;	
 		while(payloads_received < payloads_expected)
 		{
 			current_inbound_payload = inbound_payloads[payloads_received];
 			
+			// Receive payload metadata so you can prepare to actually receive the payload itself
 			receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
+			while(receive_status == false && receive_attempts < 10)
+			{
+				receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
+				receive_attempts++;
+			}
+			if(receive_attempts >= 10)
+			{
+				fprintf(stderr, "[handle_client] Failed to receive payload metadata from the client. 10 or more attempts were reached. receive_payload_metadata() returned false.\n");
+
+				continue;
+			}
 
 			send_status = send_acknowledgement(client_socket);
 
@@ -103,9 +149,26 @@ void* handle_client(void *arg)
 			if(current_inbound_payload->data == NULL)
 			{
 				fprintf(stderr, "[handle_client] Failed to allocate %zu bytes for the data buffer of the current inbound payload (payload %zu)\n", current_inbound_payload.parameters_total_size, payloads_received);
+				send_status = send_acknowledgement(client_socket, INSUFFICIENT_MEMORY);
 				break;
 			}
+
+			// Actually receive the payload
 			receive_status = receive_payload(client_socket, current_inbound_payload);
+			if(receive_status == false)
+			{
+				fprintf(stderr, "[handle client] Failed to receive payload from client. Received %zu payloads in total. Expected to receive %zu overall.\n", payloads_received, payloads_expected);
+				send_status = send_acknowledgement(client_socket, FAILED);
+				clean_payload_buffer(inbound_payloads, inbound_payloads_length);
+				break;
+			}
+			inbound_payloads_length++;
+
+			// Acknowledge that you received it 
+			send_status = send_acknowledgement(client_socket, OK);
+			if(send_status == false)
+			{
+			}
 		}
 	}
 

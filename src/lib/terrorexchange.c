@@ -128,7 +128,7 @@ bool receive_request_header(int socket, struct request_header *header)
 	return true;
 }
 
-bool send_acknowledgement(int socket)
+bool send_acknowledgement(int socket, enum ACKNOWLEDGMENT_TYPE type)
 {
 	// (1) Create acknowledgement request header
 	// (2) DO NOT convert to network byte order, because send_request_header 
@@ -136,7 +136,7 @@ bool send_acknowledgement(int socket)
 	struct request_header acknowledgement; 
 	acknowledgement.action = SEND;
 	acknowledgement.subject = ACKNOWLEDGEMENT;
-	acknowledgement.parameter_count = 0;
+	acknowledgement.parameter_count = type;
 	acknowledgement.metadata_total_size = 0;
 	acknowledgement.parameters_total_size = 0;
 	acknowledgement.total_bytes = 0;
@@ -318,6 +318,8 @@ bool send_payload(int socket, struct payload *outbound_payload)
 	return true;
 }
 
+// DATA BUFFER IN INBOUND_PAYLOAD->DATA SHOULD ALREADY BE ALLOCATED FROM THE INFORMATION
+// RECEIVED BY CALLING RECEIVE_PAYLOAD_METADATA
 bool receive_payload(int socket, struct payload *inbound_payload)
 {
 	if(inbound_payload == NULL) {
@@ -338,7 +340,7 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 	size_t total_bytes_received = 0;
 	ssize_t bytes_received = 0;
 
-	// Try to send all the data at once if chunking is not required.
+	// Try to receive all the data at once if chunking is not required.
 	if(total_bytes_to_receive <= CHUNK_SIZE)
 	{
 		// First try
@@ -351,7 +353,7 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 			return false;
 		}
 
-		// Continue sending the data that remains.
+		// Continue receiving the data that remains.
 		total_bytes_received = bytes_received;
 		while(total_bytes_received < total_bytes_to_receive)
 		{
