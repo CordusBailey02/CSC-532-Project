@@ -28,12 +28,6 @@ void clean_payload_buffer(struct payload **payload_buffer, size_t *length)
 
 bool check_valid_request_header(struct request_header *header)
 {
-	if(header->action == NULL)
-		return false;
-	
-	if(header->subject == NULL)
-		return false;
-
 	if(header->action != GET && header->action != SEND)
 		return false;
 
@@ -62,9 +56,9 @@ bool check_valid_request_header(struct request_header *header)
 			break;
 	}
 
-	if(header->metadata_total_size > total_bytes) return false;
-	if(header->parameters_total_size > total_bytes) return false;
-	if(metadata_total_size + parameters_total_size > total_bytes) return false;
+	if(header->metadata_total_size > header->total_bytes) return false;
+	if(header->parameters_total_size > header->total_bytes) return false;
+	if(header->metadata_total_size + header->parameters_total_size > header->total_bytes) return false;
 	
 	return true;
 }
@@ -82,7 +76,7 @@ void* handle_client(void *arg)
 	if(inbound_buffer == NULL)
 	{
 		fprintf(stderr, "[handle_client] Cannot allocate default 4096 bytes for the inbound buffer.\n");
-		return;
+		return NULL;
 	}
 	size_t inbound_buffer_length = 0;
 	size_t inbound_buffer_capacity = 4096;
@@ -94,7 +88,7 @@ void* handle_client(void *arg)
 	{
 		fprintf(stderr, "[handle_client] Cannot allocate default 4096 bytes for the outbound buffer.\n");
 		free(inbound_buffer);
-		return;
+		return NULL;
 	}
 	size_t outbound_buffer_length = 0;
 	size_t outbound_buffer_capacity = 4096;
@@ -160,7 +154,7 @@ void* handle_client(void *arg)
 		send_status = send_acknowledgement(client_socket, OK);
 		while(send_status == false && send_attempts < 10)
 		{
-			send_status = send_acknowledgement(client_scoket, OK);
+			send_status = send_acknowledgement(client_socket, OK);
 			send_attempts++;
 		}
 		if(send_attempts >= 10)
@@ -188,6 +182,7 @@ void* handle_client(void *arg)
 		struct payload *current_inbound_payload;	
 		inbound_payloads_length = 0;
 		payloads_received = 0;
+		clean_payload_buffer(inbound_payloads, &inbound_payloads_length); // no previous data
 		while(payloads_received < payloads_expected)
 		{
 			current_inbound_payload = inbound_payloads[payloads_received];
@@ -221,10 +216,10 @@ void* handle_client(void *arg)
 			send_attempts = 0;
 
 			// Ensure current inbound payload can actually store the data
-			current_inbound_payload->data = malloc(current_inbound_payload->parameters_total_size);
+			current_inbound_payload->data = malloc(current_inbound_payload->member_count * current_inbound_payload->member_size);
 			if(current_inbound_payload->data == NULL)
 			{
-				fprintf(stderr, "[handle_client] Failed to allocate %zu bytes for the data buffer of the current inbound payload (payload %zu)\n", current_inbound_payload.parameters_total_size, payloads_received);
+				fprintf(stderr, "[handle_client] Failed to allocate %zu bytes for the data buffer of the current inbound payload (payload %zu)\n", current_inbound_payload->member_size * current_inbound_payload->member_count, payloads_received);
 				send_status = send_acknowledgement(client_socket, INSUFFICIENT_MEMORY);
 				break;
 			}
@@ -239,7 +234,7 @@ void* handle_client(void *arg)
 			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
 			{
 				fprintf(stderr, "[handle client] Failed to receive payload from client. Received %zu payloads in total. Expected to receive %zu overall.\n", payloads_received, payloads_expected);
-				clean_payload_buffer(inbound_payloads, inbound_payloads_length);
+				clean_payload_buffer(inbound_payloads, &inbound_payloads_length);
 				break;
 			}
 			receive_attempts = 0;
@@ -255,7 +250,7 @@ void* handle_client(void *arg)
 			if(send_attempts >= MAX_SEND_ATTEMPTS)
 			{
 				fprintf(stderr, "[handle_client] Failed to send OK acknowledgement to client after receiving the data for payload #%zu of %zu.\n", payloads_received + 1, payloads_expected);
-				clean_payload_buffer(inbound_payloads, inbound_payloads_length);
+				clean_payload_buffer(inbound_payloads, &inbound_payloads_length);
 				break;
 			}
 			send_attempts = 0;
@@ -285,6 +280,13 @@ void* handle_client(void *arg)
 			switch(inbound_request_header.subject)
 			{
 				case DEVELOPER_TEST_MESSAGE:
+					send_status = send_developer_test_message(client_socket, &outbound_request_header, inbound_payloads[0]->data);
+					if(send_status == false)
+					{
+						fprintf(stderr, "[handle_client] Main logic: Failed to send developer test message to client. Something might be wrong with the connection.\n");
+						break;
+					}
+					printf("Successfully sent developer test message back to client.\n");	
 					break;
 				default:
 					break;
@@ -295,6 +297,7 @@ void* handle_client(void *arg)
 	}
 
 	close(client_socket);
+	return NULL;
 }
  
 int main(int argc, char **argv)
