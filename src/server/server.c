@@ -186,6 +186,15 @@ void* handle_client(void *arg)
 		while(payloads_received < payloads_expected)
 		{
 			current_inbound_payload = inbound_payloads[payloads_received];
+			if(current_inbound_payload == NULL)
+			{
+				current_inbound_payload = malloc(sizeof(struct payload));
+				if(current_inbound_payload == NULL)
+				{
+					fprintf(stderr, "[handle_client] Failed to allocate sufficient memory to hold inbound payload structs.\n");
+					break;
+				}
+			}
 			
 			// Receive payload metadata so you can prepare to actually receive the payload itself
 			receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
@@ -262,7 +271,10 @@ void* handle_client(void *arg)
 		// If all the payloads WERE NOT received, start back from
 		// beginning of routine 
 		if(payloads_received != payloads_expected)
+		{
+			fprintf(stderr, "[handle_client] Did not receive expected amount of payloads from the client. Expected %zu but only received %zu.\n", payloads_expected, payloads_received);
 			continue;
+		}
 		
 		// If all payloads WERE received, then respond to the client accordingly
 		if(inbound_request_header.action == GET)
