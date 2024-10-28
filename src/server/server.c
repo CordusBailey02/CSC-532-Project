@@ -63,6 +63,31 @@ bool check_valid_request_header(struct request_header *header)
 	return true;
 }
 
+// Generates a 4 digit code for the email verification
+int generate_code()
+{
+    int num = rand() % 9000 + 1000;
+    return num;
+}
+
+// Sends an email to the provided email
+// Generates code in function and sends it in the email
+void send_email(const char* name, const char* email)
+{
+    // Generate the 4 digit number
+    int generated_code = generate_code();
+
+    printf("Generated numbers: %d\n", generated_code);
+
+    // Call the Python script
+    char command[256];
+    // Paramaters to send: Name, email, generated_code
+    snprintf(command, sizeof(command), "python3 send_email.py %s %s %d", name, email, generated_code);
+    system(command);
+
+	// STORE THE CODE TO COMPARE WHAT THE CLIENT INPUTS
+}
+
 // arg parameter is the client's socket
 void* handle_client(void *arg)
 {
