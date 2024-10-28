@@ -86,6 +86,10 @@ int main(int argc, char **argv)
 	char input_buffer[4096]; 
 	size_t input_buffer_length = 0;
 	size_t input_buffer_capacity = 4096;
+
+	char outbound_buffer[4096];
+	size_t outbound_data_buffer_length = 0;
+	size_t outbound_data_buffer_capacity = 4096;
 	
 	struct request_header outbound_request_header; 
 	struct request_header inbound_request_header;
@@ -137,7 +141,7 @@ int main(int argc, char **argv)
 		printf("Got action as \"%s\" (code %d).\n", action_type, outbound_request_header.action);
 		printf("Got subject as \"%s\" (code %d).\n", subject_type, outbound_request_header.subject);
 		printf("Got data as \"%s\" (length %zu).\n", data, strlen(data));
-
+		memcpy(outbound_buffer, data, strlen(data) + 1);
 
 		if(outbound_request_header.action == GET)
 		{
@@ -208,18 +212,19 @@ int main(int argc, char **argv)
 		payloads_received = 0;
 		payloads_expected = inbound_request_header.parameter_count;
 
-		if(inbound_payloads[0] == NULL) 
-		{
-			inbound_payloads[0] = malloc(sizeof(struct payload));
-			if(inbound_payloads[0] == NULL)
-			{
-				fprintf(stderr, "Failed to allocate memory to hold first payload in payload buffer.\n");
-				continue;
-			}
-		}
-		current_inbound_payload = inbound_payloads[0];	
 		while(payloads_received < payloads_expected)
 		{
+			if(inbound_payloads[inbound_payloads_length] == NULL)
+			{
+				inbound_payloads[inbound_payloads_length] = malloc(sizeof(struct payload));
+				if(inbound_payloads[inbound_payloads_length] == NULL)
+				{
+					fprintf(stderr, "Failed to allocate memory to hold first payload in payload buffer.\n");
+					break;
+				}
+			}
+			current_inbound_payload = inbound_payloads[inbound_payloads_length];
+
 			// Receive payload metadata
 			receive_status = receive_payload_metadata(tcp_socket, current_inbound_payload);
 			receive_attempts = 1;
