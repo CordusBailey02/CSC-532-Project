@@ -145,14 +145,14 @@ void* handle_client(void *arg)
 		// Receive the request header
 		printf("Waiting to receive request header for client socket %d...\n", client_socket);
 		receive_status = receive_request_header(client_socket, &inbound_request_header);
-		while(receive_status == false && receive_attempts < 10)
+		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
 			receive_status = receive_request_header(client_socket, &inbound_request_header);
 			receive_attempts++;
 		}
-		if(receive_attempts >= 10)
+		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
 		{
-			fprintf(stderr, "[handle_client] Unable to receive request header from client. Call to receive_request_header returned false.\n");
+			fprintf(stderr, "[handle_client] Unable to receive request header from client. Receive attempts reached/exceeded MAX_RECEIVE_ATTEMPTS. Call to receive_request_header returned false. There might be something wrong with the connection.\n");
 			continue;
 		}
 		receive_attempts = 0;	
@@ -180,14 +180,14 @@ void* handle_client(void *arg)
 		// Acknowledge that you received it (AND IT WAS A GOOD HEADER)	
 		printf("Sending OK acknowledgement to client with client socket %d...\n", client_socket);
 		send_status = send_acknowledgement(client_socket, OK);
-		while(send_status == false && send_attempts < 10)
+		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 		{
 			send_status = send_acknowledgement(client_socket, OK);
 			send_attempts++;
 		}
-		if(send_attempts >= 10)
+		if(send_attempts >= MAX_SEND_ATTEMPTS)
 		{
-			fprintf(stderr, "[handle_client] Unable to send acknowledgement to client. Send attempts reached or exceeded 10 (send_acknowledgement returned false)\n");
+			fprintf(stderr, "[handle_client] Unable to send acknowledgement to client. Send attempts reached or exceeded MAX_SEND_ATTEMPTS (send_acknowledgement returned false). Maybe something is wrong with the connection?\n");
 			continue;
 		}
 		send_attempts = 0;
