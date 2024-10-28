@@ -88,6 +88,9 @@ bool send_payload_metadata(int socket, struct payload *outbound_payload);
 bool receive_payload_metadata(int socket, struct payload *inbound_payload);
 
 bool send_payload(int socket, struct payload *outbound_payload);
+bool receive_payload(int socket, struct payload *inbound_payload);
+
+bool send_developer_test_message(int socket, struct request_header *outbound_request_header, char *message);
 
 bool server_confirm_user_existence(char username[]);
 
