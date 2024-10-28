@@ -391,6 +391,14 @@ int main(int argc, char **argv)
 		}
 		printf("Client connection accepted.\n");
 
+		// Perform handshake with the client
+		uint32_t shared_secret;
+		if (server_handshake(*client_socket, &shared_secret) < 0) {
+			fprintf(stderr, "Server handshake failed.\n");
+			close(*client_socket);
+			free(client_socket);
+    	}
+
 		// Spawn a new thread to handle the client using handle_client function.
 		pthread_t thread_id;
 		if(pthread_create(&thread_id, NULL, handle_client, (void *) client_socket) != 0)
@@ -403,27 +411,7 @@ int main(int argc, char **argv)
 		else 
 			pthread_detach(thread_id);
 	}
-	/*
-	// Perform handshake with the client
-	uint32_t shared_secret;
-	if (server_handshake(client_socket, &shared_secret) < 0) {
-		fprintf(stderr, "Server handshake failed.\n");
-		close(client_socket);
-		exit(EXIT_FAILURE);
-    	}
 
-
-	char buffer[1024];
-	ssize_t bytes_received = secure_recv(client_socket, buffer, sizeof(buffer), 0, shared_secret);
-    
-	if (bytes_received < 0) {
-		perror("Receive failed");
-		exit(EXIT_FAILURE);
-    	}
-
-    	//buffer[bytes_received] = '\0'; // Null-terminate the string
-    	printf("Received: %s\n", buffer);
-	*/
 	// Cleanup
 	close(server_fd);
 	return 0;

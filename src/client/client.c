@@ -82,6 +82,14 @@ int main(int argc, char **argv)
 
 	printf("Server connection established.\n\n");
 
+	// Perform handshake with the server
+	uint32_t shared_secret;
+	if (client_handshake(tcp_socket, &shared_secret) < 0) {
+		fprintf(stderr, "Client handshake failed.\n");
+		close(tcp_socket);
+		exit(EXIT_FAILURE);
+	}
+
 	// for getting user input to send requests
 	char input_buffer[4096]; 
 	size_t input_buffer_length = 0;
@@ -307,22 +315,6 @@ int main(int argc, char **argv)
 				printf("\"%s\" ", (char *) inbound_payloads[i]->data);
 		}
 	}
-
-	// Perform handshake with the server
-	uint32_t shared_secret;
-	if (client_handshake(tcp_socket, &shared_secret) < 0) {
-		fprintf(stderr, "Client handshake failed.\n");
-		close(tcp_socket);
-		exit(EXIT_FAILURE);
-	}
-
-	char message[] = "Hello, secure world! This works...";
-	ssize_t bytes_sent = secure_send(tcp_socket, message, strlen(message), 0, shared_secret);
-    	if (bytes_sent < 0) {
-		perror("send");
-    	}
-
-	printf("Sent encrypted message and signature.\n");
 
 	close(tcp_socket);
 	return 0;
