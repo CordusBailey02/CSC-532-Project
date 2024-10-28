@@ -129,13 +129,14 @@ int main(int argc, char **argv)
 			break;
 		}
 		data = subject_type + strlen(subject_type) + 1; // pointer arithmetic.
-		
-		printf("Got action as \"%s\".\n", action_type);
-		printf("Got subject as \"%s\".\n", subject_type);
-		printf("Got data as \"%s\".\n", data);
 
 		outbound_request_header.action = string_to_request_header_action(action_type, strlen(action_type));
 		outbound_request_header.subject = string_to_request_header_subject(subject_type, strlen(subject_type));
+	
+		printf("Got action as \"%s\" (code %d).\n", action_type, outbound_request_header.action);
+		printf("Got subject as \"%s\" (code %d).\n", subject_type, outbound_request_header.subject);
+		printf("Got data as \"%s\" (length %zu).\n", data, strlen(data));
+
 
 		if(outbound_request_header.action == GET)
 		{

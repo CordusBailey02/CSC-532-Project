@@ -118,6 +118,7 @@ void* handle_client(void *arg)
 		send_attempts = 0;
 
 		// Receive the request header
+		printf("Waiting to receive request header for client socket %d...\n", client_socket);
 		receive_status = receive_request_header(client_socket, &inbound_request_header);
 		while(receive_status == false && receive_attempts < 10)
 		{
@@ -129,7 +130,8 @@ void* handle_client(void *arg)
 			fprintf(stderr, "[handle_client] Unable to receive request header from client. Call to receive_request_header returned false.\n");
 			continue;
 		}
-		receive_attempts = 0;
+		receive_attempts = 0;	
+		printf("Received request header for client socket %d\n", client_socket);
 	
 		// Check that the request header was actually valid 
 		if(check_valid_request_header(&inbound_request_header) == false)
@@ -150,7 +152,8 @@ void* handle_client(void *arg)
 			continue;
 		}
 
-		// Acknowledge that you received it (AND IT WAS A GOOD HEADER)
+		// Acknowledge that you received it (AND IT WAS A GOOD HEADER)	
+		printf("Sending OK acknowledgement to client with client socket %d...\n", client_socket);
 		send_status = send_acknowledgement(client_socket, OK);
 		while(send_status == false && send_attempts < 10)
 		{
@@ -163,6 +166,7 @@ void* handle_client(void *arg)
 			continue;
 		}
 		send_attempts = 0;
+		printf("Sent OK acknowledgement to client with client socket %d.\n", client_socket);
 		
 		// Setup inbound payloads buffer (to store all payloads) 
 		payloads_expected = inbound_request_header.parameter_count;
@@ -177,6 +181,7 @@ void* handle_client(void *arg)
 				break; 
 			}
 		}
+		printf("%zu payloads are expected from client with client socket %d.\n", payloads_expected, client_socket);
 
 		// Receive payloads (metadata, then payload itself)
 		struct payload *current_inbound_payload;	
