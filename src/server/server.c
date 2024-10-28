@@ -280,6 +280,7 @@ void* handle_client(void *arg)
 			payloads_received++;
 			inbound_payloads_length++;
 		}
+		printf("Done receiving payloads from client with client socket %d!\n", client_socket);
 
 		// If all the payloads WERE NOT received, start back from
 		// beginning of routine 
@@ -292,6 +293,7 @@ void* handle_client(void *arg)
 		// If all payloads WERE received, then respond to the client accordingly
 		if(inbound_request_header.action == GET)
 		{
+			printf("Responding to GET request from client with client socket %d...\n", client_socket);
 			switch(inbound_request_header.subject)
 			{
 				case DEVELOPER_TEST_MESSAGE:
@@ -302,10 +304,22 @@ void* handle_client(void *arg)
 		}
 		else // client is sending us data
 		{
+			printf("Responding to SEND request from client with client socket %d...\n", client_socket);
 			switch(inbound_request_header.subject)
 			{
 				case DEVELOPER_TEST_MESSAGE:
-					send_status = send_developer_test_message(client_socket, &outbound_request_header, inbound_payloads[0]->data);
+					printf("SEND DEVELOPER_TEST_MESSAGE received from client with client socket %d.\n", client_socket);
+					if(inbound_payloads[0] == NULL) 
+						printf("inbound payload 0 is null.\n");
+					else
+						printf("inbound payload 0 is NOT null.\n");
+					if(inbound_payloads[0]->data == NULL)
+						printf("inbound payload 0 data is null.\n");
+					else 
+						printf("inbound payload 0 data is NOT null.\n");
+					printf("Message received from client was \"%s\"\n", (char *) inbound_payloads[0]->data);
+					printf("Attempting to use send_developer_test_message function to reply to client with client socket %d.\n", client_socket);
+					send_status = send_developer_test_message(client_socket, &outbound_request_header, (char *) inbound_payloads[0]->data);
 					if(send_status == false)
 					{
 						fprintf(stderr, "[handle_client] Main logic: Failed to send developer test message to client. Something might be wrong with the connection.\n");

@@ -445,6 +445,7 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	outbound_request_header->total_bytes = outbound_request_header->metadata_total_size + outbound_request_header->parameters_total_size;
 
 	// Send SEND DEVELOPER_TEST_MESSAGE message
+	printf("[send_developer_test_message] Trying to send SEND DEVELOPER_TEST_MESSAGE request header to connection with connection socket %d.\n", connection_socket);
 	send_status = send_request_header(connection_socket, outbound_request_header);
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
@@ -457,8 +458,10 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 		return false;
 	}
 	send_attempts = 0;
+	printf("[send_developer_test_message] Sent request header to connection with connection socket %d.\n", connection_socket);
 
 	// Wait for OK acknowledgement
+	printf("[send_developer_test_message] Waiting to receive acknowledgement from connection with connection socket %d.\n", connection_socket);
 	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{	
@@ -471,6 +474,7 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 		return false;
 	}
 	receive_attempts = 0;
+	printf("[send_developer_test_message] Received acknowledgement from connection with connection socket %d.\n", connection_socket);
 
 	// Send payload metadata
 	struct payload outbound_payload;
