@@ -71,10 +71,63 @@ bool check_valid_request_header(struct request_header *header)
 	return true;
 }
 
+// This sets the request header properly for you. There is no need to configure it in advance.
 bool send_developer_test_message(int client_socket, struct request_header *outbound_request_header, char *message)
 {
+	if(outbound_request_header == NULL)
+	{
+		fprintf(stderr, "[send_developer_test_message] Cannot send a request header struct that points to NULL.\n");
+		return false;
+	}
 
-}
+	if(message == NULL)
+	{
+		fprintf(stderr, "[send_developer_test_message] Cannot send a message with a char pointer that points to NULL. Bad argument provided.\n");
+		return false;
+	}
+	
+	bool send_status;
+	int send_attempts = 0;
+	bool receive_status;
+	int receive_attempts = 0;
+	struct request_header inbound_request_header;
+
+	// Set outbound request header with proper values
+	outbound_request_header->action = SEND;
+	outbound_request_header->subject = DEVELOPER_TEST_MESSAGE;
+	outbound_request_header->parameter_count = 1;
+	outbound_request_header->metadata_total_size = 2 * sizeof(size_t);
+	outbound_request_header->parameters_total_size = strlen(message);
+	outbound_request_header->total_bytes = outbound_request_header->metadata_total_size + outbound_request_header->parameters_total_size;
+
+	// Send SEND DEVELOPER_TEST_MESSAGE message
+	send_status = send_request_header(client_socket, outbound_request_header);
+	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
+	{
+		send_status = send_request_header(client_socket, outbound_request_header);
+		send_attempts++;
+	}
+	if(send_attempts >= MAX_SEND_ATTEMPTS)
+	{
+		fprintf(stderr, "[send_developer_test_message] Failed to send SEND DEVELOPER_TEST_MESSAGE request header to the client. Something might be wrong with the connection.\n");
+		return false;
+	}
+	send_attempts = 0;
+
+	// Wait for OK acknowledgement
+	receive_status = receive_acknowledgement(client_socket, &inbound_request_header);
+	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTTEMPTS)
+	{	
+		receive_status = receive_acknowledgement(client_socket, &inbound_request_header);
+		receive_attempts++;
+	}
+	if(receive_attempts >= MAX_RECEIVE_ATTTEMPTS)
+	{
+		fprintf(stderr, "[send_developer_test_message] Failed to receive SEND ACKNOWLEDGMENT request header from the sender. Receive attempts reached/exceeded MAX_RECEIVE_ATTEMPTS. Something might be wrong with the connection.\n");
+		return false;
+	}
+	receive_attempts = 0;
+} 
 
 // arg parameter is the client's socket
 void* handle_client(void *arg)
