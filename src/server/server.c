@@ -10,7 +10,7 @@
 #include  "../lib/secure_connection.h"
 #define CONNECTION_BACKLOG_CAPACITY 128
 #define MAX_SEND_ATTEMPTS 10
-#define MAX_RECEIVE_ATTTEMPTS 10
+#define MAX_RECEIVE_ATTEMPTS 10
 
 void clean_payload_buffer(struct payload **payload_buffer, size_t *length)
 {
@@ -91,13 +91,14 @@ bool send_developer_test_message(int client_socket, struct request_header *outbo
 	bool receive_status;
 	int receive_attempts = 0;
 	struct request_header inbound_request_header;
+	int message_length = strlen(message) + 1;
 
 	// Set outbound request header with proper values
 	outbound_request_header->action = SEND;
 	outbound_request_header->subject = DEVELOPER_TEST_MESSAGE;
 	outbound_request_header->parameter_count = 1;
 	outbound_request_header->metadata_total_size = 2 * sizeof(size_t);
-	outbound_request_header->parameters_total_size = strlen(message);
+	outbound_request_header->parameters_total_size = message_length;
 	outbound_request_header->total_bytes = outbound_request_header->metadata_total_size + outbound_request_header->parameters_total_size;
 
 	// Send SEND DEVELOPER_TEST_MESSAGE message
@@ -116,17 +117,90 @@ bool send_developer_test_message(int client_socket, struct request_header *outbo
 
 	// Wait for OK acknowledgement
 	receive_status = receive_acknowledgement(client_socket, &inbound_request_header);
-	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTTEMPTS)
+	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{	
 		receive_status = receive_acknowledgement(client_socket, &inbound_request_header);
 		receive_attempts++;
 	}
-	if(receive_attempts >= MAX_RECEIVE_ATTTEMPTS)
+	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
 	{
 		fprintf(stderr, "[send_developer_test_message] Failed to receive SEND ACKNOWLEDGMENT request header from the sender. Receive attempts reached/exceeded MAX_RECEIVE_ATTEMPTS. Something might be wrong with the connection.\n");
 		return false;
 	}
 	receive_attempts = 0;
+
+	// Send payload metadata
+	struct payload outbound_payload;
+	outbound_payload.member_size = sizeof(char);
+	outbound_payload.member_count = message_length;
+	send_status = send_payload_metadata(client_socket, &outbound_payload);
+	send_attempts = 1;
+	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
+	{
+		send_status = send_payload_metadata(client_socket, &outbound_payload);
+		send_attempts++;
+	}
+	if(send_attempts >= MAX_SEND_ATTEMPTS)
+	{
+		fprintf(stderr, "[send_developer_test_message] Failed to send payload metadata to the recipient. Send attempts reached/exceed MAX_SEND_ATTEMPTS. There might be something wrong with the connection.\n");
+		return false;
+	}
+	send_attempts = 0;
+
+	// Receive acknowledgement for payload metadata
+	receive_status = receive_acknowledgement(client_socket, &inbound_request_header);
+	receive_attempts = 1;
+	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
+	{	
+		receive_status = receive_acknowledgement(client_socket, &inbound_request_header);
+		receive_attempts++;
+	}
+	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
+	{
+		fprintf(stderr, "[send_developer_test_message] Failed to receive acknowledgement from recipient after delivering payload metadata. Receive attempts reached/exceeded MAX_RECEIVE_ATTEMPTS. Something might be wrong with the connection.\n");
+		return false;
+	}
+	receive_attempts = 0;
+
+	// Send payload itself
+	outbound_payload.data = malloc(message_length);
+	if(outbound_payload.data == NULL)
+	{
+		fprintf(stderr, "[send_developer_test_message] Failed to allocate memory for the outbound payload's data member. Malloc returned NULL.\n");
+		return false;
+	}
+	memcpy(outbound_payload.data, message, message_length);
+	send_status = send_payload(client_socket, &outbound_payload);
+	send_attempts = 1;
+	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
+	{
+		send_status = send_payload(client_socket, &outbound_payload);
+		send_attempts++;
+	}
+	if(send_attempts >= MAX_SEND_ATTEMPTS)
+	{
+		fprintf(stderr, "[send_developer_test_message] Failed to send test message's payload of size %d bytes to the recipient. Send attempts reached/exceeded MAX_SEND_ATTEMPTS. Something might be wrong with the connection.\n", message_length);
+		free(outbound_payload.data);
+		return false;
+	}
+	send_attempts = 0;
+	free(outbound_payload.data);
+	
+	// Receive acknowledgement for payload receipt
+	receive_status = receive_acknowledgement(client_socket, &inbound_request_header);
+	receive_attemtps = 1;
+	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
+	{
+		receive_status = receive_acknowledgement(client_socket, &inbound_request_header);
+		receive_attempts++;
+	}
+	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
+	{
+		fprintf(stderr, "[send_developer_test_message] Failed to receive acknowledgement after sending test message's paylod from recipient. Receive attempts exceeded MAX_RECEIVE_ATTEMPTS. Something might be wrong with the connection.\n");
+		return false;
+	}
+
+	return true;
 } 
 
 // arg parameter is the client's socket
@@ -254,12 +328,12 @@ void* handle_client(void *arg)
 			
 			// Receive payload metadata so you can prepare to actually receive the payload itself
 			receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
-			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTTEMPTS)
+			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
 				receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
 				receive_attempts++;
 			}
-			if(receive_attempts >= MAX_RECEIVE_ATTTEMPTS)
+			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
 			{
 				fprintf(stderr, "[handle_client] Failed to receive payload metadata from the client. 10 or more attempts were reached. receive_payload_metadata() returned false.\n");
 				continue;
@@ -291,12 +365,12 @@ void* handle_client(void *arg)
 
 			// Actually receive the payload
 			receive_status = receive_payload(client_socket, current_inbound_payload);
-			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTTEMPTS)
+			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
 				receive_status = receive_payload(client_socket, current_inbound_payload);
 				receive_attempts++;
 			}
-			if(receive_attempts >= MAX_RECEIVE_ATTTEMPTS)
+			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
 			{
 				fprintf(stderr, "[handle client] Failed to receive payload from client. Received %zu payloads in total. Expected to receive %zu overall.\n", payloads_received, payloads_expected);
 				clean_payload_buffer(inbound_payloads, inbound_payloads_length);
