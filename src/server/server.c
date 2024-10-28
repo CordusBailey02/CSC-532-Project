@@ -202,6 +202,7 @@ void* handle_client(void *arg)
 			}
 			
 			// Receive payload metadata so you can prepare to actually receive the payload itself
+			printf("Waiting to receive payload metadata #%zu from client with client socket %d.\n", payloads_received + 1, client_socket);
 			receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
@@ -214,8 +215,10 @@ void* handle_client(void *arg)
 				continue;
 			}
 			receive_attempts = 0;
+			printf("Received payload metadata for payload #%zu from client with client socket %d.\n", payloads_received + 1, client_socket);
 
 			// Acknowledge receipt of payload metadata
+			printf("Sending OK acknowledgement for payload %zu's metadata to client with client_socket %d.\n", payloads_received + 1, client_socket);
 			send_status = send_acknowledgement(client_socket, OK);
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 			{
@@ -228,6 +231,7 @@ void* handle_client(void *arg)
 				continue;
 			}
 			send_attempts = 0;
+			printf("Sent OK acknowledgement to client with client socket %d.\n", client_socket);
 
 			// Ensure current inbound payload can actually store the data
 			current_inbound_payload->data = malloc(current_inbound_payload->member_count * current_inbound_payload->member_size);
@@ -239,6 +243,7 @@ void* handle_client(void *arg)
 			}
 
 			// Actually receive the payload
+			printf("Waiting to receive payload %zu's data attribute from client with client socket %d.\n", payloads_received + 1, client_socket);
 			receive_status = receive_payload(client_socket, current_inbound_payload);
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
@@ -252,9 +257,10 @@ void* handle_client(void *arg)
 				break;
 			}
 			receive_attempts = 0;
-			inbound_payloads_length++;
+			printf("Received payload %zu's data attribute from client with client socket %d.\n", payloads_received + 1, client_socket);		
 
 			// Acknowledge that you received the payload
+			printf("Sending OK acknowledgement to client with client socket %d.\n", client_socket);
 			send_status = send_acknowledgement(client_socket, OK);
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 			{
@@ -268,8 +274,10 @@ void* handle_client(void *arg)
 				break;
 			}
 			send_attempts = 0;
+			printf("Sent OK acknowledgement to client with client socket %d.\n", client_socket);
 
 			// Increment and now restart at loop beginning to receive the rest of the payloads
+			payloads_received++;
 			inbound_payloads_length++;
 		}
 
