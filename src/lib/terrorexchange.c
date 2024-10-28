@@ -531,7 +531,7 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	
 	// Receive acknowledgement for payload receipt
 	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
-	receive_attemtps = 1;
+	receive_attempts = 1;
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{
 		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);

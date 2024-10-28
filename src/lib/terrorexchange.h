@@ -6,6 +6,8 @@
 #define byte unsigned char
 #define COEFFICIENT 31
 #define CHUNK_SIZE 16384
+#define MAX_SEND_ATTEMPTS 10
+#define MAX_RECEIVE_ATTEMPTS 10
 
 enum ACTION { GET, SEND, ACTION_ERROR};	// ERROR is for functions that return an ACTION
 					// enum. If they run into an error, then ERROR

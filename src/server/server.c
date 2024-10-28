@@ -9,8 +9,6 @@
 #include  "../lib/terrorexchange.h"
 #include  "../lib/secure_connection.h"
 #define CONNECTION_BACKLOG_CAPACITY 128
-#define MAX_SEND_ATTEMPTS 10
-#define MAX_RECEIVE_ATTEMPTS 10
 
 void clean_payload_buffer(struct payload **payload_buffer, size_t *length)
 {
