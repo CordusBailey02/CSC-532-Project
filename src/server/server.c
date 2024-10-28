@@ -209,17 +209,14 @@ void* handle_client(void *arg)
 		printf("%zu payloads are expected from client with client socket %d.\n", payloads_expected, client_socket);
 
 		// Receive payloads (metadata, then payload itself)
-		struct payload *current_inbound_payload;	
 		inbound_payloads_length = 0;
 		payloads_received = 0;
-		clean_payload_buffer(inbound_payloads, &inbound_payloads_length); // no previous data
 		while(payloads_received < payloads_expected)
 		{
-			current_inbound_payload = inbound_payloads[payloads_received];
-			if(current_inbound_payload == NULL)
+			if(inbound_payloads[inbound_payloads_length] == NULL)
 			{
-				current_inbound_payload = malloc(sizeof(struct payload));
-				if(current_inbound_payload == NULL)
+				inbound_payloads[inbound_payloads_length] = malloc(sizeof(struct payload));
+				if(inbound_payloads[inbound_payloads_length] == NULL)
 				{
 					fprintf(stderr, "[handle_client] Failed to allocate sufficient memory to hold inbound payload structs.\n");
 					break;
@@ -228,10 +225,10 @@ void* handle_client(void *arg)
 			
 			// Receive payload metadata so you can prepare to actually receive the payload itself
 			printf("Waiting to receive payload metadata #%zu from client with client socket %d.\n", payloads_received + 1, client_socket);
-			receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
+			receive_status = receive_payload_metadata(client_socket, inbound_payloads[inbound_payloads_length]);
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
-				receive_status = receive_payload_metadata(client_socket, current_inbound_payload);
+				receive_status = receive_payload_metadata(client_socket, inbound_payloads[inbound_payloads_length]);
 				receive_attempts++;
 			}
 			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -259,26 +256,25 @@ void* handle_client(void *arg)
 			printf("Sent OK acknowledgement to client with client socket %d.\n", client_socket);
 
 			// Ensure current inbound payload can actually store the data
-			current_inbound_payload->data = malloc(current_inbound_payload->member_count * current_inbound_payload->member_size);
-			if(current_inbound_payload->data == NULL)
+			inbound_payloads[inbound_payloads_length]->data = malloc(inbound_payloads[inbound_payloads_length]->member_count * inbound_payloads[inbound_payloads_length]->member_size);
+			if(inbound_payloads[inbound_payloads_length]->data == NULL)
 			{
-				fprintf(stderr, "[handle_client] Failed to allocate %zu bytes for the data buffer of the current inbound payload (payload %zu)\n", current_inbound_payload->member_size * current_inbound_payload->member_count, payloads_received);
+				fprintf(stderr, "[handle_client] Failed to allocate %zu bytes for the data buffer of the current inbound payload (payload %zu)\n", inbound_payloads[inbound_payloads_length]->member_size * inbound_payloads[inbound_payloads_length]->member_count, payloads_received);
 				send_status = send_acknowledgement(client_socket, INSUFFICIENT_MEMORY);
 				break;
 			}
 
 			// Actually receive the payload
 			printf("Waiting to receive payload %zu's data attribute from client with client socket %d.\n", payloads_received + 1, client_socket);
-			receive_status = receive_payload(client_socket, current_inbound_payload);
+			receive_status = receive_payload(client_socket, inbound_payloads[inbound_payloads_length]);
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
-				receive_status = receive_payload(client_socket, current_inbound_payload);
+				receive_status = receive_payload(client_socket, inbound_payloads[inbound_payloads_length]);
 				receive_attempts++;
 			}
 			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
 			{
 				fprintf(stderr, "[handle client] Failed to receive payload from client. Received %zu payloads in total. Expected to receive %zu overall.\n", payloads_received, payloads_expected);
-				clean_payload_buffer(inbound_payloads, &inbound_payloads_length);
 				break;
 			}
 			receive_attempts = 0;
@@ -295,7 +291,6 @@ void* handle_client(void *arg)
 			if(send_attempts >= MAX_SEND_ATTEMPTS)
 			{
 				fprintf(stderr, "[handle_client] Failed to send OK acknowledgement to client after receiving the data for payload #%zu of %zu.\n", payloads_received + 1, payloads_expected);
-				clean_payload_buffer(inbound_payloads, &inbound_payloads_length);
 				break;
 			}
 			send_attempts = 0;

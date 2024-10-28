@@ -235,13 +235,17 @@ bool send_payload(int socket, struct payload *outbound_payload)
 	ssize_t bytes_sent = 0;
 	size_t total_bytes_sent = 0;
 	size_t total_bytes_to_send = outbound_payload->member_size * outbound_payload->member_count;
+	int send_attempts = 0;
 	// try to send data all at once - payload is smaller than one chunk
 	if(total_bytes_to_send <= CHUNK_SIZE)
 	{
+		printf("[send_payload] Attempting to send payload data as a singular chunk (%zu total bytes).\n", total_bytes_to_send);
 		bytes_sent = send(socket, payload_data, total_bytes_to_send, 0);
-
 		if(bytes_sent == total_bytes_to_send)
+		{
+			printf("[send_payload] All the bytes of the payload were sent with one call to send().\n");
 			return true;
+		}
 
 		if(bytes_sent < 0)
 		{
@@ -251,6 +255,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 
 		// Continue sending the rest of the bytes
 		total_bytes_sent = bytes_sent;
+		printf("[send_payload] Attempting to send remaining %zu bytes of payload data.\n", total_bytes_to_send - total_bytes_sent);
 		while(total_bytes_sent < total_bytes_to_send)
 		{
 			bytes_sent = send(socket, payload_data + total_bytes_sent, total_bytes_to_send - total_bytes_sent, 0);
@@ -262,6 +267,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 
 			total_bytes_sent += bytes_sent;
 		}
+		printf("[send_payload] All bytes were sent in one chunk!\n");
 		return true; // all bytes sent
 	}
 
@@ -272,6 +278,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 	size_t total_chunk_bytes_sent;
 	bytes_sent = 0;
 	total_bytes_sent = 0;
+	printf("[send_payload] Attempting to send payload data in several chunks.\n");
 	while(bytes_remaining > 0)
 	{
 		// set chunk
@@ -343,10 +350,16 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 	// Try to receive all the data at once if chunking is not required.
 	if(total_bytes_to_receive <= CHUNK_SIZE)
 	{
+		printf("[receive_payload] Attempting to receive payload (%zu bytes) all in one chunk from connection with socket #%d.\n", total_bytes_to_receive, socket);
 		// First try
 		bytes_received = recv(socket, inbound_payload->data, total_bytes_to_receive, 0);
+		printf("[receive_payload] Received %ld bytes from connection with socket #%d (expected %zu byte).\n", bytes_received, socket, total_bytes_to_receive); 
 		if(bytes_received == total_bytes_to_receive)
+		{
+			printf("[receive_payload] Received all bytes from client socket #%d in one call to send().\n", socket);
 			return true;
+		}
+
 		if(bytes_received < 0)
 		{
 			fprintf(stderr, "[receive_payload]: Failed to receive payload with %zu bytes. Recv() returned -1.\n", total_bytes_to_receive);
@@ -357,6 +370,7 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 		total_bytes_received = bytes_received;
 		while(total_bytes_received < total_bytes_to_receive)
 		{
+			printf("[receive_payload] Starting pointer is %p. Expecting to receive %zu bytes.\n", inbound_payload->data + total_bytes_received, total_bytes_to_receive - total_bytes_received);
 			bytes_received = recv(socket, inbound_payload->data + total_bytes_received, total_bytes_to_receive - total_bytes_received, 0);
 			if(bytes_received < 0)
 			{
