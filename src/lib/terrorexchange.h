@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include "secure_connection.h"
 
 #ifndef TERROREXCHANGE_H
 #define TERROREXCHANGE_H

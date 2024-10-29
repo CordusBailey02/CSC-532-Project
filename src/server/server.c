@@ -10,6 +10,14 @@
 #include  "../lib/secure_connection.h"
 #define CONNECTION_BACKLOG_CAPACITY 128
 
+// used to pass multiple arguments to the pthread for each
+// client connection
+struct client_data
+{
+	int client_socket;
+	uint32_t shared_secret;
+};
+
 void clean_payload_buffer(struct payload **payload_buffer, size_t *length)
 {
 	if(length == NULL)
@@ -91,8 +99,14 @@ void send_email(const char* name, const char* email)
 // arg parameter is the client's socket
 void* handle_client(void *arg)
 {
+	/*
 	int client_socket = *(int *) arg; // dereference the argument casted as int ptr
 	free(arg);
+	*/
+	struct client_data *client_connection_data = (struct client_data *) arg;
+	int client_socket = client_connection_data->client_socket;
+	uint32_t shared_secret = client_connection_data->shared_secret;
+	free(client_connection_data);
 
 	struct request_header inbound_request_header;
 	struct request_header outbound_request_header;
@@ -318,11 +332,14 @@ void* handle_client(void *arg)
 			{
 				case DEVELOPER_TEST_MESSAGE:
 					break;
+				case POST:
+					printf("[UNIMPLEMENTED ERROR] Cannot fetch posts at the moment.\n");
+					break;
 				default:
 					break;
 			}
 		}
-		else // client is sending us data
+		else // client is sending us data - SEND
 		{
 			printf("Responding to SEND request from client with client socket %d...\n", client_socket);
 			switch(inbound_request_header.subject)
@@ -417,11 +434,26 @@ int main(int argc, char **argv)
 			fprintf(stderr, "Server handshake failed.\n");
 			close(*client_socket);
 			free(client_socket);
-    	}
+			continue;
+    		}
+		
+		// Create client data to pass to handle_client so thread has both
+		// client socket and shared secret
+		struct client_data *client_connection_data = malloc(sizeof(struct client_data));
+		if(client_connection_data == NULL)
+		{
+			fprintf(stderr, "Failed to allocate memory for a client data struct. Client with socket %d will not be accepted/handled (pthread cannot run handle_client without client_socket and shared_key).\n", *client_socket);
+			close(*client_socket);
+			free(client_socket);
+			continue;
+		}
+		client_connection_data->client_socket = *client_socket;
+		client_connection_data->shared_secret = shared_secret;
 
 		// Spawn a new thread to handle the client using handle_client function.
 		pthread_t thread_id;
-		if(pthread_create(&thread_id, NULL, handle_client, (void *) client_socket) != 0)
+		// if(pthread_create(&thread_id, NULL, handle_client, (void *) client_socket) != 0)
+		if(pthread_create(&thread_id, NULL, handle_client, (void *) client_connection_data) != 0)
 		{
 			fprintf(stderr, "Failed to create thread.\n");
 			close(*client_socket);
