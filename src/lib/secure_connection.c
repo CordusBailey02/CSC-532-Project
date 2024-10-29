@@ -71,10 +71,14 @@ uint32_t compute_shared_secret(DHKeyPair *keypair, uint32_t other_public_key, ui
 
 // Function for client handshake
 int client_handshake(int socket, uint32_t *shared_secret) {
-    // Seed the random number generator
-    srand(123456789); 
 
-    uint32_t p = generate_prime(MODULUS_BITS); 
+
+    uint32_t p;
+    if (recv(socket, &p, sizeof(p), 0) < 0) {
+        perror("Failed to receive p from server");
+        return -1;
+    }
+
     uint32_t g = 2;
 
     // Create a new ephemeral key pair
@@ -108,9 +112,10 @@ int client_handshake(int socket, uint32_t *shared_secret) {
 // Function for server handshake
 int server_handshake(int socket, uint32_t *shared_secret) {
     // Seed the random number generator
-    srand(123456789);
+    srand(time(NULL));
 
-    uint32_t p = generate_prime(MODULUS_BITS); 
+    uint32_t p = generate_prime(MODULUS_BITS);
+    send(socket, &p, sizeof(p), 0);
     uint32_t g = 2;
 
     // Create a new ephemeral key pair
