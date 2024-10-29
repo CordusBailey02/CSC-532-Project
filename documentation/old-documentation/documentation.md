@@ -11,7 +11,6 @@ A parameter is capable of representing a single piece of information (e.g. an in
 
 **If hetergeneous data needs to be sent,** then several parameters should be used. 
 
-
 # Calling Convention
 
 The caller is always expected to ensure that the data is properly setup before calling the functions.
@@ -104,5 +103,3 @@ This is done with the function `client_send_parameters_to_server(3)`.
 `bool client_send_parameters_to_server(int socket, struct message_parameter **parameters, size_t parameters_length)` is used to send the request parameters contained within `parameters` to the server. The function returns true if all of the parameters are received by the server and false otherwise.  
 
 ## Sending Response Parameters (Server)
-
-

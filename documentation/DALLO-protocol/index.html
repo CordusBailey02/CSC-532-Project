@@ -1,0 +1,13 @@
+<div style="font-family: Inter">
+<h1 id="dallo-protocol-documentation">DALLO Protocol Documentation</h1>
+<p>David Jara <br> Ben Meister <br> Cordus Bailey <br></p>
+<h1 id="what-is-the-dallo-protocol">What is the DALLO Protocol</h1>
+<p>The <strong>DALLO</strong> Protocol is an application-layer protocol using TCP for the transport layer. “DALLO Protocol” is an abbreviation of “Dave’s Accelerated Lightweight Lossless Open Protocol.” It was built specifically for this project, from scratch.</p>
+<h1 id="how-does-it-work">How Does it Work</h1>
+<p>The DALLO Protocol is based around synchronicity and simplicity. Likewise, each time a piece of data is sent/received, it must be acknowledged by the recipient. This acknowledgement procedure ensures that the sender and receiver remain synchronized as it pertains to the particular item that is being sent/received.</p>
+<p>The DALLO Protocol was also developed with security in mind, which is why it utilizes Diffie-Hellman key exchange to encrypt and decrypt data sent between the client and server.</p>
+<p><img src="DALLO-protocol.png"></p>
+<p>As can be seen in the image above, each time a piece of data is received, the recipient sends an acknowledgement to the sender. A sender never sends more than one thing before hearing from the recipient. This keeps them on the same page about what is being sent and received.</p>
+<p>At the same time, the functions that are being used to send/receive the data structures used by the DALLO Protocol utilize modified versions of the <code>send</code> and <code>recv</code> functions. These functions (<code>secure_send</code> and <code>secure_recv</code>) have all the same parameters as <code>send</code> and <code>recv</code>, except for an additional one - the key the client and server share as per Diffie-Hellman key exchange. This key is used by the <code>secure_send</code> function to encrypt outbound data; it is also used by the <code>secure_recv</code> function to decrypt inbound data. If data is ever intercepted by an outside party, it will be completely illegible.</p>
+<p>The DALLO Protocol also works well with unstable connections, using bounded re-transmission attempts to ensure data is not lost.</p>
+</div>

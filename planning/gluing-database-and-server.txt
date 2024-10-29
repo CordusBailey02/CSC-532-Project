@@ -1,0 +1,36 @@
+SEND DEVELOPER_TEST_MESSAGE hiii
+
+0   6        0 
+GET CATEGORY "Programming" 
+              ^ inbound_payloads[0]
+
+struct payload **payloads
+size_t inbound_payloads_length
+
+payloads[0]->data 
+
+struct payload *current_payload = payloads[i];
+current_payload->data
+
+size_t member_size
+size_t member_count
+void   *data
+
+enum CATEGORY query_category = string_to_category_enum(inbound_payloads[0]);
+
+---> char *query_name = request_header_to_query_name(inbound_request_header);
+
+char *result = query_mysql(query_name, inbound_payloads);
+
+0,dave,NULL,
+
+free(result);
+
+"25 delimited" - if 25 is a nonprintable character, separate items in database response
+string with the ASCII value 25. This allows us to maintain commas in the user's post contents
+(which would otherwise be broken by using a CSV format)
+
+E - encrypted
+E - efficient
+S - synchronized
+S - secure

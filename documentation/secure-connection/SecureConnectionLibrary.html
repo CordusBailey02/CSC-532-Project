@@ -1,0 +1,107 @@
+<h1 id="secure-connection-library">Secure Connection Library</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol class="incremental" type="1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#key-structures-and-functions">Key Structures and Functions</a></li>
+<li><a href="#usage-examples">Usage Examples</a></li>
+</ol>
+<p><br> <br></p>
+<h2 id="overview">Overview</h2>
+<p>This library provides functions for secure communication between clients and servers using Diffie-Hellman key exchange. It includes implementations for key generation, shared secret computation, client-server handshake, and message encryption/decryption.</p>
+<p><br> <br></p>
+<h2 id="key-structures-and-functions">Key Structures and Functions</h2>
+<h3 id="dhkeypair-structure">DHKeyPair Structure</h3>
+<p>Represents a Diffie-Hellman key pair.</p>
+<pre><code>typedef struct {
+    uint32_t private_key;
+    uint32_t public_key;
+} DHKeyPair;</code></pre>
+<h3 id="key-generation-functions">Key Generation Functions</h3>
+<ul class="incremental">
+<li><p>Creates a Diffie-Hellman key pair and computes the shared secret between two parties.</p></li>
+<li><p>Keys are generated each time a new connection is made, following a ‘Ephemeral Diffie-Hellman’.</p></li>
+<li><p>A random prime number gets generated for ‘p’</p></li>
+<li><p>‘g’ is agreed upon prior, in this case ‘2’ is used</p></li>
+<li><p>Using these values, a private key is generated and a public key generated from the private key</p></li>
+</ul>
+<figure>
+<img src="Diffie-HellmanDiagram.png" alt="" /><figcaption>DiffieDiagram</figcaption>
+</figure>
+<p><br> <br></p>
+<h3 id="client-server-handshake-functions">Client-Server Handshake Functions</h3>
+<ul class="incremental">
+<li><p>Handles the client-server handshake protocol, returning the computed shared secret.</p></li>
+<li><p>There is a function ‘client_handshake’ to handle the client side</p></li>
+<li><p>There is a function ‘server_handshake’ to handle the server side</p></li>
+<li><p>This handshake process follow the traditional Diffie-Hellman key exchange process</p></li>
+</ul>
+<h4 id="the-client">The client:</h4>
+<pre><code>1. Sends its created public key to the server
+2. Receives the server&#39;s public key
+3. Computes the shared key with clients private key and servers public key</code></pre>
+<h4 id="the-server">The server:</h4>
+<pre><code>1. Receives the clients public key
+2. Sends the client the server&#39;s public key
+3. Computes the shared key with servers private key and clients public key</code></pre>
+<h4 id="the-process-as-a-whole">The process as a whole:</h4>
+<pre><code>1. Client intitates connection to server
+2. Client starts handshake process by sending its public key
+3. Server receives client public key
+4. Server sends its public key to client
+5. Client receives the server&#39;s public key
+6. Both client and server compute shared key</code></pre>
+<h4 id="the-following-diagram-shows-this-process">The following diagram shows this process:</h4>
+<figure>
+<img src="ConnectionDiagram.png" alt="" /><figcaption>ConnectionDiagram</figcaption>
+</figure>
+<p><br> <br></p>
+<h3 id="sending-and-receiving-encrypted-messages">Sending and Receiving encrypted messages</h3>
+<ul class="incremental">
+<li>This library implements a secure send and recieve by encrpyting and decrypting a message using the shared key between the client and server.</li>
+<li>These functions simply take either the plain text and encrypt it or the encrypted text and decrypt it, while using the normal ‘send’ and ‘recv’ functions.</li>
+</ul>
+<h4 id="sending">Sending:</h4>
+<ul class="incremental">
+<li>Sending is done by providing the socket, message, message length, flags, and the shared key</li>
+<li>The following function call is an example of how this is used:</li>
+</ul>
+<pre><code>ssize_t bytes_sent = secure_send(tcp_socket, message, strlen(message), 0, shared_secret);</code></pre>
+<ul class="incremental">
+<li>This call will take the plaintext and encrypt it</li>
+<li>It then sends the encrypted message using the ‘send()’ function</li>
+</ul>
+<h4 id="receiving">Receiving:</h4>
+<ul class="incremental">
+<li>Receiving is done by providing the socket, encrypted message, size of message, and shared key</li>
+<li>The following function calls is an exmaple of how this is used:</li>
+</ul>
+<pre><code>ssize_t bytes_received = secure_recv(client_socket, buffer, sizeof(buffer), 0, shared_secret);</code></pre>
+<ul class="incremental">
+<li>This call will use the ‘recv()’ function to get the data being sent</li>
+<li>It then takes the encrypted message and turns in into plaintext in the buffer</li>
+</ul>
+<p><br> <br></p>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>Server usage:</p>
+<pre><code>uint32_t shared_secret;
+server_handshake(client_socket, &amp;shared_secret);</code></pre>
+<p>Server usage with error handling:</p>
+<pre><code>uint32_t shared_secret;
+if (server_handshake(client_socket, &amp;shared_secret) &lt; 0) {
+    fprintf(stderr, &quot;Server handshake failed.\n&quot;);
+    close(client_socket);
+    exit(EXIT_FAILURE);
+}</code></pre>
+<p>Client usage:</p>
+<pre><code>uint32_t shared_secret;
+server_handshake(tcp_socket, &amp;shared_secret);</code></pre>
+<p>Client usage with error handling:</p>
+<pre><code>uint32_t shared_secret;
+if (client_handshake(tcp_socket, &amp;shared_secret) &lt; 0) {
+    fprintf(stderr, &quot;Server handshake failed.\n&quot;);
+    close(client_socket);
+    exit(EXIT_FAILURE);
+}</code></pre>
+<p><br> <br></p>
+<h2 id="additional-information">Additional Information</h2>
+<p>For detailed implementation details and code examples, please refer to the source code files in the <code>src/lib/</code> directory, where the files are named ‘secure_connection.c’ and ‘secure_connection.h’.</p>

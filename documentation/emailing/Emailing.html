@@ -1,0 +1,58 @@
+<h1 id="emailing-system-documentation">Emailing System Documentation</h1>
+<h2 id="overview">Overview</h2>
+<p>This document describes the emailing system used in our application, focusing on the code responsible for generating verification codes and sending emails. This documentation provides a comprehensive overview of the <code>generate_code()</code> and <code>send_email()</code> functions, including their purpose, usage, implementation details, and security considerations. It offers insights into how these functions work together to implement the emailing system in our application.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol class="incremental" type="1">
+<li><a href="#function-descriptions">Function Descriptions</a></li>
+<li><a href="#implementation-details">Implementation Details</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#usage-examples">Usage Examples</a></li>
+</ol>
+<h2 id="function-descriptions">Function Descriptions</h2>
+<h3 id="generate_code">generate_code()</h3>
+<p>Purpose: Generates a random 4-digit verification code for email authentication.</p>
+<p>Parameters: None</p>
+<p>Return Value: An integer representing a random 4-digit number between 1000 and 9999.</p>
+<p>Description: This function uses the <code>rand()</code> function to generate a pseudo-random number. It calculates the remainder of the division of this random number by 9000, then adds 1000 to ensure the result is always a 4-digit number.</p>
+<p>Example Usage:</p>
+<pre><code>int verification_code = generate_code(); 
+printf(&quot;Verification code: %d\n&quot;, verification_code);</code></pre>
+<h3 id="send_email">send_email()</h3>
+<p>Purpose: Sends an email to the provided recipient with a generated verification code.</p>
+<p>Parameters: - <code>name</code>: A constant character pointer containing the recipient’s name. - <code>email</code>: A constant character pointer containing the recipient’s email address.</p>
+<p>Return Value: None (void function)</p>
+<p>Description: This function performs the following steps: 1. Calls <code>generate_code()</code> to produce a 4-digit verification code. 2. Prints the generated code to the console for debugging purposes. 3. Constructs a command to execute a Python script called <code>send_email.py</code>. 4. Uses the <code>system()</code> function to execute the Python script with the generated code, name, and email as arguments.</p>
+<p>Note: The comment <code>// STORE THE CODE TO COMPARE WHAT THE CLIENT INPUTS</code> is a placeholder point for saving the code to compare with what the client user provides to the server.</p>
+<h2 id="implementation-details">Implementation Details</h2>
+<ol class="incremental" type="1">
+<li><strong>Random Number Generation</strong>:
+<ul class="incremental">
+<li>The <code>generate_code()</code> function relies on the <code>rand()</code> function, which needs to be seeded for better randomness. Ensure that <code>srand(time(NULL))</code> is called before using this function.</li>
+</ul></li>
+<li><strong>Email Sending Mechanism</strong>:
+<ul class="incremental">
+<li>The email sending is delegated to a separate Python script (<code>send_email.py</code>).</li>
+<li>This approach allows for separation of concerns and easier maintenance of email-related functionality.</li>
+</ul></li>
+</ol>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>Here’s an example of how these functions might be called within a larger application:</p>
+<pre><code>#include &lt;stdio.h&gt; 
+#include &lt;stdlib.h&gt;
+
+int main() { 
+    srand(time(NULL)); // Seed random number generator
+
+    // Generate the 4 digit number
+    int generated_code = generate_code();
+
+    char* name = &quot;Alice Smith&quot;;
+    char* email = &quot;alice@example.com&quot;;
+
+    // Call the Python script
+    char command[256];
+    // Paramaters to send: Name, email, generated_code
+    snprintf(command, sizeof(command), &quot;python3 send_email.py %s %s %d&quot;, name, email, generated_code);
+    system(command);
+}
+</code></pre>

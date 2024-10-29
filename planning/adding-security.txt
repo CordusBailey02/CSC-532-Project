@@ -1,0 +1,31 @@
+send_<ITEM> is a function using the send(...) function
+
+receive_<ITEM> is a function using the recv(...) function
+
+In each of these send_<ITEM> and receive_<ITEM> functions, replace calls to send(...) or receive(...) with secure_send(...) or secure_recv(...)
+
+ASM -> ACTION SUBJECT METADATA 
+
+GET POST_BY_QUERY How to make good coffee
+
+| POST_ID | POSTER | CONTENTS                        |
+|---------|--------|---------------------------------|
+| 1       | dave   | This is how to make good coffee |
+
+SEND DEVELOPER_TEST_MESSAGE hi this 
+
+is client 1!
+
+0..255    [1 byte]
+
+45 -> 700 [2 bytes]
+
+SENDER                                                                       RECEIVER
+send_request_header(int socket, struct request_header *outbound_header)      receive_request_header(int socket, struct request_header *inbound_header);
+
+SPRINT 2 HIGHLIGHTS
+1. Mulithreaded server w/ working custom protocol
+2. Encrypted communication with Diffie-Hellman
+3. Working MongoDB and MySQL database (not yet integrated with server application)
+4. Nginx load balancing
+
