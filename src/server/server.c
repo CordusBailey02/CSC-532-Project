@@ -378,6 +378,10 @@ void* handle_client(void *arg)
  
 int main(int argc, char **argv)
 {
+	if(argc < 2) {
+		fprintf(stderr, "Not enough args... Provide a port...");
+		exit(EXIT_FAILURE);
+	}
 	// Create connection socket
 	int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if(server_fd == -1)
@@ -390,7 +394,7 @@ int main(int argc, char **argv)
 	struct sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = INADDR_ANY; // bind to all available network ifaces
-	server_addr.sin_port = htons(8080); // tcp
+	server_addr.sin_port = htons(atoi(argv[1])); // tcp
 
 	if(bind(server_fd, (struct sockaddr*) &server_addr, sizeof(server_addr)) < 0)
 	{
@@ -406,7 +410,7 @@ int main(int argc, char **argv)
 		close(server_fd);
 		exit(EXIT_FAILURE);
 	}
-	printf("Now listening for connections on TCP port 8080.\n");
+	printf("Now listening for connections on TCP port %d.\n", atoi(argv[1]));
 
 	// Accept client connections --- spawn a new thread for each new connection.
 	while(true)
