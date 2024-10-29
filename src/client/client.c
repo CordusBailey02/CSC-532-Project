@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 			switch(outbound_request_header.subject)
 			{
 				case DEVELOPER_TEST_MESSAGE:
-					send_status = send_developer_test_message(tcp_socket, &outbound_request_header, data);
+					send_status = send_developer_test_message(tcp_socket, &outbound_request_header, data, shared_secret);
 					if(send_status == false)
 					{
 						fprintf(stderr, "[ERROR] Failed to send developer test message to the server.\n"); break;
@@ -174,11 +174,11 @@ int main(int argc, char **argv)
 		}
 
 		// Wait to receive data back for what we sent.
-		receive_status = receive_request_header(tcp_socket, &inbound_request_header);
+		receive_status = receive_request_header(tcp_socket, &inbound_request_header, shared_secret);
 		receive_attempts = 1;
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
-			receive_status = receive_request_header(tcp_socket, &inbound_request_header);
+			receive_status = receive_request_header(tcp_socket, &inbound_request_header, shared_secret);
 			receive_attempts++;
 		}
 		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -202,11 +202,11 @@ int main(int argc, char **argv)
 		}
 
 		// Send acknowledgement of receipt
-		send_status = send_acknowledgement(tcp_socket, OK);
+		send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 		send_attempts = 1;
 		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 		{
-			send_status = send_acknowledgement(tcp_socket, OK);
+			send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 			send_attempts++;
 		}
 		if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -234,11 +234,11 @@ int main(int argc, char **argv)
 			current_inbound_payload = inbound_payloads[inbound_payloads_length];
 
 			// Receive payload metadata
-			receive_status = receive_payload_metadata(tcp_socket, current_inbound_payload);
+			receive_status = receive_payload_metadata(tcp_socket, current_inbound_payload, shared_secret);
 			receive_attempts = 1;
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
-				receive_status = receive_payload_metadata(tcp_socket, current_inbound_payload);
+				receive_status = receive_payload_metadata(tcp_socket, current_inbound_payload, shared_secret);
 				receive_attempts++;
 			}
 			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -260,11 +260,11 @@ int main(int argc, char **argv)
 			}
 			
 			// Send acknowledgement for the payload metadata
-			send_status = send_acknowledgement(tcp_socket, OK);
+			send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 			send_attempts = 1;
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 			{
-				send_status = send_acknowledgement(tcp_socket, OK);
+				send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 				send_attempts++;
 			}
 			if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -275,11 +275,11 @@ int main(int argc, char **argv)
 			send_attempts = 0;
 
 			// Receive actual payload
-			receive_status = receive_payload(tcp_socket, current_inbound_payload);
+			receive_status = receive_payload(tcp_socket, current_inbound_payload, shared_secret);
 			receive_attempts = 1;
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
-				receive_status = receive_payload(tcp_socket, current_inbound_payload);
+				receive_status = receive_payload(tcp_socket, current_inbound_payload, shared_secret);
 				receive_attempts++;
 			}
 			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -290,11 +290,12 @@ int main(int argc, char **argv)
 			receive_attempts = 0;
 
 			// Acknowledge receipt of payload
-			send_status = send_acknowledgement(tcp_socket, OK);
+			printf("Attempting to send OK acknowledgement for receipt of payload.\n");
+			send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 			send_attempts = 1;
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 			{	
-				send_status = send_acknowledgement(tcp_socket, OK);
+				send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 				send_attempts++;
 			}
 			if(send_attempts >= MAX_SEND_ATTEMPTS)

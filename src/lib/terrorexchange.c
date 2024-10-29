@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <stdint.h>
 #include "terrorexchange.h"
 
 struct request_header* request_header_create(enum ACTION action, enum SUBJECT subject, size_t parameter_count, size_t metadata_total_size, size_t parameters_total_size, size_t total_bytes)
@@ -38,7 +39,7 @@ struct payload* payload_create(size_t member_size, size_t member_count)
 	return new_payload;
 }
 
-bool send_request_header(int socket, struct request_header *header)
+bool send_request_header(int socket, struct request_header *header, uint32_t shared_secret)
 {
 	if(header == NULL)
 	{
@@ -56,7 +57,8 @@ bool send_request_header(int socket, struct request_header *header)
 	header->total_bytes = htonl(header->total_bytes);
 
 	ssize_t bytes_sent;
-	bytes_sent = send(socket, header, sizeof(struct request_header), 0);
+	// bytes_sent = send(socket, header, sizeof(struct request_header), 0);
+	bytes_sent = secure_send(socket, header, sizeof(struct request_header), 0, shared_secret);
 
 	// All data sent OK
 	if(bytes_sent == sizeof(struct request_header))
@@ -73,7 +75,7 @@ bool send_request_header(int socket, struct request_header *header)
 	ssize_t total_bytes_sent = bytes_sent;
 	while(total_bytes_sent < sizeof(struct request_header))
 	{
-		bytes_sent = send(socket, header + total_bytes_sent, sizeof(struct request_header) - total_bytes_sent, 0);
+		bytes_sent = secure_send(socket, header + total_bytes_sent, sizeof(struct request_header) - total_bytes_sent, 0, shared_secret);
 		if(bytes_sent < 0)
 		{
 			fprintf(stderr, "[send_request_header]: Unable to send remaining bytes. Send function returned -1.\n");
@@ -84,7 +86,7 @@ bool send_request_header(int socket, struct request_header *header)
 	return true;
 }
 
-bool receive_request_header(int socket, struct request_header *header)
+bool receive_request_header(int socket, struct request_header *header, uint32_t shared_secret)
 {
 	if(header == NULL)
 	{
@@ -93,7 +95,7 @@ bool receive_request_header(int socket, struct request_header *header)
 	}
 
 	ssize_t bytes_received;
-	bytes_received = recv(socket, header, sizeof(struct request_header), 0);
+	bytes_received = secure_recv(socket, header, sizeof(struct request_header), 0, shared_secret);
 	if(bytes_received < 0)
 	{
 		fprintf(stderr, "[receive_request_header]: Failed to receive data. Recv function returned -1.\n");
@@ -106,7 +108,7 @@ bool receive_request_header(int socket, struct request_header *header)
 		ssize_t total_bytes_received = bytes_received;
 		while(total_bytes_received < sizeof(struct request_header))
 		{
-			bytes_received = recv(socket, header + total_bytes_received, sizeof(struct request_header) - total_bytes_received, 0);
+			bytes_received = secure_recv(socket, header + total_bytes_received, sizeof(struct request_header) - total_bytes_received, 0, shared_secret);
 			if(bytes_received < 0)
 			{
 				fprintf(stderr, "[receive_request_header]: Failed to receive data. Recv function returned -1 while trying to receive remaining bytes.\n");
@@ -128,7 +130,7 @@ bool receive_request_header(int socket, struct request_header *header)
 	return true;
 }
 
-bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type)
+bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type, uint32_t shared_secret)
 {
 	// (1) Create acknowledgement request header
 	// (2) DO NOT convert to network byte order, because send_request_header 
@@ -143,7 +145,7 @@ bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type)
 
 	// Send the acknowledgement
 	bool status;
-	status = send_request_header(socket, &acknowledgement);
+	status = send_request_header(socket, &acknowledgement, shared_secret);
 	if(status == false)
 		fprintf(stderr, "[send_acknowledgement]: Could not send acknowledgement. send_request_header() returned false.\n");
 
@@ -153,7 +155,7 @@ bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type)
 // This is not guaranteed to receive an OK acknowledgement. 
 // You should check if the subject is ACKNOWLEDGEMENT afterwards; it might be NOT_FOUND
 // instead.
-bool receive_acknowledgement(int socket, struct request_header *header)
+bool receive_acknowledgement(int socket, struct request_header *header, uint32_t shared_secret)
 {
 	if(header == NULL)
 	{
@@ -163,14 +165,14 @@ bool receive_acknowledgement(int socket, struct request_header *header)
 
 	// receive acknowledgement
 	bool status;
-	status = receive_request_header(socket, header);
+	status = receive_request_header(socket, header, shared_secret);
 	if(status == false)
 		fprintf(stderr, "[receive_acknowledgement]: Failed to receive acknowledgement. receive_request_header returned false.\n");
 
 	return status;
 }
 
-bool send_payload_metadata(int socket, struct payload *outbound_payload)
+bool send_payload_metadata(int socket, struct payload *outbound_payload, uint32_t shared_secret)
 {
 	if(outbound_payload == NULL)
 	{
@@ -191,7 +193,7 @@ bool send_payload_metadata(int socket, struct payload *outbound_payload)
 
 	// Send the payload metadata 
 	bool status;
-	status = send_request_header(socket, &payload_metadata);
+	status = send_request_header(socket, &payload_metadata, shared_secret);
 	if(status == false)
 		fprintf(stderr, "[send_payload_metadata]: Could not send payload metadata. send_request_header() returned false.\n");
 
@@ -200,7 +202,7 @@ bool send_payload_metadata(int socket, struct payload *outbound_payload)
 
 // receives a SEND PAYLOAD METADATA request header and uses that data to initialize a
 // payload (the inbound_payload parameter)
-bool receive_payload_metadata(int socket, struct payload *inbound_payload)
+bool receive_payload_metadata(int socket, struct payload *inbound_payload, uint32_t shared_secret)
 {
 	if(inbound_payload == NULL)
 	{
@@ -211,7 +213,7 @@ bool receive_payload_metadata(int socket, struct payload *inbound_payload)
 	// receive payload metadata 
 	struct request_header header;
 	bool status;
-	status = receive_request_header(socket, &header);
+	status = receive_request_header(socket, &header, shared_secret);
 	if(status == false)
 		fprintf(stderr, "[receive_payload_metadata]: Failed to receive payload metadata request header. receive_request_header returned false.\n");
 
@@ -223,7 +225,7 @@ bool receive_payload_metadata(int socket, struct payload *inbound_payload)
 	return status;
 }
 
-bool send_payload(int socket, struct payload *outbound_payload)
+bool send_payload(int socket, struct payload *outbound_payload, uint32_t shared_secret)
 {
 	if(outbound_payload == NULL)
 	{
@@ -240,7 +242,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 	if(total_bytes_to_send <= CHUNK_SIZE)
 	{
 		printf("[send_payload] Attempting to send payload data as a singular chunk (%zu total bytes).\n", total_bytes_to_send);
-		bytes_sent = send(socket, payload_data, total_bytes_to_send, 0);
+		bytes_sent = secure_send(socket, payload_data, total_bytes_to_send, 0, shared_secret);
 		if(bytes_sent == total_bytes_to_send)
 		{
 			printf("[send_payload] All the bytes of the payload were sent with one call to send().\n");
@@ -258,7 +260,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 		printf("[send_payload] Attempting to send remaining %zu bytes of payload data.\n", total_bytes_to_send - total_bytes_sent);
 		while(total_bytes_sent < total_bytes_to_send)
 		{
-			bytes_sent = send(socket, payload_data + total_bytes_sent, total_bytes_to_send - total_bytes_sent, 0);
+			bytes_sent = secure_send(socket, payload_data + total_bytes_sent, total_bytes_to_send - total_bytes_sent, 0, shared_secret);
 			if(bytes_sent < 0)
 			{
 				fprintf(stderr, "[send_payload]: Failed to send remaining %zu bytes of payload. Send() returned -1.\n", total_bytes_to_send - total_bytes_to_send);
@@ -294,7 +296,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 		}
 	
 		// send the chunk
-		bytes_sent = send(socket, chunk_buffer, chunk_buffer_used, 0);
+		bytes_sent = secure_send(socket, chunk_buffer, chunk_buffer_used, 0, shared_secret);
 		if(bytes_sent < 0)
 		{
 			fprintf(stderr, "[payload_send]: Failed to send chunk of size %zu to recipient. %zu bytes of %zu bytes were sent in all (across all chunks). Send() function returned -1.\n", chunk_buffer_used, total_bytes_sent, total_bytes_to_send);
@@ -306,7 +308,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 		total_chunk_bytes_sent = bytes_sent;
 		while(total_chunk_bytes_sent < chunk_buffer_used)
 		{
-			bytes_sent = send(socket, chunk_buffer + total_chunk_bytes_sent, chunk_buffer_used - total_chunk_bytes_sent, 0);
+			bytes_sent = secure_send(socket, chunk_buffer + total_chunk_bytes_sent, chunk_buffer_used - total_chunk_bytes_sent, 0, shared_secret);
 			if(bytes_sent < 0)
 			{
 				fprintf(stderr, "[send_payload]: Failed to send %zu bytes of chunk buffer to recipient. %zu bytes of %zu were sent in total across all chunks. %zu bytes of the current chunk were sent. Send() function returned -1.\n", chunk_buffer_used - total_chunk_bytes_sent, total_bytes_sent, total_bytes_to_send, bytes_sent);
@@ -327,7 +329,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 
 // DATA BUFFER IN INBOUND_PAYLOAD->DATA SHOULD ALREADY BE ALLOCATED FROM THE INFORMATION
 // RECEIVED BY CALLING RECEIVE_PAYLOAD_METADATA
-bool receive_payload(int socket, struct payload *inbound_payload)
+bool receive_payload(int socket, struct payload *inbound_payload, uint32_t shared_secret)
 {
 	if(inbound_payload == NULL) {
 		fprintf(stderr, "[receive_payload]: Cannot load incoming payload data into a payload struct that points to NULL.\n");
@@ -352,7 +354,7 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 	{
 		printf("[receive_payload] Attempting to receive payload (%zu bytes) all in one chunk from connection with socket #%d.\n", total_bytes_to_receive, socket);
 		// First try
-		bytes_received = recv(socket, inbound_payload->data, total_bytes_to_receive, 0);
+		bytes_received = secure_recv(socket, inbound_payload->data, total_bytes_to_receive, 0, shared_secret);
 		printf("[receive_payload] Received %ld bytes from connection with socket #%d (expected %zu byte).\n", bytes_received, socket, total_bytes_to_receive); 
 		if(bytes_received == total_bytes_to_receive)
 		{
@@ -371,7 +373,7 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 		while(total_bytes_received < total_bytes_to_receive)
 		{
 			printf("[receive_payload] Starting pointer is %p. Expecting to receive %zu bytes.\n", inbound_payload->data + total_bytes_received, total_bytes_to_receive - total_bytes_received);
-			bytes_received = recv(socket, inbound_payload->data + total_bytes_received, total_bytes_to_receive - total_bytes_received, 0);
+			bytes_received = secure_recv(socket, inbound_payload->data + total_bytes_received, total_bytes_to_receive - total_bytes_received, 0, shared_secret);
 			if(bytes_received < 0)
 			{
 				fprintf(stderr, "[receive_payload]: Failed to receive remaining %zu bytes of payload. %zu bytes were received in total up until this failure. Send() returned -1.\n", total_bytes_to_receive - total_bytes_received, total_bytes_received);
@@ -398,7 +400,7 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 			chunk_buffer_amt_to_use = bytes_remaining;
 
 		// Receive data into the chunk buffer
-		bytes_received = recv(socket, chunk_buffer, chunk_buffer_amt_to_use, 0);
+		bytes_received = secure_recv(socket, chunk_buffer, chunk_buffer_amt_to_use, 0, shared_secret);
 		if(bytes_received < 0)
 		{
 			fprintf(stderr, "[receive_payload]: Failed to receive chunk of size %zu from sender. %zu bytes of %zu bytes were received in all (across all chunks). Recv() function returned -1.\n", chunk_buffer_amt_to_use, total_bytes_received, total_bytes_to_receive);
@@ -409,7 +411,7 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 		total_chunk_bytes_received = bytes_received;
 		while(total_chunk_bytes_received < chunk_buffer_amt_to_use)
 		{
-			bytes_received = recv(socket, chunk_buffer + total_chunk_bytes_received, chunk_buffer_amt_to_use - total_chunk_bytes_received, 0);
+			bytes_received = secure_recv(socket, chunk_buffer + total_chunk_bytes_received, chunk_buffer_amt_to_use - total_chunk_bytes_received, 0, shared_secret);
 			if(bytes_received < 0)
 			{
 				fprintf(stderr, "[receive_payload]: Failed to receive %zu bytes of chunk buffer. %zu bytes of %zu were received in total across all bytes. %zu bytes of the current chunk were received. Recv() function returned -1.\n", chunk_buffer_amt_to_use - total_chunk_bytes_received, total_bytes_received, total_bytes_to_receive, total_chunk_bytes_received);
@@ -429,7 +431,7 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 }
 
 // This sets the request header properly for you. There is no need to configure it in advance.
-bool send_developer_test_message(int connection_socket, struct request_header *outbound_request_header, char *message)
+bool send_developer_test_message(int connection_socket, struct request_header *outbound_request_header, char *message, uint32_t shared_secret)
 {
 	if(outbound_request_header == NULL)
 	{
@@ -460,10 +462,10 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 
 	// Send SEND DEVELOPER_TEST_MESSAGE message
 	printf("[send_developer_test_message] Trying to send SEND DEVELOPER_TEST_MESSAGE request header to connection with connection socket %d.\n", connection_socket);
-	send_status = send_request_header(connection_socket, outbound_request_header);
+	send_status = send_request_header(connection_socket, outbound_request_header, shared_secret);
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
-		send_status = send_request_header(connection_socket, outbound_request_header);
+		send_status = send_request_header(connection_socket, outbound_request_header, shared_secret);
 		send_attempts++;
 	}
 	if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -476,10 +478,10 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 
 	// Wait for OK acknowledgement
 	printf("[send_developer_test_message] Waiting to receive acknowledgement from connection with connection socket %d.\n", connection_socket);
-	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header, shared_secret);
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{	
-		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header, shared_secret);
 		receive_attempts++;
 	}
 	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -494,11 +496,11 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	struct payload outbound_payload;
 	outbound_payload.member_size = sizeof(char);
 	outbound_payload.member_count = message_length;
-	send_status = send_payload_metadata(connection_socket, &outbound_payload);
+	send_status = send_payload_metadata(connection_socket, &outbound_payload, shared_secret);
 	send_attempts = 1;
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
-		send_status = send_payload_metadata(connection_socket, &outbound_payload);
+		send_status = send_payload_metadata(connection_socket, &outbound_payload, shared_secret);
 		send_attempts++;
 	}
 	if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -509,11 +511,11 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	send_attempts = 0;
 
 	// Receive acknowledgement for payload metadata
-	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header, shared_secret);
 	receive_attempts = 1;
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{	
-		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header, shared_secret);
 		receive_attempts++;
 	}
 	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -531,11 +533,11 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 		return false;
 	}
 	memcpy(outbound_payload.data, message, message_length);
-	send_status = send_payload(connection_socket, &outbound_payload);
+	send_status = send_payload(connection_socket, &outbound_payload, shared_secret);
 	send_attempts = 1;
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
-		send_status = send_payload(connection_socket, &outbound_payload);
+		send_status = send_payload(connection_socket, &outbound_payload, shared_secret);
 		send_attempts++;
 	}
 	if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -548,11 +550,11 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	free(outbound_payload.data);
 	
 	// Receive acknowledgement for payload receipt
-	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header, shared_secret);
 	receive_attempts = 1;
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{
-		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header, shared_secret);
 		receive_attempts++;
 	}
 	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)

@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "secure_connection.h"
 
 #ifndef TERROREXCHANGE_H
@@ -81,19 +82,19 @@ struct post
 
 struct payload* payload_create(size_t member_size, size_t member_count);
 
-bool send_request_header(int socket, struct request_header *header);
-bool receive_request_header(int socket, struct request_header *header);
+bool send_request_header(int socket, struct request_header *header, uint32_t shared_secret);
+bool receive_request_header(int socket, struct request_header *header, uint32_t shared_secret);
 
-bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type);
-bool receive_acknowledgement(int socket, struct request_header *header);
+bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type, uint32_t shared_secret);
+bool receive_acknowledgement(int socket, struct request_header *header, uint32_t shared_secret);
 
-bool send_payload_metadata(int socket, struct payload *outbound_payload);
-bool receive_payload_metadata(int socket, struct payload *inbound_payload);
+bool send_payload_metadata(int socket, struct payload *outbound_payload, uint32_t shared_secret);
+bool receive_payload_metadata(int socket, struct payload *inbound_payload, uint32_t shared_secret);
 
-bool send_payload(int socket, struct payload *outbound_payload);
-bool receive_payload(int socket, struct payload *inbound_payload);
+bool send_payload(int socket, struct payload *outbound_payload, uint32_t shared_secret);
+bool receive_payload(int socket, struct payload *inbound_payload, uint32_t shared_secret);
 
-bool send_developer_test_message(int socket, struct request_header *outbound_request_header, char *message);
+bool send_developer_test_message(int socket, struct request_header *outbound_request_header, char *message, uint32_t shared_secret);
 
 bool server_confirm_user_existence(char username[]);
 

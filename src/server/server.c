@@ -158,10 +158,10 @@ void* handle_client(void *arg)
 
 		// Receive the request header
 		printf("Waiting to receive request header for client socket %d...\n", client_socket);
-		receive_status = receive_request_header(client_socket, &inbound_request_header);
+		receive_status = receive_request_header(client_socket, &inbound_request_header, shared_secret);
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
-			receive_status = receive_request_header(client_socket, &inbound_request_header);
+			receive_status = receive_request_header(client_socket, &inbound_request_header, shared_secret);
 			receive_attempts++;
 		}
 		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -176,10 +176,10 @@ void* handle_client(void *arg)
 		if(check_valid_request_header(&inbound_request_header) == false)
 		{
 			fprintf(stderr, "[handle_client] Received request header was formatted inproperly. Sending MALFORMED messgage to sender. check_valid_request_header() returned false.\n");
-			send_status = send_acknowledgement(client_socket, MALFORMED);
+			send_status = send_acknowledgement(client_socket, MALFORMED, shared_secret);
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 			{		
-				send_status = send_acknowledgement(client_socket, MALFORMED);
+				send_status = send_acknowledgement(client_socket, MALFORMED, shared_secret);
 				send_attempts++;
 			}
 			if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -193,10 +193,10 @@ void* handle_client(void *arg)
 
 		// Acknowledge that you received it (AND IT WAS A GOOD HEADER)	
 		printf("Sending OK acknowledgement to client with client socket %d...\n", client_socket);
-		send_status = send_acknowledgement(client_socket, OK);
+		send_status = send_acknowledgement(client_socket, OK, shared_secret);
 		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 		{
-			send_status = send_acknowledgement(client_socket, OK);
+			send_status = send_acknowledgement(client_socket, OK, shared_secret);
 			send_attempts++;
 		}
 		if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -239,10 +239,10 @@ void* handle_client(void *arg)
 			
 			// Receive payload metadata so you can prepare to actually receive the payload itself
 			printf("Waiting to receive payload metadata #%zu from client with client socket %d.\n", payloads_received + 1, client_socket);
-			receive_status = receive_payload_metadata(client_socket, inbound_payloads[inbound_payloads_length]);
+			receive_status = receive_payload_metadata(client_socket, inbound_payloads[inbound_payloads_length], shared_secret);
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
-				receive_status = receive_payload_metadata(client_socket, inbound_payloads[inbound_payloads_length]);
+				receive_status = receive_payload_metadata(client_socket, inbound_payloads[inbound_payloads_length], shared_secret);
 				receive_attempts++;
 			}
 			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -255,10 +255,10 @@ void* handle_client(void *arg)
 
 			// Acknowledge receipt of payload metadata
 			printf("Sending OK acknowledgement for payload %zu's metadata to client with client_socket %d.\n", payloads_received + 1, client_socket);
-			send_status = send_acknowledgement(client_socket, OK);
+			send_status = send_acknowledgement(client_socket, OK, shared_secret);
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 			{
-				send_status = send_acknowledgement(client_socket, OK);
+				send_status = send_acknowledgement(client_socket, OK, shared_secret);
 				send_attempts++;
 			}
 			if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -274,16 +274,16 @@ void* handle_client(void *arg)
 			if(inbound_payloads[inbound_payloads_length]->data == NULL)
 			{
 				fprintf(stderr, "[handle_client] Failed to allocate %zu bytes for the data buffer of the current inbound payload (payload %zu)\n", inbound_payloads[inbound_payloads_length]->member_size * inbound_payloads[inbound_payloads_length]->member_count, payloads_received);
-				send_status = send_acknowledgement(client_socket, INSUFFICIENT_MEMORY);
+				send_status = send_acknowledgement(client_socket, INSUFFICIENT_MEMORY, shared_secret);
 				break;
 			}
 
 			// Actually receive the payload
 			printf("Waiting to receive payload %zu's data attribute from client with client socket %d.\n", payloads_received + 1, client_socket);
-			receive_status = receive_payload(client_socket, inbound_payloads[inbound_payloads_length]);
+			receive_status = receive_payload(client_socket, inbound_payloads[inbound_payloads_length], shared_secret);
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 			{
-				receive_status = receive_payload(client_socket, inbound_payloads[inbound_payloads_length]);
+				receive_status = receive_payload(client_socket, inbound_payloads[inbound_payloads_length], shared_secret);
 				receive_attempts++;
 			}
 			if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -296,10 +296,10 @@ void* handle_client(void *arg)
 
 			// Acknowledge that you received the payload
 			printf("Sending OK acknowledgement to client with client socket %d.\n", client_socket);
-			send_status = send_acknowledgement(client_socket, OK);
+			send_status = send_acknowledgement(client_socket, OK, shared_secret);
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 			{
-				send_status = send_acknowledgement(client_socket, OK);
+				send_status = send_acknowledgement(client_socket, OK, shared_secret);
 				send_attempts++;
 			}
 			if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -356,7 +356,7 @@ void* handle_client(void *arg)
 						printf("inbound payload 0 data is NOT null.\n");
 					printf("Message received from client was \"%s\"\n", (char *) inbound_payloads[0]->data);
 					printf("Attempting to use send_developer_test_message function to reply to client with client socket %d.\n", client_socket);
-					send_status = send_developer_test_message(client_socket, &outbound_request_header, (char *) inbound_payloads[0]->data);
+					send_status = send_developer_test_message(client_socket, &outbound_request_header, (char *) inbound_payloads[0]->data, shared_secret);
 					if(send_status == false)
 					{
 						fprintf(stderr, "[handle_client] Main logic: Failed to send developer test message to client. Something might be wrong with the connection.\n");
