@@ -364,6 +364,39 @@ void* handle_client(void *arg)
 					}
 					printf("Successfully sent developer test message back to client.\n");	
 					break;
+
+				case LOGIN_ATTEMPT:
+					printf("SEND LOGIN_ATTEMPT received from client with client socket %d.\n", client_socket);
+					if(inbound_payloads[0]->data == NULL)
+					{
+						fprintf(stderr, "[handle_client] Inbound payload #1's data buffer is NULL. For a SEND LOGIN_ATTEMPT request header, 2 non-NULL payloads are expected. Maybe the data was sent erroneously?\n");
+						break;
+					}
+					if(inbound_payloads[1]->data == NULL)
+					{
+						fprintf(stderr, "[handle_client] Inbound payload #2's data buffer is NULL. For a SEND LOGIN_ATTEMPT request header, 2 non-NULL payloads are expected. Maybe the data was sent erroneously?\n");
+						break;
+					}
+					printf("Got username: \"%s\", password: \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
+					// DO DATABASE THING HERE
+					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
+					char *temporary_response = malloc(40 + strlen(inbound_payloads[0]->data) + strlen(inbound_payloads[1]->data) + 3);
+					if(temporary_response == NULL)
+					{
+						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
+						break;
+					}
+					sprintf(temporary_response, "Got username as \"%s\" and password as \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
+					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
+					free(temporary_response);
+					if(send_status == false)
+					{
+						fprintf(stderr, "[handle_client] Failed to send developer test message to client. Something might be wrong with the connection.\n");
+						break;
+					}
+					printf("Successfully sent temporary response to client with socket #%d for their SEND LOGIN_ATTEMPT message.\n", client_socket);
+					break;
+
 				default:
 					break;
 			}
