@@ -59,6 +59,14 @@ bool check_valid_request_header(struct request_header *header)
 			break;
 		case ACKNOWLEDGEMENT:
 			break;
+		case LOGIN_ATTEMPT: 
+			break;
+		case USERNAME_CHANGE:
+			break;
+		case PASSWORD_CHANGE:
+			break;
+		case ACCOUNT_CREATE:
+			break;
 		default:
 			return false;
 			break;
