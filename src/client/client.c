@@ -57,6 +57,10 @@ enum SUBJECT string_to_request_header_subject(char *str, size_t str_length)
 	else if(strcmp(str, "PAYLOAD_METADATA") == 0) 		return PAYLOAD_METADATA;	
 	else if(strcmp(str, "PAYLOAD") == 0) 			return PAYLOAD;
 	else if(strcmp(str, "ACKNOWLEDGEMENT") == 0) 		return ACKNOWLEDGEMENT;
+	else if(strcmp(str, "LOGIN_ATTEMPT") == 0)		return LOGIN_ATTEMPT;
+	else if(strcmp(str, "USERNAME_CHANGE") == 0)		return USERNAME_CHANGE;
+	else if(strcmp(str, "PASSWORD_CHANGE") == 0)		return PASSWORD_CHANGE;
+	else if(strcmp(str, "ACCOUNT_CREATE") == 0)		return ACCOUNT_CREATE;
 	else 							return SUBJECT_ERROR;
 }
 
