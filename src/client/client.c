@@ -132,8 +132,11 @@ int main(int argc, char **argv)
 
 	char *username;
 	char *password;
+	char *email;
 	int username_length = 0;
 	int password_length = 0;
+	int email_length = 0;
+	bool valid_email = false;
 	
 	// Used to prevent client from waiting to receive something when data was 
 	// input erroneously. If nothing was sent, it will never receive anything.
@@ -248,7 +251,7 @@ int main(int argc, char **argv)
 						DATA_SENT_FLAG = false;
 						continue;		
 					}
-					username_length = strlen(username);
+					username_length = strlen(username) + 1;
 					if(username_length >= USERNAME_MAX_LENGTH)
 					{
 						fprintf(stderr, "Username is too long (%d+ characters).\n", USERNAME_MAX_LENGTH);
@@ -263,11 +266,10 @@ int main(int argc, char **argv)
 						DATA_SENT_FLAG = false;
 						continue;
 					}
-					password_length = strlen(password);
+					password_length = strlen(password) + 1;
 					if(password_length >= PASSWORD_MAX_LENGTH)
 					{
 						fprintf(stderr, "Password is too long (%d+ characters).\n", PASSWORD_MAX_LENGTH);
-
 						DATA_SENT_FLAG = false;
 						continue;
 					}
@@ -283,6 +285,70 @@ int main(int argc, char **argv)
 					DATA_SENT_FLAG = true;
 					break;
 
+				case ACCOUNT_CREATE:
+					// Parse input for username
+					username = strtok(outbound_buffer, " ");
+					if(username == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve username.\n");
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					username_length = strlen(username) + 1;
+					if(username_length > USERNAME_MAX_LENGTH)
+					{
+						fprintf(stderr, "Username is too long (%d+ characters).\n", USERNAME_MAX_LENGTH);
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					// Parse input for email
+					email = strtok(NULL, " ");
+					if(email == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve email.\n");
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					email_length = strlen(email) + 1;
+					if(email_length >= 64)
+					{
+						fprintf(stderr, "Email is too long (64+ characters).\n");
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					for(int email_i = 0; i < email_length; i++)
+					{
+						if(email[email_i] == '@') 
+						{
+							valid_email = true;
+							break;
+						}
+					} 
+					if(valid_email == false)
+					{ 
+						fprintf(stderr, "Email address \"%s\" does not have a domain (no @ symbol found).\n");
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+
+					// Parse input for password
+					password = strtok(NULL, " ");
+					if(password == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize password to resolve password.\n");
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					password_length = strlen(password) + 1;
+					if(password_length > PASSWORD_MAX_LENGTH)
+					{
+						fprintf(stderr, "Password is too long (%d+ characters).\n", PASSWORD_MAX_LENGTH);
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					// temporary behavior
+					printf("Got username: \"%s\", email: \"%s\", password: \"%s\".\n", username, email, password);
+					break;	
 				default:
 					fprintf(stderr, "Unimplemented SEND case for subject %s.\n", subject_type);
 					DATA_SENT_FLAG = false;					
