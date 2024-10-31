@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = newew1.0.0
-DISTDIR = /home/vboxuser/Desktop/newew/.tmp/newew1.0.0
+DISTDIR = /home/vboxuser/Desktop/GUI_v0.8/.tmp/newew1.0.0
 LINK          = clang++
 LFLAGS        = -ccc-gcc-name g++ -Wl,-rpath,/home/vboxuser/Qt/6.8.0/gcc_64/lib -Wl,-rpath-link,/home/vboxuser/Qt/6.8.0/gcc_64/lib
 LIBS          = $(SUBLIBS) /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Widgets.so /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Gui.so /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Core.so -lpthread -lGL   
@@ -283,6 +283,7 @@ DIST          = ../../Qt/6.8.0/gcc_64/mkspecs/features/spec_pre.prf \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/qt_config.prf \
 		../../Qt/6.8.0/gcc_64/mkspecs/linux-clang/qmake.conf \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/toolchain.prf \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/default_pre.prf \
@@ -519,6 +520,7 @@ Makefile: newew.pro ../../Qt/6.8.0/gcc_64/mkspecs/linux-clang/qmake.conf ../../Q
 		../../Qt/6.8.0/gcc_64/mkspecs/features/qt_config.prf \
 		../../Qt/6.8.0/gcc_64/mkspecs/linux-clang/qmake.conf \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/toolchain.prf \
 		../../Qt/6.8.0/gcc_64/mkspecs/features/default_pre.prf \
@@ -723,6 +725,7 @@ Makefile: newew.pro ../../Qt/6.8.0/gcc_64/mkspecs/linux-clang/qmake.conf ../../Q
 ../../Qt/6.8.0/gcc_64/mkspecs/features/qt_config.prf:
 ../../Qt/6.8.0/gcc_64/mkspecs/linux-clang/qmake.conf:
 ../../Qt/6.8.0/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../Qt/6.8.0/gcc_64/mkspecs/features/exclusive_builds.prf:
 ../../Qt/6.8.0/gcc_64/mkspecs/features/toolchain.prf:
 ../../Qt/6.8.0/gcc_64/mkspecs/features/default_pre.prf:
@@ -992,7 +995,7 @@ moc_AccountCode.cpp: AccountCode.h \
 		../../Qt/6.8.0/gcc_64/include/QtGui/qguiapplication_platform.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include AccountCode.h -o moc_AccountCode.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include AccountCode.h -o moc_AccountCode.cpp
 
 moc_answerwindow.cpp: answerwindow.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -1534,7 +1537,7 @@ moc_answerwindow.cpp: answerwindow.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/qwizard.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include answerwindow.h -o moc_answerwindow.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include answerwindow.h -o moc_answerwindow.cpp
 
 moc_comment_1.cpp: comment_1.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -1728,7 +1731,7 @@ moc_comment_1.cpp: comment_1.h \
 		../../Qt/6.8.0/gcc_64/include/QtGui/qguiapplication_platform.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include comment_1.h -o moc_comment_1.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include comment_1.h -o moc_comment_1.cpp
 
 moc_communitiestab.cpp: communitiestab.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -2270,7 +2273,7 @@ moc_communitiestab.cpp: communitiestab.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/qwizard.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include communitiestab.h -o moc_communitiestab.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include communitiestab.h -o moc_communitiestab.cpp
 
 moc_createaccount.cpp: createaccount.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -2464,7 +2467,7 @@ moc_createaccount.cpp: createaccount.h \
 		../../Qt/6.8.0/gcc_64/include/QtGui/qguiapplication_platform.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include createaccount.h -o moc_createaccount.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include createaccount.h -o moc_createaccount.cpp
 
 moc_forgotpassword.cpp: forgotpassword.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -2658,7 +2661,7 @@ moc_forgotpassword.cpp: forgotpassword.h \
 		../../Qt/6.8.0/gcc_64/include/QtGui/qguiapplication_platform.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include forgotpassword.h -o moc_forgotpassword.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include forgotpassword.h -o moc_forgotpassword.cpp
 
 moc_mainwindow.cpp: mainwindow.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QMainWindow \
@@ -2853,7 +2856,7 @@ moc_mainwindow.cpp: mainwindow.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/qtabwidget.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
 
 moc_makecommentorpost.cpp: makecommentorpost.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -3047,7 +3050,7 @@ moc_makecommentorpost.cpp: makecommentorpost.h \
 		../../Qt/6.8.0/gcc_64/include/QtGui/qguiapplication_platform.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include makecommentorpost.h -o moc_makecommentorpost.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include makecommentorpost.h -o moc_makecommentorpost.cpp
 
 moc_makequestion.cpp: makequestion.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -3241,7 +3244,7 @@ moc_makequestion.cpp: makequestion.h \
 		../../Qt/6.8.0/gcc_64/include/QtGui/qguiapplication_platform.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include makequestion.h -o moc_makequestion.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include makequestion.h -o moc_makequestion.cpp
 
 moc_post_1.cpp: post_1.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -3783,7 +3786,7 @@ moc_post_1.cpp: post_1.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/qwizard.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include post_1.h -o moc_post_1.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include post_1.h -o moc_post_1.cpp
 
 moc_profile.cpp: profile.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -4325,7 +4328,7 @@ moc_profile.cpp: profile.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/qwizard.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include profile.h -o moc_profile.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include profile.h -o moc_profile.cpp
 
 moc_searchresults.cpp: searchresults.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -4867,7 +4870,7 @@ moc_searchresults.cpp: searchresults.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/qwizard.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include searchresults.h -o moc_searchresults.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include searchresults.h -o moc_searchresults.cpp
 
 moc_secdialog.cpp: secdialog.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QDialog \
@@ -5409,7 +5412,7 @@ moc_secdialog.cpp: secdialog.h \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/qwizard.h \
 		moc_predefs.h \
 		../../Qt/6.8.0/gcc_64/libexec/moc
-	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/newew/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/newew -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include secdialog.h -o moc_secdialog.cpp
+	/home/vboxuser/Qt/6.8.0/gcc_64/libexec/moc $(DEFINES) --include /home/vboxuser/Desktop/GUI_v0.8/moc_predefs.h -I/home/vboxuser/Qt/6.8.0/gcc_64/mkspecs/linux-clang -I/home/vboxuser/Desktop/GUI_v0.8 -I/home/vboxuser/Qt/6.8.0/gcc_64/include -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtWidgets -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtGui -I/home/vboxuser/Qt/6.8.0/gcc_64/include/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/llvm-18/lib/clang/18/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include secdialog.h -o moc_secdialog.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
