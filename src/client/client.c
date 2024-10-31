@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #define SERVER_ADDR "142.93.199.100"
 //#define SERVER_ADDR "127.0.0.1"
+#define USERNAME_MAX_LENGTH 16
+#define PASSWORD_MAX_LENGTH 16
 #include "../lib/terrorexchange.h"
 #include "../lib/secure_connection.h"
 
@@ -124,6 +126,16 @@ int main(int argc, char **argv)
 	size_t payloads_received = 0;
 	size_t payloads_expected = 0;
 
+	char *username;
+	char *password;
+	int username_length = 0;
+	int password_length = 0;
+	
+	// Used to prevent client from waiting to receive something when data was 
+	// input erroneously. If nothing was sent, it will never receive anything.
+	// So, it shouldn't enter the waiting logic as it will wait forever.
+	bool DATA_SENT_FLAG = false;
+
 	// MAINLOOP: Input data and send off to the server. Then, receive data.
 	while(true)
 	{
@@ -150,13 +162,15 @@ int main(int argc, char **argv)
 		printf("Got subject as \"%s\" (code %d).\n", subject_type, outbound_request_header.subject);
 		printf("Got data as \"%s\" (length %zu).\n", data, strlen(data));
 		memcpy(outbound_buffer, data, strlen(data) + 1);
-
+		
+		// SEND SOMETHING TO THE SERVER BASED ON WHAT THE USER INPUT
 		if(outbound_request_header.action == GET)
 		{
 			fprintf(stderr, "GET DATA ABILITY UNIMPLEMENTED.\n");
+			DATA_SENT_FLAG = false;
 			continue;
 		}
-		else // sending data to the server
+		else // SENDing data to the server
 		{
 			switch(outbound_request_header.subject)
 			{
@@ -164,14 +178,65 @@ int main(int argc, char **argv)
 					send_status = send_developer_test_message(tcp_socket, &outbound_request_header, data, shared_secret);
 					if(send_status == false)
 					{
-						fprintf(stderr, "[ERROR] Failed to send developer test message to the server.\n"); break;
+						fprintf(stderr, "[ERROR] Failed to send developer test message to the server.\n");
+						DATA_SENT_FLAG = false;
 					}
+					DATA_SENT_FLAG = true;
 					break;
+
+				case LOGIN_ATTEMPT:
+					// Parse input for username
+					username = strtok(outbound_buffer, " ");
+					if(username == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve username.\n");
+						DATA_SENT_FLAG = false;
+						continue;		
+					}
+					username_length = strlen(username);
+					if(username_length >= USERNAME_MAX_LENGTH)
+					{
+						fprintf(stderr, "Username is too long (%d+ characters).\n", USERNAME_MAX_LENGTH);
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					// Parse input for password
+					password = strtok(NULL, " ");
+					if(password == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve password.\n");
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					password_length = strlen(password);
+					if(password_length >= PASSWORD_MAX_LENGTH)
+					{
+						fprintf(stderr, "Password is too long (%d+ characters).\n", PASSWORD_MAX_LENGTH);
+
+						DATA_SENT_FLAG = false;
+						continue;
+					}
+					printf("Got username: \"%s\", password: \"%s\".\n", username, password);
+
+					// Try to send off to the server (UNIMPLEMENTED)
+					send_status = send_login_attempt(tcp_socket, &outbound_request_header, username, username_length, password, password_length, shared_secret);
+					if(send_status == false)
+					{	
+						fprintf(stderr, "[ERROR] Failed to send login attempt to the server. send_login_attempt returned false.\n");
+						DATA_SENT_FLAG = false;
+					}
+					DATA_SENT_FLAG = true;
+					break;
+
 				default:
 					fprintf(stderr, "Unimplemented SEND case for subject %s.\n", subject_type);
+					DATA_SENT_FLAG = false;					
 					break;
 			}
 		}
+		
+		// Don't wait to receive data if you never sent anything (forever halting)
+		if(DATA_SENT_FLAG == false) continue;
 
 		// Wait to receive data back for what we sent.
 		receive_status = receive_request_header(tcp_socket, &inbound_request_header, shared_secret);
@@ -308,7 +373,7 @@ int main(int argc, char **argv)
 			payloads_received++;
 		}
 		
-		// Review data received.
+		// Review data received.	
 		if(inbound_request_header.action == SEND && inbound_request_header.subject == DEVELOPER_TEST_MESSAGE)
 		{
 			printf("Received: ");

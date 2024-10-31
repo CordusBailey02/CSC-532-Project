@@ -26,6 +26,7 @@ enum SUBJECT { // Typical data objects
 	       SUBJECT_ERROR
 	     };
 
+// parameter_count member of outbound request header is used to signal the type of acknowledgement.
 enum ACKNOWLEDGEMENT_TYPE {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED, FAILED,
 			   INSUFFICIENT_MEMORY, 
 		 	   ACKNOWLEDGEMENT_TYPE_ERROR };
@@ -97,6 +98,7 @@ bool send_payload(int socket, struct payload *outbound_payload, uint32_t shared_
 bool receive_payload(int socket, struct payload *inbound_payload, uint32_t shared_secret);
 
 bool send_developer_test_message(int socket, struct request_header *outbound_request_header, char *message, uint32_t shared_secret);
+bool send_login_attempt(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *password, int password_length, uint32_t shared_secret);
 
 bool server_confirm_user_existence(char username[]);
 
