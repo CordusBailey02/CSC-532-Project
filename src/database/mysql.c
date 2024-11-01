@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../lib/terrorexchange.h"
+#include "../lib/.env"
 
 
 MYSQL *conn;
@@ -11,7 +13,7 @@ enum DATABASE_ERROR
     INEXISTENT_QUERY,
     INSUFFICIENT_PARAMETERS,
     CONNECTION_ERROR
-}
+};
 
 void cleanup()
 {
@@ -21,11 +23,11 @@ void cleanup()
 
 int connection_init()
 {
-    const char *hostname = $SQL_HOSTNAME;
-    const char *username = $SQL_USERNAME;
-    const char *psw = $SQL_PASSWORD;
-    const char *db = $SQL_DB;
-    const unsigned int port = $SQL_PORT;
+    const char *hostname = SQL_HOSTNAME;
+    const char *username = SQL_USERNAME;
+    const char *psw = SQL_PASSWORD;
+    const char *db = SQL_DB;
+    const unsigned int port = SQL_PORT;
     const char *unix_socket = NULL;
     const unsigned long client_flag = 0;
     conn = mysql_init(NULL);
@@ -111,7 +113,7 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
     else
     {
         printf("No query found...");
-        &return_flag = INEXISTANT_QUERY;
+        &return_flag = INEXISTENT_QUERY;
         return "NULL";
     }
 
