@@ -3,17 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../lib/terrorexchange.h"
-#include "../lib/.env"
 
 
 MYSQL *conn;
 
-enum DATABASE_ERROR
-{
-    INEXISTENT_QUERY,
-    INSUFFICIENT_PARAMETERS,
-    CONNECTION_ERROR
-};
 
 void cleanup()
 {
@@ -23,11 +16,11 @@ void cleanup()
 
 int connection_init()
 {
-    const char *hostname = SQL_HOSTNAME;
-    const char *username = SQL_USERNAME;
-    const char *psw = SQL_PASSWORD;
-    const char *db = SQL_DB;
-    const unsigned int port = SQL_PORT;
+    const char *hostname = getenv("SQL_HOSTNAME");
+    const char *username = getenv("SQL_USERNAME");
+    const char *psw = getenv("SQL_PASSWORD");
+    const char *db = getenv("SQL_DB");
+    const unsigned int port = 25060;
     const char *unix_socket = NULL;
     const unsigned long client_flag = 0;
     conn = mysql_init(NULL);
@@ -54,12 +47,19 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
 
     size_t payload_length = inbound_payloads[0]->member_count;
     bool query_length_check = false;
+    char ***results_table = malloc(num_fields[0] * num_rows[0] + 10);
+    results_table[0][0] = "NULL";
+
+    // reset return_flag, num_fields, num_rows
+    *return_flag = SUCCESS;
+    *num_fields = 0;
+    *num_rows = 0;
 
     if(connection_init())
     {
         printf("\nConnection Failed...\n");
-        &return_flag = CONNECTION_ERROR;
-        return "NULL";
+        *return_flag = CONNECTION_ERROR;
+        return results_table;
     }
 
     printf("\nConnection success...\n");
@@ -71,40 +71,45 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
     {
 
         int j = snprintf(query, 100, "CALL get_categories_from_user(\'%s\');",
-            inbound_payloads[0]->data);
+            (char *) inbound_payloads[0]->data);
     }
     else if(query_name == "add_user_category")
     {
         if(payload_length < 2)
         {
             query_length_check = true;
-            break;
         }
-        int j = snprintf(query, 100, "CALL add_user_category(\'%s\', \'%d\');",
-            inbound_payloads[0]->data,
-            atoi(inbound_payloads[1]->data));
+        else
+        {
+            int j = snprintf(query, 100, "CALL add_user_category(\'%s\', \'%d\');",
+                (char *) inbound_payloads[0]->data,
+                atoi(inbound_payloads[1]->data));
+        }
     }
     else if(query_name == "get_user_reports")
     {
         int j = snprintf(query, 100, "CALL add_user_category(\'%s\');",
-            inbound_payloads[0]);
+            (char *) inbound_payloads[0]);
     }
     else if(query_name == "add_new_category")
     {
         int j = snprintf(query, 100, "CALL add_new_category(\'%s\');",
-            inbound_payloads[0]);
+            (char *) inbound_payloads[0]);
     }
     else if(query_name == "add_new_user")
     {
         if(payload_length < 2)
         {
             query_length_check = true;
-            break;
         }
-        int j = snprintf(query, 100, "CALL add_new_user(\'%s\', \'%s\', \'%s\', 0, 0);",
-            inbound_payloads[0]->data,
-            inbound_payloads[1]->data,
-            inbound_payloads[2]->data);
+        else
+        {
+            int j = snprintf(query, 100, "CALL add_new_user(\'%s\', \'%s\', \'%s\', 0, 0);",
+                (char *) inbound_payloads[0]->data,
+                (char *) inbound_payloads[1]->data,
+                (char *) inbound_payloads[2]->data);
+        }
+        
     }
     else if(query_name == "get_all_users")
     {
@@ -113,15 +118,15 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
     else
     {
         printf("No query found...");
-        &return_flag = INEXISTENT_QUERY;
-        return "NULL";
+        *return_flag = INEXISTENT_QUERY;
+        return results_table;
     }
 
     if(query_length_check)
     {
         printf("Inbound payload had an insuffucient amount of data.");
-        &return_flag = INSUFFICIENT_PARAMETERS;
-        return "NULL";
+        *return_flag = INSUFFICIENT_PARAMETERS;
+        return results_table;
     }
 
     printf("\nQuery: %s\n", query);
@@ -130,21 +135,21 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
     {
         printf("\nQuery Failed...\n");
         fprintf(stderr, "Error: %s\n", mysql_error(conn));
-        return "NULL";
+        return results_table;
     }
 
     printf("\nQuery success...\n");
 
     // Now that the query has successfully completed, gather the results and return each row.
     
-    unsigned int num_rows;
     MYSQL_RES *result;
     MYSQL_ROW row;
     unsigned int table_index = 0;
 
     result = mysql_store_result(conn);
-    uint64_t *num_rows = mysql_num_rows(result);
-    char ***results_table = malloc(sizeof(row*) * num_rows);
+    *num_rows = mysql_num_rows(result);
+    *num_fields = mysql_num_fields(result);
+    results_table = realloc(results_table, sizeof(row) * *num_rows);
 
     if (result) 
     {
@@ -159,13 +164,14 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
         printf("\nNo result...\n");
         if(mysql_field_count(conn) == 0)
         {
-            num_rows = mysql_affected_rows(conn);
-            return "OK";
+            // *num_rows = mysql_affected_rows(conn);
+            results_table[0][0] = "OK";
+            return results_table;
         }
         else 
         {
             fprintf(stderr, "Error: %s\n", mysql_error(conn));
-            return "NULL";
+            return results_table;
         }
     }
 
