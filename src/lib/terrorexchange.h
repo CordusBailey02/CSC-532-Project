@@ -97,8 +97,13 @@ bool receive_payload_metadata(int socket, struct payload *inbound_payload, uint3
 bool send_payload(int socket, struct payload *outbound_payload, uint32_t shared_secret);
 bool receive_payload(int socket, struct payload *inbound_payload, uint32_t shared_secret);
 
+void print_too_many_send_attempts_error(int socket, char *function_name, char *outbound_thing, int item_number);
+void print_too_many_receive_attempts_error(int socket, char *function_name, char *outbound_thing, int item_number, char *additional_comment);
+void print_acknowledgement_type_mismatch_error(int socket, char *function_name, char *message_type, enum ACKNOWLEDGEMENT_TYPE wrong_type, enum ACKNOWLEDGEMENT_TYPE right_type)
+
 bool send_developer_test_message(int socket, struct request_header *outbound_request_header, char *message, uint32_t shared_secret);
 bool send_login_attempt(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *password, int password_length, uint32_t shared_secret);
+bool send_account_create(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *email, int email_length, char *password, int password_length, uint32_t shared_secret);
 
 bool server_confirm_user_existence(char username[]);
 
