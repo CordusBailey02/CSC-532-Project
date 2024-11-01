@@ -1,0 +1,2 @@
+#Ignore env file containing secret MYSQL connection info
+*.env
