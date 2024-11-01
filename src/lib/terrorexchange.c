@@ -447,7 +447,7 @@ void print_too_many_receive_attempts_error(int socket, char *function_name, char
 
 void print_acknowledgement_type_mismatch_error(int socket, char *function_name, char *message_type, enum ACKNOWLEDGEMENT_TYPE wrong_type, enum ACKNOWLEDGEMENT_TYPE right_type)
 {
-	fprintf(stderr, "[%s] Received acknowledgement from connection with socket %d for %s; however, the acknowledgement was of type %ld (wanted %ld). Maybe the data was sent erroneously?\n", function_name, socket, message_type, wrong_type, right_type);
+	fprintf(stderr, "[%s] Received acknowledgement from connection with socket %d for %s; however, the acknowledgement was of type %d (wanted %d). Maybe the data was sent erroneously?\n", function_name, socket, message_type, wrong_type, right_type);
 }
 
 // This sets the request header properly for you. There is no need to configure it in advance.
@@ -808,7 +808,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	outbound_request_header->parameter_count = 3;
 	outbound_request_header->metadata_total_size = outbound_request_header->parameter_count * 2 * sizeof(size_t);
 	outbound_request_header->parameters_total_size = username_length + password_length + email_length;
-	outobund_request_header->total_bytes = outbound_request_header->parameters_total_size + outbound_request_header->metadata_total_size;
+	outbound_request_header->total_bytes = outbound_request_header->parameters_total_size + outbound_request_header->metadata_total_size;
 
 	// Send SEND ACCOUNT_CREATE message
 	printf("[send_account_create] Trying to send SEND ACCOUNT_CREATE request header to connection with socket #%d.\n", socket);
@@ -840,7 +840,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	}
 	
 	// Check valid acknowledgement
-	if(inbound_request_header.parameters_count != OK)
+	if(inbound_request_header.parameter_count != OK)
 	{
 		fprintf(stderr, "[send_account_create] Received acknowledgement from connection with socket #%d for SEND ACCOUNT_CREATE; however an acknowledgement type other than OK was received. Maybe the data was sent erroneously?\n", socket);
 		return false;
@@ -853,7 +853,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	outbound_payloads[0].member_size = 1;
 	outbound_payloads[0].member_count = username_length;
 	outbound_payloads[0].data = malloc(username_length);
-	if(outbound_payload[0].data == NULL)
+	if(outbound_payloads[0].data == NULL)
 	{
 		fprintf(stderr, "[send_login_attempt] Failed to allocate memory buffer for outbound payload 1 (of 3). Needed to allocate %d bytes. Is the system low on memory?\n", username_length);
 		return false;
@@ -863,7 +863,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	outbound_payloads[1].member_size = 1;
 	outbound_payloads[1].member_count = email_length;
 	outbound_payloads[1].data = malloc(email_length);
-	if(outbound_payload[1].data == NULL)
+	if(outbound_payloads[1].data == NULL)
 	{
 		fprintf(stderr, "[send_login_attempt] Failed to allocate memory buffer for outbound payload 2 (of 3). Needed to allocate %d bytes. Is the system low on memory?\n", email_length);
 		return false;
@@ -873,7 +873,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	outbound_payloads[2].member_size = 1;
 	outbound_payloads[2].member_count = password_length;
 	outbound_payloads[2].data = malloc(password_length);
-	if(outbound_payload[2].data == NULL)
+	if(outbound_payloads[2].data == NULL)
 	{
 		fprintf(stderr, "[send_login_attempt] Failed to allocate memory buffer for outbound payload 3 (of 3). Needed to allocate %d bytes. Is the system low on memory?\n", password_length);
 		return false;
@@ -887,7 +887,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 		send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent], shared_secret);
 		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 		{
-			send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent], shared secret);
+			send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent], shared_secret);
 			send_attempts++;
 		}
 		if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -901,10 +901,10 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 		send_attempts = 0;
 
 		// Receive acknowledgement
-		receive_status = receive_acknowledge(socket, &inbound_request_header, shared_secret);
+		receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
-			receive_stauts = receive_acknowledge(socket, &inbound_request_header, shared_secret);
+			receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
 			receive_attempts++;
 		}
 		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -913,14 +913,14 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 			free(outbound_payloads[0].data);
 			free(outbound_payloads[1].data);
 			free(outbound_payloads[2].data);
-			return false;`
+			return false;
 		}
 		receive_attempts = 0;
 
 		// Check valid acknowledgement
 		if(inbound_request_header.parameter_count != OK)
 		{
-			fprintf(stderr, "[send_account_create] Received acknowledgement from connection with socket %d for SEND ACCOUNT_CREATE; however, the acknowledgement was of type %ld (wanted %ld). This happened after the transmission of the metadata for payload #%d. Maybe the data was sent erroneously?\n", socket, inbound_request_header.parameter_count, OK, payloads_sent);
+			fprintf(stderr, "[send_account_create] Received acknowledgement from connection with socket %d for SEND ACCOUNT_CREATE; however, the acknowledgement was of type %ld (wanted %d). This happened after the transmission of the metadata for payload #%d. Maybe the data was sent erroneously?\n", socket, inbound_request_header.parameter_count, OK, payloads_sent);
 			free(outbound_payloads[0].data);
 			free(outbound_payloads[1].data);
 			free(outbound_payloads[2].data);
@@ -962,9 +962,9 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 		receive_attempts = 0;
 
 		// Check valid acknowledgement
-		if(inbound_request_header.parameters_count != OK)
+		if(inbound_request_header.parameter_count != OK)
 		{
-			print_acknowledgement_type_mismatch_error(socket, "send_account_create", "SEND ACCOUNT_CREATE", inbound_request_header.parameters_count, OK);
+			print_acknowledgement_type_mismatch_error(socket, "send_account_create", "SEND ACCOUNT_CREATE", inbound_request_header.parameter_count, OK);
 			fprintf(stderr, "This happened after trying to get an acknowledgement for the receipt of the data member of payload #%d.\n", payloads_sent + 1);
 			free(outbound_payloads[0].data);
 			free(outbound_payloads[1].data);

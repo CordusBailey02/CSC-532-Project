@@ -405,6 +405,18 @@ void* handle_client(void *arg)
 					printf("Successfully sent temporary response to client with socket #%d for their SEND LOGIN_ATTEMPT message.\n", client_socket);
 					break;
 
+				case ACCOUNT_CREATE:
+					printf("SEND ACCOUNT_CREATE received from client with client socket %d.\n", client_socket);
+					if(inbound_payloads[0]->data == NULL)
+					{
+						fprintf(stderr, "[handle_client] Inbound payload #%d's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously?\n", client_socket);
+						continue;
+					}
+					if(inbound_payloads[1]->data == NULL)
+					{
+						fprintf(stderr, "[handle_client] Inbound payload #%d's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously?\n", client_socket);
+						continue;
+					}
 				default:
 					break;
 			}
