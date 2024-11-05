@@ -424,8 +424,10 @@ void* handle_client(void *arg)
 						fprintf(stderr, "[handle_client] Inbound payload 3's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
 						continue;
 					}
+					// Review what was received
 					printf("Got username: \"%s\", email: \"%s\", password: \"%s\" from client with socket #%d.\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data, client_socket);
-					// temporary response
+
+					// Send a temporary response
 					int username_length, email_length, password_length;
 					username_length = strlen(inbound_payloads[0]->data);
 					email_length = strlen(inbound_payloads[1]->data);
@@ -437,6 +439,7 @@ void* handle_client(void *arg)
 						continue;
 					}
 					sprintf(temporary_response, "Got username: \"%s\", email: \"%s\", password: \"%s\".\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data);
+					printf("Temporary response to send off to client is \"%s\"\n", temporary_response);
 					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
 					if(send_status == false)
 					{

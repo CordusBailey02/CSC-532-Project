@@ -384,8 +384,9 @@ int main(int argc, char **argv)
 		
 		// Don't wait to receive data if you never sent anything (forever halting)
 		if(DATA_SENT_FLAG == false) continue;
-
+		
 		// Wait to receive data back for what we sent.
+		printf("Waiting to receive response request header from server...\n");
 		receive_status = receive_request_header(tcp_socket, &inbound_request_header, shared_secret);
 		receive_attempts = 1;
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
@@ -399,8 +400,10 @@ int main(int argc, char **argv)
 			continue;
 		}
 		receive_attempts = 0;
+		printf("Received request header from server. Subject code was %d.\n", inbound_request_header.subject);
 	
 		// Ensure payloads buffer is big enough to hold the number of payloads specified.
+		printf("Checking if there is sufficient memory to store specified payloads...\n");
 		if(inbound_payloads_capacity < inbound_request_header.parameter_count)
 		{
 			inbound_payloads_capacity = inbound_request_header.parameter_count + 5;
@@ -412,8 +415,10 @@ int main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 		}
+		printf("Memory check done.\n");
 
 		// Send acknowledgement of receipt
+		printf("Sending acknowledgement to server...\n");
 		send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 		send_attempts = 1;
 		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
@@ -427,11 +432,13 @@ int main(int argc, char **argv)
 			continue;
 		}
 		send_attempts = 0;
+		printf("Acknowledgement sent.\n");
 
 		// Begin receiving payload metadata and payloads.
 		payloads_received = 0;
 		payloads_expected = inbound_request_header.parameter_count;
-
+		
+		printf("Receiving payloads...\n");
 		while(payloads_received < payloads_expected)
 		{
 			if(inbound_payloads[inbound_payloads_length] == NULL)
@@ -446,6 +453,7 @@ int main(int argc, char **argv)
 			current_inbound_payload = inbound_payloads[inbound_payloads_length];
 
 			// Receive payload metadata
+			printf("Receiving payload metadata for payload #%ld...\n", payloads_received + 1);
 			receive_status = receive_payload_metadata(tcp_socket, current_inbound_payload, shared_secret);
 			receive_attempts = 1;
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
@@ -459,8 +467,10 @@ int main(int argc, char **argv)
 				break;
 			}
 			receive_attempts = 0;
+			printf("Metadata for payload #%ld received.\n", payloads_received + 1);
 
 			// Ensure the current inbound payload can actually hold the data that is about to be received.
+			printf("Checking if current inbound payload can store payload #%ld...\n", payloads_received + 1);
 			if(current_inbound_payload->data != NULL)
 				free(current_inbound_payload->data);
 
@@ -470,8 +480,10 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Failed to allocate memory for the data buffer of the first payload to be received from the server.\n");
 				break;
 			}
+			printf("Memory check complete.\n");
 			
 			// Send acknowledgement for the payload metadata
+			printf("Sending acknowledgement for the receipt of the metadata for payload #%ld...\n", payloads_received + 1);
 			send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 			send_attempts = 1;
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
@@ -485,8 +497,10 @@ int main(int argc, char **argv)
 				break;
 			}
 			send_attempts = 0;
+			printf("Acknowledgement sent.\n");
 
 			// Receive actual payload
+			printf("Receiving actual payload data for payload #%ld...\n", payloads_received + 1);
 			receive_status = receive_payload(tcp_socket, current_inbound_payload, shared_secret);
 			receive_attempts = 1;
 			while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
@@ -500,9 +514,10 @@ int main(int argc, char **argv)
 				break;
 			}
 			receive_attempts = 0;
+			printf("Actual data for payload #%ld received.\n", payloads_received + 1);
 
 			// Acknowledge receipt of payload
-			printf("Attempting to send OK acknowledgement for receipt of payload.\n");
+			printf("Attempting to send OK acknowledgement for receipt of payload...\n");
 			send_status = send_acknowledgement(tcp_socket, OK, shared_secret);
 			send_attempts = 1;
 			while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
@@ -516,6 +531,7 @@ int main(int argc, char **argv)
 				break;
 			}
 			send_attempts = 0;
+			printf("Acknowledgement sent.\n");
 
 			payloads_received++;
 		}
