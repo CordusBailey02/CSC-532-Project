@@ -207,8 +207,16 @@ int main(int argc, char **argv)
 	// MAINLOOP: Input data and send off to the server. Then, receive data.
 	while(true)
 	{
+		// get user input
+		printf("\ndemake$ ");
 		fgets(input_buffer, 4096, stdin);
 		input_buffer_length = strlen(input_buffer);
+
+		// remove newline and replace with null terminator
+		if(input_buffer_length == 0) continue;
+		input_buffer[input_buffer_length - 1] = '\0';
+		input_buffer_length -= 1;
+
 		action_type = strtok(input_buffer, " ");
 		if(action_type == NULL)
 		{
