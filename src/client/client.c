@@ -66,6 +66,13 @@ enum SUBJECT string_to_request_header_subject(char *str, size_t str_length)
 
 int main(int argc, char **argv)
 {
+	bool use_gui = true;
+	if(argc > 1)
+	{
+		if(strcmp(argv[1], "-n") == 0 || strcmp(argv[1], "--no-gui") == 0 )
+			use_gui = false;
+	}
+
 	// Establish connection to server machine
 	int tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if(tcp_socket < 0)
@@ -142,57 +149,60 @@ int main(int argc, char **argv)
 	// input erroneously. If nothing was sent, it will never receive anything.
 	// So, it shouldn't enter the waiting logic as it will wait forever.
 	bool DATA_SENT_FLAG = false;
-
-	// START GUI AND CONNECT TO IT
-	// (1) Create connection socket
-	int client_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if(client_fd == -1)
-	{
-		fprintf(stderr, "Failed to create socket for connection to GUI process.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	// (2) bind socket to IP addr and port for GUI connection
-	struct sockaddr_in client_addr;
-	client_addr.sin_family = AF_INET;
-	client_addr.sin_addr.s_addr = INADDR_ANY; // bind to all available network ifaces
-	client_addr.sin_port = htons(55000); 	       // random port chosen for the client and GUI to communicate
-	if( bind(client_fd, (struct sockaddr*) &client_addr, sizeof(client_addr)) < 0 )
-	{
-		fprintf(stderr, "Failed to bind socket to port 55000 (port for client-GUI communication.\n"); 
-		close(client_fd);
-		exit(EXIT_FAILURE);
-	}
-
-	// (3) Listen for connection from GUI
-	if( listen(client_fd, 0) < 0 ) // only want ONE gui connection - no backlogging for several
-	{
-		fprintf(stderr, "Listening on port 55000 for GUI connection failed.\n");
-		close(client_fd);
-		exit(EXIT_FAILURE);
-	}
-	printf("Listening on port 55000 for a connection from the GUI.\n");
 	
-	// (4) spawn GUI process
-	system("../../LinuxProtoTypeGUI_v0.8/clientGUI");
-
-	// (5) Accept GUI connection
-	struct sockaddr_in GUI_PROCESS_ADDR;	
-	int gui_process_addrlen = sizeof(GUI_PROCESS_ADDR);
-	int *gui_socket = malloc(sizeof(int));
-	if(gui_socket == NULL)
-	{ 
-		fprintf(stderr, "Failed to allocate memory for client socket.\n");
-		exit(EXIT_FAILURE);
-	}
-	*gui_socket = accept(client_fd, (struct sockaddr*) &client_addr, (socklen_t*) &gui_process_addrlen);
-	if(*gui_socket < 0)
+	if(use_gui == true)
 	{
-		fprintf(stderr, "Failed to accept connection.\n");
-		free(gui_socket);
-		exit(EXIT_FAILURE);
+		// START GUI AND CONNECT TO IT
+		// (1) Create connection socket
+		int client_fd = socket(AF_INET, SOCK_STREAM, 0);
+		if(client_fd == -1)
+		{
+			fprintf(stderr, "Failed to create socket for connection to GUI process.\n");
+			exit(EXIT_FAILURE);
+		}
+
+		// (2) bind socket to IP addr and port for GUI connection
+		struct sockaddr_in client_addr;
+		client_addr.sin_family = AF_INET;
+		client_addr.sin_addr.s_addr = INADDR_ANY; // bind to all available network ifaces
+		client_addr.sin_port = htons(55000); 	       // random port chosen for the client and GUI to communicate
+		if( bind(client_fd, (struct sockaddr*) &client_addr, sizeof(client_addr)) < 0 )
+		{
+			fprintf(stderr, "Failed to bind socket to port 55000 (port for client-GUI communication.\n"); 
+			close(client_fd);
+			exit(EXIT_FAILURE);
+		}
+
+		// (3) Listen for connection from GUI
+		if( listen(client_fd, 0) < 0 ) // only want ONE gui connection - no backlogging for several
+		{
+			fprintf(stderr, "Listening on port 55000 for GUI connection failed.\n");
+			close(client_fd);
+			exit(EXIT_FAILURE);
+		}
+		printf("Listening on port 55000 for a connection from the GUI.\n");
+		
+		// (4) spawn GUI process
+		system("../../LinuxProtoTypeGUI_v0.8/clientGUI");
+
+		// (5) Accept GUI connection
+		struct sockaddr_in GUI_PROCESS_ADDR;	
+		int gui_process_addrlen = sizeof(GUI_PROCESS_ADDR);
+		int *gui_socket = malloc(sizeof(int));
+		if(gui_socket == NULL)
+		{ 
+			fprintf(stderr, "Failed to allocate memory for client socket.\n");
+			exit(EXIT_FAILURE);
+		}
+		*gui_socket = accept(client_fd, (struct sockaddr*) &client_addr, (socklen_t*) &gui_process_addrlen);
+		if(*gui_socket < 0)
+		{
+			fprintf(stderr, "Failed to accept connection.\n");
+			free(gui_socket);
+			exit(EXIT_FAILURE);
+		}
+		printf("GUI connection established.\n");
 	}
-	printf("GUI connection established.\n");
 	
 	// MAINLOOP: Input data and send off to the server. Then, receive data.
 	while(true)
