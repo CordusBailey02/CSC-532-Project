@@ -148,6 +148,8 @@ void* handle_client(void *arg)
 	size_t payloads_expected = 0;
 	size_t payloads_received = 0;
 
+	char *temporary_response;
+
 	// Maintain connection with client via loop
 	// The entire process of 1st receiving the request type and the number of
 	// parameters to be received, 2nd receiving the first parameter, ... finally 
@@ -388,7 +390,7 @@ void* handle_client(void *arg)
 					printf("Got username: \"%s\", password: \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
 					// DO DATABASE THING HERE
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
-					char *temporary_response = malloc(40 + strlen(inbound_payloads[0]->data) + strlen(inbound_payloads[1]->data) + 3);
+					temporary_response = malloc(40 + strlen(inbound_payloads[0]->data) + strlen(inbound_payloads[1]->data) + 3);
 					if(temporary_response == NULL)
 					{
 						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
@@ -414,10 +416,39 @@ void* handle_client(void *arg)
 					}
 					if(inbound_payloads[1]->data == NULL)
 					{
-						fprintf(stderr, "[handle_client] Inbound payload #%d's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously?\n", client_socket);
+						fprintf(stderr, "[handle_client] Inbound payload #2's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
 						continue;
 					}
+					if(inbound_payloads[2]->data == NULL)
+					{
+						fprintf(stderr, "[handle_client] Inbound payload 3's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
+						continue;
+					}
+					printf("Got username: \"%s\", email: \"%s\", password: \"%s\" from client with socket #%d.\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data, client_socket);
+					// temporary response
+					int username_length, email_length, password_length;
+					username_length = strlen(inbound_payloads[0]->data);
+					email_length = strlen(inbound_payloads[1]->data);
+					password_length = strlen(inbound_payloads[2]->data);
+					temporary_response = malloc(username_length + email_length + password_length + 40);
+					if(temporary_response == NULL)
+					{
+						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
+						continue;
+					}
+					sprintf(temporary_response, "Got username: \"%s\", email: \"%s\", password: \"%s\".\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data);
+					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
+					if(send_status == false)
+					{
+						fprintf(stderr, "[handle_client] Failed to send developer test message to client as part of temporary response to send_account_create to client with socket #%d.\n", client_socket);
+						continue;
+					}
+					free(temporary_response);
+					printf("Successfully sent temporary response to client with socket #%d for their send account_create request.\n", client_socket);
+					break;
+					
 				default:
+					printf("Unimplemented subject code for SEND message from client with socket #%d.\n", client_socket);
 					break;
 			}
 		}

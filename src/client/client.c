@@ -316,7 +316,7 @@ int main(int argc, char **argv)
 						DATA_SENT_FLAG = false;
 						continue;
 					}
-					for(int email_i = 0; i < email_length; i++)
+					for(int email_i = 0; email_i < email_length; email_i++)
 					{
 						if(email[email_i] == '@') 
 						{
@@ -326,7 +326,7 @@ int main(int argc, char **argv)
 					} 
 					if(valid_email == false)
 					{ 
-						fprintf(stderr, "Email address \"%s\" does not have a domain (no @ symbol found).\n");
+						fprintf(stderr, "Email address \"%s\" does not have a domain (no @ symbol found).\n", email);
 						DATA_SENT_FLAG = false;
 						continue;
 					}
@@ -346,8 +346,16 @@ int main(int argc, char **argv)
 						DATA_SENT_FLAG = false;
 						continue;
 					}
-					// temporary behavior
+					// remove later
 					printf("Got username: \"%s\", email: \"%s\", password: \"%s\".\n", username, email, password);
+					// send the information off to the server
+					send_status = send_account_create(tcp_socket, &outbound_request_header, username, username_length, email, email_length, password, password_length, shared_secret);
+					if(send_status == false)
+					{
+						fprintf(stderr, "[ERROR] Failed to send account creation attempt to the server. send_account_create returned false.\n");
+						DATA_SENT_FLAG = false;
+					}
+					DATA_SENT_FLAG = true;
 					break;	
 				default:
 					fprintf(stderr, "Unimplemented SEND case for subject %s.\n", subject_type);
