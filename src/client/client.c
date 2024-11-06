@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define SERVER_ADDR "142.93.199.100"
-//#define SERVER_ADDR "127.0.0.1"
+// #define SERVER_ADDR "142.93.199.100"
+#define SERVER_ADDR "127.0.0.1"
 #define USERNAME_MAX_LENGTH 16
 #define PASSWORD_MAX_LENGTH 16
 #include "../lib/terrorexchange.h"
@@ -467,7 +467,7 @@ int main(int argc, char **argv)
 				break;
 			}
 			receive_attempts = 0;
-			printf("Metadata for payload #%ld received.\n", payloads_received + 1);
+			printf("Metadata for payload #%ld received. According to this payload, %zu bytes should be received.\n", payloads_received + 1, current_inbound_payload->member_size * current_inbound_payload->member_count);
 
 			// Ensure the current inbound payload can actually hold the data that is about to be received.
 			printf("Checking if current inbound payload can store payload #%ld...\n", payloads_received + 1);

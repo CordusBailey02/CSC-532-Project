@@ -516,6 +516,7 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	struct payload outbound_payload;
 	outbound_payload.member_size = sizeof(char);
 	outbound_payload.member_count = message_length;
+	printf("[send_developer_test_message] Sending payload metadata. Member size is %zu and member count is %zu.\n", outbound_payload.member_size, outbound_payload.member_count);
 	send_status = send_payload_metadata(connection_socket, &outbound_payload, shared_secret);
 	send_attempts = 1;
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)

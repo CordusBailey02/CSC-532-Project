@@ -412,17 +412,17 @@ void* handle_client(void *arg)
 					if(inbound_payloads[0]->data == NULL)
 					{
 						fprintf(stderr, "[handle_client] Inbound payload #%d's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously?\n", client_socket);
-						continue;
+						break;
 					}
 					if(inbound_payloads[1]->data == NULL)
 					{
 						fprintf(stderr, "[handle_client] Inbound payload #2's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
-						continue;
+						break;
 					}
 					if(inbound_payloads[2]->data == NULL)
 					{
 						fprintf(stderr, "[handle_client] Inbound payload 3's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
-						continue;
+						break;
 					}
 					// Review what was received
 					printf("Got username: \"%s\", email: \"%s\", password: \"%s\" from client with socket #%d.\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data, client_socket);
@@ -432,7 +432,7 @@ void* handle_client(void *arg)
 					username_length = strlen(inbound_payloads[0]->data);
 					email_length = strlen(inbound_payloads[1]->data);
 					password_length = strlen(inbound_payloads[2]->data);
-					temporary_response = malloc(username_length + email_length + password_length + 40);
+					temporary_response = malloc(username_length + email_length + password_length + 60);
 					if(temporary_response == NULL)
 					{
 						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
@@ -441,12 +441,12 @@ void* handle_client(void *arg)
 					sprintf(temporary_response, "Got username: \"%s\", email: \"%s\", password: \"%s\".\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data);
 					printf("Temporary response to send off to client is \"%s\"\n", temporary_response);
 					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
+					free(temporary_response);
 					if(send_status == false)
 					{
 						fprintf(stderr, "[handle_client] Failed to send developer test message to client as part of temporary response to send_account_create to client with socket #%d.\n", client_socket);
-						continue;
+						break;
 					}
-					free(temporary_response);
 					printf("Successfully sent temporary response to client with socket #%d for their send account_create request.\n", client_socket);
 					break;
 					
