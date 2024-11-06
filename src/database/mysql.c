@@ -98,22 +98,28 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
     }
     else if(query_name == "add_new_user")
     {
-        if(payload_length < 2)
+        if(payload_length < 4)
         {
             query_length_check = true;
         }
         else
         {
-            int j = snprintf(query, 100, "CALL add_new_user(\'%s\', \'%s\', \'%s\', 0, 0);",
+            int j = snprintf(query, 100, "CALL add_new_user(\'%s\', \'%s\', \'%s\', \'%s\', 0, 0);",
                 (char *) inbound_payloads[0]->data,
                 (char *) inbound_payloads[1]->data,
-                (char *) inbound_payloads[2]->data);
+                (char *) inbound_payloads[2]->data,
+                (char *) inbound_payloads[3]->data);
         }
         
     }
     else if(query_name == "get_all_users")
     {
         int j = snprintf(query, 100, "CALL get_all_users();");
+    }
+    else if(query_name == "check_user")
+    {
+        int j = snprintf(query, 100, "CALL get_all_users(\'%s\');",
+            (char *) inbound_payloads[0]->data);
     }
     else
     {
