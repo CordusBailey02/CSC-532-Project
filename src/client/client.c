@@ -374,7 +374,12 @@ int main(int argc, char **argv)
 						DATA_SENT_FLAG = false;
 					}
 					DATA_SENT_FLAG = true;
-					break;	
+					break;
+
+				case VERIFICATION_REQUEST:
+					fprintf(stderr, "Send verification_request unimplemented.\n");
+					break;
+
 				default:
 					fprintf(stderr, "Unimplemented SEND case for subject %s.\n", subject_type);
 					DATA_SENT_FLAG = false;					
