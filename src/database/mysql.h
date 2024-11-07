@@ -3,9 +3,9 @@
 
 enum DATABASE_ERROR { SUCCESS, CONNECTION_ERROR, INEXISTENT_QUERY, INSUFFICIENT_PARAMETERS};
 
-void cleanup();
+void mysql_cleanup();
 
-int connection_init(void);
+int mysql_connection_init(void);
 
-char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *return_flag, int *num_fields, int *num_rows);
+char ***mysql_query(char *query_name, struct payload **inbound_payloads, int *return_flag, int *num_fields, int *num_rows);
 

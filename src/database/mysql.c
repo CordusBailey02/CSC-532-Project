@@ -8,13 +8,13 @@
 MYSQL *conn;
 
 
-void cleanup()
+void mysql_cleanup()
 {
     mysql_close(conn); 
 }
 
 
-int connection_init()
+int mysql_connection_init()
 {
     const char *hostname = getenv("SQL_HOSTNAME");
     const char *username = getenv("SQL_USERNAME");
@@ -41,7 +41,7 @@ int connection_init()
 }
 
 
-char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *return_flag, int *num_fields, int *num_rows)
+char ***mysql_query(char *query_name, struct payload **inbound_payloads, int *return_flag, int *num_fields, int *num_rows)
 {
     char query[100];
 
@@ -55,7 +55,7 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
     *num_fields = 0;
     *num_rows = 0;
 
-    if(connection_init())
+    if(mysql_connection_init())
     {
         printf("\nConnection Failed...\n");
         *return_flag = CONNECTION_ERROR;
@@ -182,27 +182,4 @@ char ***query_mysql(char *query_name, struct payload **inbound_payloads, int *re
     }
 
     return results_table;
-}
-
-
-
-int main(int argc, char **argv)
-{
-    char *result;
-
-    // char *data[] = {"test", "first", "last"};
-
-    // result = query_mysql("add_new_user", data);
-
-    // char *user_data[] = {"user2", "user", "2"};
-
-    // result = query_mysql("add_new_user", user_data);
-
-    // char *empty[] = {};
-
-    // result = query_mysql("get_all_users", empty);
-
-    cleanup();
-       
-    return EXIT_SUCCESS;
 }

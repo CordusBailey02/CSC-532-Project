@@ -150,6 +150,16 @@ void* handle_client(void *arg)
 	size_t payloads_received = 0;
 
 	char *temporary_response;
+	int *return_flag = SUCCESS;
+	int *num_fields = 0;
+	int *num_rows = 0;
+
+	// Extablish a connection to MYSQL for the client thread. Connection stays
+	// open as long as the client is connected.
+	if(mysql_connection_init())
+	{
+        fprintf(stderr, "[handle_client] Unable to establish a connection to MYSQL.\n");
+	}
 
 	// Maintain connection with client via loop
 	// The entire process of 1st receiving the request type and the number of
@@ -461,6 +471,7 @@ void* handle_client(void *arg)
 	}
 
 	close(client_socket);
+	mysql_cleanup();
 	return NULL;
 }
  
