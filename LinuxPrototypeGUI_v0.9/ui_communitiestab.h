@@ -60,6 +60,17 @@ public:
         new QListWidgetItem(listWidget);
         new QListWidgetItem(listWidget);
         listWidget->setObjectName("listWidget");
+        QPalette palette;
+        QBrush brush(QColor(146, 194, 242, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        QBrush brush1(QColor(0, 0, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget->setPalette(palette);
         listWidget->setFont(font);
 
         verticalLayout->addWidget(listWidget);

@@ -99,6 +99,17 @@ public:
         new QListWidgetItem(listWidget);
         new QListWidgetItem(listWidget);
         listWidget->setObjectName("listWidget");
+        QPalette palette;
+        QBrush brush(QColor(146, 194, 242, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        QBrush brush1(QColor(0, 0, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget->setPalette(palette);
         listWidget->setFont(font);
 
         verticalLayout_3->addWidget(listWidget);
@@ -110,6 +121,11 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(pushButton_commentBtn->sizePolicy().hasHeightForWidth());
         pushButton_commentBtn->setSizePolicy(sizePolicy1);
+        QPalette palette1;
+        palette1.setBrush(QPalette::Active, QPalette::Button, brush);
+        palette1.setBrush(QPalette::Inactive, QPalette::Button, brush);
+        palette1.setBrush(QPalette::Disabled, QPalette::Button, brush);
+        pushButton_commentBtn->setPalette(palette1);
         pushButton_commentBtn->setFont(font);
 
         verticalLayout_3->addWidget(pushButton_commentBtn);
@@ -143,6 +159,7 @@ public:
         label_upAnswerCount = new QLabel(answerWindow);
         label_upAnswerCount->setObjectName("label_upAnswerCount");
         label_upAnswerCount->setFont(font);
+        label_upAnswerCount->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         horizontalLayout->addWidget(label_upAnswerCount);
 
@@ -154,6 +171,7 @@ public:
         label_downAnswerCount = new QLabel(answerWindow);
         label_downAnswerCount->setObjectName("label_downAnswerCount");
         label_downAnswerCount->setFont(font);
+        label_downAnswerCount->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         horizontalLayout->addWidget(label_downAnswerCount);
 

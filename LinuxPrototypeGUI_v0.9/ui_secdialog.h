@@ -91,6 +91,17 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(listWidget_defaultList->sizePolicy().hasHeightForWidth());
         listWidget_defaultList->setSizePolicy(sizePolicy2);
+        QPalette palette;
+        QBrush brush(QColor(146, 194, 242, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        QBrush brush1(QColor(0, 0, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget_defaultList->setPalette(palette);
         QFont font1;
         font1.setPointSize(15);
         listWidget_defaultList->setFont(font1);
@@ -117,6 +128,13 @@ public:
         listWidget_favoriteList->setObjectName("listWidget_favoriteList");
         sizePolicy2.setHeightForWidth(listWidget_favoriteList->sizePolicy().hasHeightForWidth());
         listWidget_favoriteList->setSizePolicy(sizePolicy2);
+        QPalette palette1;
+        palette1.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        palette1.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette1.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette1.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette1.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget_favoriteList->setPalette(palette1);
         listWidget_favoriteList->setFont(font1);
 
         gridLayout->addWidget(listWidget_favoriteList, 4, 0, 1, 4);
@@ -152,6 +170,13 @@ public:
         listWidget_communitiesList->setObjectName("listWidget_communitiesList");
         sizePolicy2.setHeightForWidth(listWidget_communitiesList->sizePolicy().hasHeightForWidth());
         listWidget_communitiesList->setSizePolicy(sizePolicy2);
+        QPalette palette2;
+        palette2.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        palette2.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette2.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette2.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette2.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget_communitiesList->setPalette(palette2);
         listWidget_communitiesList->setFont(font1);
 
         gridLayout->addWidget(listWidget_communitiesList, 4, 4, 3, 2);
@@ -165,6 +190,13 @@ public:
         sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(pushButton_askAQuestion->sizePolicy().hasHeightForWidth());
         pushButton_askAQuestion->setSizePolicy(sizePolicy3);
+        QPalette palette3;
+        QBrush brush2(QColor(255, 190, 111, 255));
+        brush2.setStyle(Qt::SolidPattern);
+        palette3.setBrush(QPalette::Active, QPalette::Button, brush2);
+        palette3.setBrush(QPalette::Inactive, QPalette::Button, brush2);
+        palette3.setBrush(QPalette::Disabled, QPalette::Button, brush2);
+        pushButton_askAQuestion->setPalette(palette3);
         pushButton_askAQuestion->setFont(font);
 
         horizontalLayout_3->addWidget(pushButton_askAQuestion);
@@ -181,6 +213,13 @@ public:
         pushButton_searchButton->setObjectName("pushButton_searchButton");
         sizePolicy3.setHeightForWidth(pushButton_searchButton->sizePolicy().hasHeightForWidth());
         pushButton_searchButton->setSizePolicy(sizePolicy3);
+        QPalette palette4;
+        QBrush brush3(QColor(143, 240, 164, 255));
+        brush3.setStyle(Qt::SolidPattern);
+        palette4.setBrush(QPalette::Active, QPalette::Button, brush3);
+        palette4.setBrush(QPalette::Inactive, QPalette::Button, brush3);
+        palette4.setBrush(QPalette::Disabled, QPalette::Button, brush3);
+        pushButton_searchButton->setPalette(palette4);
         pushButton_searchButton->setFont(font);
 
         horizontalLayout_3->addWidget(pushButton_searchButton);
