@@ -58,6 +58,17 @@ public:
         new QListWidgetItem(listWidget);
         new QListWidgetItem(listWidget);
         listWidget->setObjectName("listWidget");
+        QPalette palette;
+        QBrush brush(QColor(146, 194, 242, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        QBrush brush1(QColor(0, 0, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget->setPalette(palette);
         QFont font;
         font.setPointSize(15);
         listWidget->setFont(font);
@@ -73,6 +84,11 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
         pushButton->setSizePolicy(sizePolicy);
+        QPalette palette1;
+        palette1.setBrush(QPalette::Active, QPalette::Button, brush);
+        palette1.setBrush(QPalette::Inactive, QPalette::Button, brush);
+        palette1.setBrush(QPalette::Disabled, QPalette::Button, brush);
+        pushButton->setPalette(palette1);
         pushButton->setFont(font);
 
         horizontalLayout_2->addWidget(pushButton);
@@ -133,6 +149,7 @@ public:
         label_upPostCount = new QLabel(Post_1);
         label_upPostCount->setObjectName("label_upPostCount");
         label_upPostCount->setFont(font);
+        label_upPostCount->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         horizontalLayout_3->addWidget(label_upPostCount);
 
@@ -144,6 +161,7 @@ public:
         label_downPostCount = new QLabel(Post_1);
         label_downPostCount->setObjectName("label_downPostCount");
         label_downPostCount->setFont(font);
+        label_downPostCount->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         horizontalLayout_3->addWidget(label_downPostCount);
 

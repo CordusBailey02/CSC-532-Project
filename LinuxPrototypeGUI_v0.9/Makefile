@@ -7893,8 +7893,7 @@ mainwindow.o: ../GUI_v0.9/mainwindow.cpp ../GUI_v0.9/mainwindow.h \
 		../GUI_v0.9/forgotpassword.h \
 		../GUI_v0.9/main.cpp \
 		../../Qt/6.8.0/gcc_64/include/QtWidgets/QApplication \
-		../../Qt/6.8.0/gcc_64/include/QtWidgets/QMessageBox \
-		../../Qt/6.8.0/gcc_64/include/QtCore/QDebug
+		../../Qt/6.8.0/gcc_64/include/QtWidgets/QMessageBox
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../GUI_v0.9/mainwindow.cpp
 
 makecommentorpost.o: ../GUI_v0.9/makecommentorpost.cpp ../GUI_v0.9/makecommentorpost.h \
@@ -10812,7 +10811,8 @@ secdialog.o: ../GUI_v0.9/secdialog.cpp ../GUI_v0.9/secdialog.h \
 		../GUI_v0.9/searchresults.h \
 		../GUI_v0.9/profile.h \
 		../../Qt/6.8.0/gcc_64/include/QtGui/QPixmap \
-		../../Qt/6.8.0/gcc_64/include/QtGui/QIcon
+		../../Qt/6.8.0/gcc_64/include/QtGui/QIcon \
+		../../Qt/6.8.0/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o secdialog.o ../GUI_v0.9/secdialog.cpp
 
 moc_AccountCode.o: moc_AccountCode.cpp 

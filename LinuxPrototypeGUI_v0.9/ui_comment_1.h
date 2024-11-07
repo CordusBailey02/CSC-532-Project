@@ -78,6 +78,7 @@ public:
         label_upCountComment = new QLabel(comment_1);
         label_upCountComment->setObjectName("label_upCountComment");
         label_upCountComment->setFont(font);
+        label_upCountComment->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         horizontalLayout->addWidget(label_upCountComment);
 
@@ -89,6 +90,7 @@ public:
         label_downCountComment = new QLabel(comment_1);
         label_downCountComment->setObjectName("label_downCountComment");
         label_downCountComment->setFont(font);
+        label_downCountComment->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         horizontalLayout->addWidget(label_downCountComment);
 
