@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include  "../lib/terrorexchange.h"
 #include  "../lib/secure_connection.h"
+#include "../database/mysql.h"
 #define CONNECTION_BACKLOG_CAPACITY 128
 
 // used to pass multiple arguments to the pthread for each
