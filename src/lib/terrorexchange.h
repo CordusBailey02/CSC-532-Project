@@ -23,6 +23,8 @@ enum SUBJECT { // Typical data objects
 
 	       LOGIN_ATTEMPT, USERNAME_CHANGE, PASSWORD_CHANGE, ACCOUNT_CREATE,
 
+	       VERIFICATION_REQUEST,
+
 	       SUBJECT_ERROR
 	     };
 
