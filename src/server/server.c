@@ -6,9 +6,10 @@
 #include <arpa/inet.h>
 #include <semaphore.h>
 #include <pthread.h>
+#include <mysql/mysql.h>
 #include  "../lib/terrorexchange.h"
 #include  "../lib/secure_connection.h"
-#include "../database/mysql.h"
+#include "../database/terrorbase.h"
 #define CONNECTION_BACKLOG_CAPACITY 128
 
 // used to pass multiple arguments to the pthread for each
@@ -402,11 +403,11 @@ void* handle_client(void *arg)
 					}
 					printf("Got username: \"%s\", password: \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
 					// DO DATABASE THING HERE
-					mysql_result_table = mysql_query("check_user", inbound_payloads, *mysql_return_flag, *mysql_num_fields, *mysql_num_rows);
+					mysql_result_table = mysql_database_query("check_user", inbound_payloads, mysql_return_flag, mysql_num_fields, mysql_num_rows);
 					switch(*mysql_return_flag)
 					{
 						case SUCCESS:
-							printf("Got result: %d rows, %d, fields.\n", mysql_num_rows, mysql_num_fields);
+							printf("Got result: %d rows, %d, fields.\n", (*mysql_num_rows), (*mysql_num_fields));
 							break;
 						case INEXISTENT_QUERY:
 							fprintf(stderr, "[handle_client] Attempted query given does not exist.");
@@ -414,7 +415,7 @@ void* handle_client(void *arg)
 						case INSUFFICIENT_PARAMETERS:
 							fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.");
 							break;
-						case default:
+						default:
 							break;
 					}
 					// print(mysql_)
