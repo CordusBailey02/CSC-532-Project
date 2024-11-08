@@ -413,7 +413,7 @@ int main(int argc, char **argv)
 							if(file_paths == NULL)
 							{
 								fprintf(stderr, "Failed to allocate more memory for the file paths buffer. Current length is %d and the call to realloc tried to expand it to %d. Maybe the system is low on memory?\n", file_paths_length, file_paths_capacity);
-								close(tcp_connection);
+								close(tcp_socket);
 								exit(EXIT_FAILURE);
 							}
 						}
