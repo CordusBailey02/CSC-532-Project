@@ -979,7 +979,83 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	return true;
 }
 
-void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t max_bytes)
+bool send_verification_request(int socket, struct request_header *outbound_request_header, char *verification_type, char **file_paths, int file_paths_length)
+{ 
+	if(outbound_request_header == NULL){
+		fprintf(stderr, "[send_verification_request] Cannot use request header struct that points to NULL for an outbound request header. Bad argument provided.\n");
+		return false;
+	}
+	if(verification_type == NULL) {
+		fprintf(stderr, "[send_verification_request] Cannot use verification type char pointer that points to NULL. Bad argument provided.\n");
+		return false;
+	}
+	if(file_paths == NULL)
+	{
+		fprintf(stderr, "[send_verification_request] Cannot use file paths string pointer (char **) that points to NULL. Bad argument provided.\n");
+		return false;
+	}
+	if(file_paths_length <= 0) {
+		fprintf(stderr, "[send_verification_request] Cannot use a buffer for file paths that is reported to be 0 length or less (length parameter was given as %d). Bad argument provided.\n", file_paths_length);
+		return false;
+	}
+	// ensure NO strings point to NULL
+	for(int i = 0; i < file_paths_length; i++)
+	{
+		if(file_paths[file_paths_length] != NULL) continue;
+
+		fprintf(stderr, "[send_verification_request] Preemptive check - Cannot use a file path char pointer that points to NULL. Member #%d of the file paths buffer points to NULL.\n", i + 1);
+		return false;
+	}
+	
+	bool send_status;
+	bool receive_status;
+	int send_attempts = 0;
+	int receive_attempts = 0;
+	struct request_header inbound_request_header;
+	
+	// set the outbound request header with the proper values
+	outbound_request_header->action = SEND;
+	outbound_request_header->subject = VERIFICATION_REQUEST;
+	outbound_request_header->parameter_count = 1 + file_paths_length;
+	outbound_request_header->metadata_total_size = 
+	outbound_request_header->
+	outbound_request_header->
+	// read the binary data of the files to be sent off
+	for(int i = 0; i < file_paths_length; i++)
+	{
+		
+	}
+}
+
+size_t get_file_size(char *file_path, enum FILE_IO_CODE *return_code)
+{
+	if(return_code == NULL){
+		fprintf(stderr, "[get_file_size] Cannot load a FILE_IO_CODE into a pointer that points to NULL. Bad argument provided.\n");
+		return NULL;
+	}
+
+	if(file_path == NULL){
+		fprintf(stderr, "[get_file_size] File path not provided. char *file_path points  to NULL.\n");
+		(*return_code) = BAD_FILE_PATH;
+		return NULL;
+	}
+
+	FILE *fh;
+	fh = fopen(file_path, "rb");
+	if(fh == NULL) {
+		fprintf(stderr, "[get_file_size] Cannot open \"%s\" for reading. Does it exist? Are there permission errors?\n", file_path);
+		(*return_code) = BAD_FILE_PATH;
+		return 0;
+	}
+	
+	fseek(fh, 0, SEEK_END);
+	file_size = ftell(fh);
+	fclose(fh);
+	(*return_code) = IO_OK;
+	return file_size;
+}
+
+void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t file_size)
 {
 	if(return_code == NULL)
 	{
@@ -991,12 +1067,6 @@ void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t m
 	{
 		fprintf(stderr, "[read_binary_file] File path not provided. char *file_path points  to NULL.\n");
 		(*return_code) = BAD_FILE_PATH;
-		return NULL;
-	}
-	if(max_bytes == 0)
-	{
-		fprintf(stderr, "[read_binary_file] Max size in megabytes is 0. Minimum size is 1mb.\n");
-		(*return_code) = ZERO_UPPER_LIMIT;
 		return NULL;
 	}
 	
