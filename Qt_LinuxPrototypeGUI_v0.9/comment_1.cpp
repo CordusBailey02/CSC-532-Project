@@ -12,12 +12,12 @@ comment_1::comment_1(QWidget *parent)
     QPixmap pix5("/home/vboxuser/Pictures/profilePic.jpg");
     ui->label_commentUserPic->setPixmap(pix5.scaled(100,100,Qt::KeepAspectRatio));
 
-    QPixmap pix8("/home/vboxuser/Pictures/profilePic.jpg");
+    QPixmap pix8("/home/vboxuser/Pictures/upvote.png");
     QIcon ButtonIcon(pix8);
     ui->pushButton_upComment->setIcon(ButtonIcon);
     ui->pushButton_upComment->setIconSize(QSize(40,40));
 
-    QPixmap pix9("/home/vboxuser/Pictures/profilePic.jpg");
+    QPixmap pix9("/home/vboxuser/Pictures/downvote.png");
     QIcon ButtonIcon_2(pix9);
     ui->pushButton_downComment->setIcon(ButtonIcon_2);
     ui->pushButton_downComment->setIconSize(QSize(40,40));
@@ -119,6 +119,7 @@ void comment_1::on_pushButton_upComment_clicked()
     QString commentUpvotesStr = QString::number(commentUpvotesInt);
     ui->label_upCountComment->setText(commentUpvotesStr);
     ui->pushButton_upComment->hide();
+    ui->pushButton_downComment->hide();
 }
 
 
@@ -129,4 +130,5 @@ void comment_1::on_pushButton_downComment_clicked()
     QString commentDownvotesStr = QString::number(commentDownvotesInt);
     ui->label_downCountComment->setText(commentDownvotesStr);
     ui->pushButton_downComment->hide();
+    ui->pushButton_upComment->hide();
 }
