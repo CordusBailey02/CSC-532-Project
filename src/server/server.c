@@ -431,7 +431,7 @@ void* handle_client(void *arg)
 						printf("[ ");
 						for(int j = 0; j < (*mysql_num_fields); j++)
 							printf("\"%s\" ", mysql_result_table[i][j]);
-						printf("]\n");
+						printf("]\n"); 	
 					}
 					
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED

@@ -1,6 +1,8 @@
 #include "makequestion.h"
 #include "ui_makequestion.h"
 #include <QtWidgets>
+#include <QPixmap>
+#include <QIcon>
 
 makeQuestion::makeQuestion(QWidget *parent)
     : QDialog(parent)
@@ -39,8 +41,10 @@ void makeQuestion::on_pushButton_uploadQuestionImage_clicked()
     {
         QMessageBox::information(this, "Received File", "<font size = 13>No file selected.</font>");
     } else {
-        QMessageBox::information(this, "Received File", filepath_questionPic);
-        ui->label_questionFileSelected->setText(filepath_questionPic);
+        //QMessageBox::information(this, "Received File", filepath_questionPic);
+        QPixmap pix4(filepath_questionPic);
+        ui->label_questionFileSelected->setPixmap(pix4.scaled(200,200,Qt::KeepAspectRatio));
+        //ui->label_questionFileSelected->setText(filepath_questionPic);
         //int sendInt = send(int socket, filepath_profilePic, size_t len, int flag);
     }
 }

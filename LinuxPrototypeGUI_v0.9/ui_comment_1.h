@@ -31,8 +31,12 @@ public:
     QPlainTextEdit *plainTextEdit_commentText;
     QHBoxLayout *horizontalLayout;
     QPushButton *pushButton_upComment;
+    QVBoxLayout *verticalLayout_2;
+    QLabel *label_2;
     QLabel *label_upCountComment;
     QPushButton *pushButton_downComment;
+    QVBoxLayout *verticalLayout_3;
+    QLabel *label_3;
     QLabel *label_downCountComment;
     QVBoxLayout *verticalLayout;
     QLabel *label_commentUserPic;
@@ -42,7 +46,7 @@ public:
     {
         if (comment_1->objectName().isEmpty())
             comment_1->setObjectName("comment_1");
-        comment_1->resize(451, 323);
+        comment_1->resize(494, 335);
         gridLayout = new QGridLayout(comment_1);
         gridLayout->setObjectName("gridLayout");
         horizontalLayout_3 = new QHBoxLayout();
@@ -72,27 +76,60 @@ public:
         horizontalLayout->setObjectName("horizontalLayout");
         pushButton_upComment = new QPushButton(comment_1);
         pushButton_upComment->setObjectName("pushButton_upComment");
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(pushButton_upComment->sizePolicy().hasHeightForWidth());
+        pushButton_upComment->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(pushButton_upComment);
+
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setObjectName("verticalLayout_2");
+        label_2 = new QLabel(comment_1);
+        label_2->setObjectName("label_2");
+        QFont font1;
+        font1.setPointSize(12);
+        label_2->setFont(font1);
+        label_2->setAlignment(Qt::AlignmentFlag::AlignCenter);
+
+        verticalLayout_2->addWidget(label_2);
 
         label_upCountComment = new QLabel(comment_1);
         label_upCountComment->setObjectName("label_upCountComment");
         label_upCountComment->setFont(font);
         label_upCountComment->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        horizontalLayout->addWidget(label_upCountComment);
+        verticalLayout_2->addWidget(label_upCountComment);
+
+
+        horizontalLayout->addLayout(verticalLayout_2);
 
         pushButton_downComment = new QPushButton(comment_1);
         pushButton_downComment->setObjectName("pushButton_downComment");
+        sizePolicy1.setHeightForWidth(pushButton_downComment->sizePolicy().hasHeightForWidth());
+        pushButton_downComment->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(pushButton_downComment);
+
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setObjectName("verticalLayout_3");
+        label_3 = new QLabel(comment_1);
+        label_3->setObjectName("label_3");
+        label_3->setFont(font1);
+        label_3->setAlignment(Qt::AlignmentFlag::AlignCenter);
+
+        verticalLayout_3->addWidget(label_3);
 
         label_downCountComment = new QLabel(comment_1);
         label_downCountComment->setObjectName("label_downCountComment");
         label_downCountComment->setFont(font);
         label_downCountComment->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        horizontalLayout->addWidget(label_downCountComment);
+        verticalLayout_3->addWidget(label_downCountComment);
+
+
+        horizontalLayout->addLayout(verticalLayout_3);
 
 
         verticalLayout_14->addLayout(horizontalLayout);
@@ -135,8 +172,10 @@ public:
         label->setText(QCoreApplication::translate("comment_1", "Comment", nullptr));
         plainTextEdit_commentText->setPlainText(QCoreApplication::translate("comment_1", "Read only three", nullptr));
         pushButton_upComment->setText(QString());
+        label_2->setText(QCoreApplication::translate("comment_1", "Upvotes", nullptr));
         label_upCountComment->setText(QCoreApplication::translate("comment_1", "0", nullptr));
         pushButton_downComment->setText(QString());
+        label_3->setText(QCoreApplication::translate("comment_1", "Downvotes", nullptr));
         label_downCountComment->setText(QCoreApplication::translate("comment_1", "0", nullptr));
         label_commentUserPic->setText(QString());
         label_commentUsername->setText(QCoreApplication::translate("comment_1", "Username", nullptr));

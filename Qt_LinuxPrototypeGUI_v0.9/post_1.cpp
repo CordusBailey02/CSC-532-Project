@@ -87,17 +87,22 @@ Post_1::Post_1(QWidget *parent)
     QPixmap pix4("/home/vboxuser/Pictures/profilePic.jpg");
     ui->label_userPic->setPixmap(pix4.scaled(100,100,Qt::KeepAspectRatio));
 
-    QPixmap pix6("/home/vboxuser/Pictures/profilePic.jpg");
+    QPixmap pix6("/home/vboxuser/Pictures/upvote.png");
     QIcon ButtonIcon(pix6);
     ui->pushButton_upPost->setIcon(ButtonIcon);
     ui->pushButton_upPost->setIconSize(QSize(40,40));
 
-    QPixmap pix7("/home/vboxuser/Pictures/profilePic.jpg");
+    QPixmap pix7("/home/vboxuser/Pictures/downvote.png");
     QIcon ButtonIcon_2(pix7);
     ui->pushButton_downPost->setIcon(ButtonIcon_2);
     ui->pushButton_downPost->setIconSize(QSize(40,40));
 
     ui->plainTextEdit_questionText->setReadOnly(true);
+
+    //if already upvoted/downvoted
+    //ui->pushButton_upPost->hide();
+    //ui->pushButton_downPost->hide();
+
 
     //QListWidgetItem *item = new QListWidgetItem(QString text, ui->listWidget);
     //ui->listWidget->addItem(item);
@@ -182,6 +187,7 @@ void Post_1::on_pushButton_upPost_clicked()
     QString postUpvotesStr = QString::number(postUpvotesInt);
     ui->label_upPostCount->setText(postUpvotesStr);
     ui->pushButton_upPost->hide();
+    ui->pushButton_downPost->hide();
 }
 
 
@@ -192,6 +198,7 @@ void Post_1::on_pushButton_downPost_clicked()
     QString postDownvotesStr = QString::number(postDownvotesInt);
     ui->label_downPostCount->setText(postDownvotesStr);
     ui->pushButton_downPost->hide();
+    ui->pushButton_upPost->hide();
 }
 
 void Post_1::on_pushButton_2_clicked()
@@ -202,8 +209,8 @@ void Post_1::on_pushButton_2_clicked()
 
     if (no file)
     {
-        QMessageBox::critical(this, "Question File", "No file was submitted");
-        //ui->pushButton_2->hide();
+        QMessageBox::critical(this, "Question File", "<font size = 13>No file was submitted</font>");
+        ui->pushButton_2->hide();
     }
     else
     {

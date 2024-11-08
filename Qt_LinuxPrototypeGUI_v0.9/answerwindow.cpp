@@ -13,15 +13,15 @@ answerWindow::answerWindow(QWidget *parent)
 
     ui->plainTextEdit_answerText->setReadOnly(true);
 
-    QPixmap pix5("C:/Users/ldura/Pictures/Mesa/me_3_closer.jpg");
+    QPixmap pix5("/home/vboxuser/Pictures/otherPic.jpg");
     ui->label_answerPic->setPixmap(pix5.scaled(100,100,Qt::KeepAspectRatio));
 
-    QPixmap pix10("C:/Users/ldura/Pictures/upvote.jpg");
+    QPixmap pix10("/home/vboxuser/Pictures/upvote.png");
     QIcon ButtonIcon(pix10);
     ui->pushButton_upAnswer->setIcon(ButtonIcon);
     ui->pushButton_upAnswer->setIconSize(QSize(40,40));
 
-    QPixmap pix11("C:/Users/ldura/Pictures/downvote.jpg");
+    QPixmap pix11("/home/vboxuser/Pictures/downvote.png");
     QIcon ButtonIcon_2(pix11);
     ui->pushButton_downAnswer->setIcon(ButtonIcon_2);
     ui->pushButton_downAnswer->setIconSize(QSize(40,40));
@@ -159,6 +159,7 @@ void answerWindow::on_pushButton_upAnswer_clicked()
     QString answerUpvotesStr = QString::number(answerUpvotesInt);
     ui->label_upAnswerCount->setText(answerUpvotesStr);
     ui->pushButton_upAnswer->hide();
+    ui->pushButton_downAnswer->hide();
 
     // send new value to client
 }
@@ -171,6 +172,7 @@ void answerWindow::on_pushButton_downAnswer_clicked()
     QString answerDownvotesStr = QString::number(answerDownvotesInt);
     ui->label_downAnswerCount->setText(answerDownvotesStr);
     ui->pushButton_downAnswer->hide();
+    ui->pushButton_upAnswer->hide();
 
     // send new value to client
 }
