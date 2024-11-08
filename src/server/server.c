@@ -428,7 +428,10 @@ void* handle_client(void *arg)
 					}
 					for(int i = 0; i < *mysql_num_rows; i++)
 					{
-						printf("Result: %s\n", **(mysql_result_table + i));
+						printf("[ ");
+						for(int j = 0; j < (*mysql_num_fields); j++)
+							printf("\"%s\" ", mysql_result_table[i][j]);
+						printf("]\n");
 					}
 					
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
