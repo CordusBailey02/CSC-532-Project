@@ -157,6 +157,8 @@ int main(int argc, char **argv)
 	}
 	int file_paths_length = 0;
 	int file_paths_capacity = 5;
+
+	bool signed_in = false;
 	
 	// Used to prevent client from waiting to receive something when data was 
 	// input erroneously. If nothing was sent, it will never receive anything.
@@ -604,7 +606,17 @@ int main(int argc, char **argv)
 					for(int i = 0; i < payloads_received; i++)
 						printf("\"%s\" ", (char *) inbound_payloads[i]->data);
 					break;
-
+				case LOGIN_ATTEMPT_RESPONSE:
+					// check response
+					if(strcmp(inbound_payloads[0]->data, "not exists") == 0)
+					{
+						fprintf(stderr, "[sign in error] No user found with provided credentials.\n");
+						username = default_username;
+					}
+					else
+						signed_in = true;	
+					// if valid sign-in, change username
+					break;
 				default:
 					fprintf(stderr, "Received a SEND request header from server with unknown/unimplemented subject (code %d). No action will be taken.\n", inbound_request_header.subject);
 					break;
