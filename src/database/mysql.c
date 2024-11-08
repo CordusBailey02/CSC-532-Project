@@ -27,13 +27,13 @@ int mysql_connection_init()
 
     if(conn == NULL)
     {
-        fprintf(stderr, "\n%s\n", mysql_error(conn));
+        fprintf(stderr, "[mysql_connection_init] %s\n", mysql_error(conn));
         return EXIT_FAILURE;
     }
 
     if(mysql_real_connect(conn, hostname, username, psw, db, port, unix_socket, client_flag) == NULL)
     {
-        fprintf(stderr, "\n%s\n", mysql_error(conn));
+        fprintf(stderr, "[mysql_connection_init] %s\n", mysql_error(conn));
         return EXIT_FAILURE;
     }
 
@@ -54,16 +54,6 @@ char ***mysql_query(char *query_name, struct payload **inbound_payloads, int *re
     *return_flag = SUCCESS;
     *num_fields = 0;
     *num_rows = 0;
-
-    if(mysql_connection_init())
-    {
-        printf("\nConnection Failed...\n");
-        *return_flag = CONNECTION_ERROR;
-        return results_table;
-    }
-
-    printf("\nConnection success...\n");
-
 
     // Check the given query name and send a call to MYSQL run the corresponding 
     // stored procedure.
@@ -123,28 +113,28 @@ char ***mysql_query(char *query_name, struct payload **inbound_payloads, int *re
     }
     else
     {
-        printf("No query found...");
+        printf("[mysql_query] No query found...");
         *return_flag = INEXISTENT_QUERY;
         return results_table;
     }
 
     if(query_length_check)
     {
-        printf("Inbound payload had an insuffucient amount of data.");
+        printf("[mysql_query] Inbound payload had an insuffucient amount of data.");
         *return_flag = INSUFFICIENT_PARAMETERS;
         return results_table;
     }
 
-    printf("\nQuery: %s\n", query);
+    printf("[mysql_query] Query: %s\n", query);
     
     if(mysql_query(conn, query))
     {
-        printf("\nQuery Failed...\n");
-        fprintf(stderr, "Error: %s\n", mysql_error(conn));
+        printf("[mysql_query] Query Failed...\n");
+        fprintf(stderr, "[mysql_query] Error: %s\n", mysql_error(conn));
         return results_table;
     }
 
-    printf("\nQuery success...\n");
+    printf("[mysql_query] Query success...\n");
 
     // Now that the query has successfully completed, gather the results and return each row.
     
@@ -155,19 +145,20 @@ char ***mysql_query(char *query_name, struct payload **inbound_payloads, int *re
     result = mysql_store_result(conn);
     *num_rows = mysql_num_rows(result);
     *num_fields = mysql_num_fields(result);
-    results_table = realloc(results_table, sizeof(row) * *num_rows);
+    results_table = realloc(results_table, sizeof(row) * (*num_rows));
 
     if (result) 
     {
-        printf("\nWe have result...\n");
+        printf("[mysql_query] Gathering result...\n");
         while ((row = mysql_fetch_row(result)) != 0)
         {
             results_table[table_index] = row;
+            table_index = table_index + 1;
         }
     }
     else 
     {
-        printf("\nNo result...\n");
+        printf("[mysql_query] No result...\n");
         if(mysql_field_count(conn) == 0)
         {
             // *num_rows = mysql_affected_rows(conn);
@@ -176,7 +167,7 @@ char ***mysql_query(char *query_name, struct payload **inbound_payloads, int *re
         }
         else 
         {
-            fprintf(stderr, "Error: %s\n", mysql_error(conn));
+            fprintf(stderr, "[mysql_query] Error: %s\n", mysql_error(conn));
             return results_table;
         }
     }
