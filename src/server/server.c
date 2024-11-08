@@ -402,8 +402,8 @@ void* handle_client(void *arg)
 					}
 					printf("Got username: \"%s\", password: \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
 					// DO DATABASE THING HERE
-					mysql_result_table = mysql_query("check_user", inbound_payloads);
-					switch(mysql_return_flag)
+					mysql_result_table = mysql_query("check_user", inbound_payloads, *mysql_return_flag, *mysql_num_fields, *mysql_num_rows);
+					switch(*mysql_return_flag)
 					{
 						case SUCCESS:
 							printf("Got result: %d rows, %d, fields.\n", mysql_num_rows, mysql_num_fields);
@@ -417,7 +417,7 @@ void* handle_client(void *arg)
 						case default:
 							break;
 					}
-					
+					// print(mysql_)
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
 					temporary_response = malloc(40 + strlen(inbound_payloads[0]->data) + strlen(inbound_payloads[1]->data) + 3);
 					if(temporary_response == NULL)
