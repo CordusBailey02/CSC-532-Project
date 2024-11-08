@@ -152,17 +152,23 @@ void* handle_client(void *arg)
 
 	char *temporary_response;
 
-	char ***mysql_result_table;
-	int *mysql_return_flag = SUCCESS;
-	int *mysql_num_fields = 0;
-	int *mysql_num_rows = 0;
+	char ***mysql_result_table = malloc(4096);
+	int *mysql_return_flag = malloc(sizeof(int));
+	int *mysql_num_fields = malloc(sizeof(int));
+	int *mysql_num_rows = malloc(sizeof(int));
+
+	*mysql_return_flag = SUCCESS;
+	*mysql_num_fields = 0;
+	*mysql_num_rows = 0;
 
 	// Extablish a connection to MYSQL for the client thread. Connection stays
 	// open as long as the client is connected.
+	mysql_cleanup();
 	if(mysql_connection_init())
 	{
         fprintf(stderr, "[handle_client] Unable to establish a connection to MYSQL.\n");
 	}
+	printf("Connection to MYSQL successful.\n");
 
 	// Maintain connection with client via loop
 	// The entire process of 1st receiving the request type and the number of
@@ -403,12 +409,14 @@ void* handle_client(void *arg)
 					}
 					printf("Got username: \"%s\", password: \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
 					// DO DATABASE THING HERE
-					mysql_result_table = mysql_database_query("check_user", inbound_payloads, mysql_return_flag, mysql_num_fields, mysql_num_rows);
+					mysql_result_table = mysql_database_query("check_user", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
 					switch(*mysql_return_flag)
 					{
 						case SUCCESS:
-							printf("Got result: %d rows, %d, fields.\n", (*mysql_num_rows), (*mysql_num_fields));
+							printf("Got result: %d rows, %d fields.\n", (*mysql_num_rows), (*mysql_num_fields));
 							break;
+						case CONNECTION_ERROR:
+							fprintf(stderr,"[handle_client] Connection to MYSQL when running query produced an error. Check error given.");
 						case INEXISTENT_QUERY:
 							fprintf(stderr, "[handle_client] Attempted query given does not exist.");
 							break;
@@ -418,7 +426,11 @@ void* handle_client(void *arg)
 						default:
 							break;
 					}
-					// print(mysql_)
+					for(int i = 0; i < *mysql_num_rows; i++)
+					{
+						printf("Result: %s\n", **(mysql_result_table + i));
+					}
+					
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
 					temporary_response = malloc(40 + strlen(inbound_payloads[0]->data) + strlen(inbound_payloads[1]->data) + 3);
 					if(temporary_response == NULL)

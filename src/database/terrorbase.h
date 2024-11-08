@@ -11,6 +11,6 @@ void mysql_cleanup();
 
 int mysql_connection_init(void);
 
-char ***mysql_database_query(char *query_name, struct payload **inbound_payloads, int *return_flag, int *num_fields, int *num_rows);
+char ***mysql_database_query(char *query_name, struct payload **inbound_payloads, char ***results_table, int *return_flag, int *num_fields, int *num_rows);
 
 #endif
