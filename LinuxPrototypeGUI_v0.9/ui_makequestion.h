@@ -62,6 +62,13 @@ public:
         pushButton_uploadQuestionImage->setObjectName("pushButton_uploadQuestionImage");
         sizePolicy.setHeightForWidth(pushButton_uploadQuestionImage->sizePolicy().hasHeightForWidth());
         pushButton_uploadQuestionImage->setSizePolicy(sizePolicy);
+        QPalette palette;
+        QBrush brush(QColor(146, 194, 242, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Button, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::Button, brush);
+        palette.setBrush(QPalette::Disabled, QPalette::Button, brush);
+        pushButton_uploadQuestionImage->setPalette(palette);
         pushButton_uploadQuestionImage->setFont(font);
 
         horizontalLayout_4->addWidget(pushButton_uploadQuestionImage);
@@ -89,6 +96,13 @@ public:
         pushButton_postQuestion->setObjectName("pushButton_postQuestion");
         sizePolicy.setHeightForWidth(pushButton_postQuestion->sizePolicy().hasHeightForWidth());
         pushButton_postQuestion->setSizePolicy(sizePolicy);
+        QPalette palette1;
+        QBrush brush1(QColor(0, 255, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette1.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette1.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette1.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        pushButton_postQuestion->setPalette(palette1);
         pushButton_postQuestion->setFont(font);
 
         horizontalLayout->addWidget(pushButton_postQuestion);
@@ -97,6 +111,13 @@ public:
         pushButton_cancel->setObjectName("pushButton_cancel");
         sizePolicy.setHeightForWidth(pushButton_cancel->sizePolicy().hasHeightForWidth());
         pushButton_cancel->setSizePolicy(sizePolicy);
+        QPalette palette2;
+        QBrush brush2(QColor(255, 0, 0, 255));
+        brush2.setStyle(Qt::SolidPattern);
+        palette2.setBrush(QPalette::Active, QPalette::Button, brush2);
+        palette2.setBrush(QPalette::Inactive, QPalette::Button, brush2);
+        palette2.setBrush(QPalette::Disabled, QPalette::Button, brush2);
+        pushButton_cancel->setPalette(palette2);
         pushButton_cancel->setFont(font);
 
         horizontalLayout->addWidget(pushButton_cancel);

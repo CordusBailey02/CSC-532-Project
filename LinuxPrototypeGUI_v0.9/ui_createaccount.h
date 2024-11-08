@@ -53,7 +53,7 @@ public:
     {
         if (createAccount->objectName().isEmpty())
             createAccount->setObjectName("createAccount");
-        createAccount->resize(570, 398);
+        createAccount->resize(570, 440);
         verticalLayout_2 = new QVBoxLayout(createAccount);
         verticalLayout_2->setObjectName("verticalLayout_2");
         horizontalLayout_3 = new QHBoxLayout();
@@ -154,6 +154,13 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(pushButton_createConfirm->sizePolicy().hasHeightForWidth());
         pushButton_createConfirm->setSizePolicy(sizePolicy1);
+        QPalette palette;
+        QBrush brush(QColor(0, 255, 0, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Button, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::Button, brush);
+        palette.setBrush(QPalette::Disabled, QPalette::Button, brush);
+        pushButton_createConfirm->setPalette(palette);
         QFont font1;
         font1.setPointSize(25);
         pushButton_createConfirm->setFont(font1);
@@ -165,6 +172,13 @@ public:
         pushButton_createCancel->setObjectName("pushButton_createCancel");
         sizePolicy1.setHeightForWidth(pushButton_createCancel->sizePolicy().hasHeightForWidth());
         pushButton_createCancel->setSizePolicy(sizePolicy1);
+        QPalette palette1;
+        QBrush brush1(QColor(255, 0, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette1.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette1.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette1.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        pushButton_createCancel->setPalette(palette1);
         pushButton_createCancel->setFont(font1);
         pushButton_createCancel->setFocusPolicy(Qt::FocusPolicy::NoFocus);
 
@@ -182,6 +196,13 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(pushButton_AccountCode->sizePolicy().hasHeightForWidth());
         pushButton_AccountCode->setSizePolicy(sizePolicy2);
+        QPalette palette2;
+        QBrush brush2(QColor(146, 194, 242, 255));
+        brush2.setStyle(Qt::SolidPattern);
+        palette2.setBrush(QPalette::Active, QPalette::Button, brush2);
+        palette2.setBrush(QPalette::Inactive, QPalette::Button, brush2);
+        palette2.setBrush(QPalette::Disabled, QPalette::Button, brush2);
+        pushButton_AccountCode->setPalette(palette2);
         pushButton_AccountCode->setFont(font1);
         pushButton_AccountCode->setFocusPolicy(Qt::FocusPolicy::NoFocus);
 

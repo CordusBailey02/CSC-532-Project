@@ -35,7 +35,7 @@ public:
     {
         if (searchResults->objectName().isEmpty())
             searchResults->setObjectName("searchResults");
-        searchResults->resize(445, 436);
+        searchResults->resize(445, 452);
         verticalLayout = new QVBoxLayout(searchResults);
         verticalLayout->setObjectName("verticalLayout");
         label = new QLabel(searchResults);
@@ -54,6 +54,17 @@ public:
         listWidget_communitiesFromSearch = new QListWidget(searchResults);
         new QListWidgetItem(listWidget_communitiesFromSearch);
         listWidget_communitiesFromSearch->setObjectName("listWidget_communitiesFromSearch");
+        QPalette palette;
+        QBrush brush(QColor(146, 194, 242, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        QBrush brush1(QColor(0, 0, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget_communitiesFromSearch->setPalette(palette);
         listWidget_communitiesFromSearch->setFont(font);
 
         verticalLayout->addWidget(listWidget_communitiesFromSearch);
@@ -69,6 +80,13 @@ public:
         listWidget_postsFromSearch = new QListWidget(searchResults);
         new QListWidgetItem(listWidget_postsFromSearch);
         listWidget_postsFromSearch->setObjectName("listWidget_postsFromSearch");
+        QPalette palette1;
+        palette1.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        palette1.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette1.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette1.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette1.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget_postsFromSearch->setPalette(palette1);
         listWidget_postsFromSearch->setFont(font);
 
         verticalLayout->addWidget(listWidget_postsFromSearch);
@@ -84,6 +102,13 @@ public:
         listWidget_answersFromSearch = new QListWidget(searchResults);
         new QListWidgetItem(listWidget_answersFromSearch);
         listWidget_answersFromSearch->setObjectName("listWidget_answersFromSearch");
+        QPalette palette2;
+        palette2.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        palette2.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette2.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette2.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette2.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget_answersFromSearch->setPalette(palette2);
         listWidget_answersFromSearch->setFont(font);
 
         verticalLayout->addWidget(listWidget_answersFromSearch);
@@ -99,6 +124,13 @@ public:
         listWidget_commentsFromSearch = new QListWidget(searchResults);
         new QListWidgetItem(listWidget_commentsFromSearch);
         listWidget_commentsFromSearch->setObjectName("listWidget_commentsFromSearch");
+        QPalette palette3;
+        palette3.setBrush(QPalette::Active, QPalette::Highlight, brush);
+        palette3.setBrush(QPalette::Active, QPalette::HighlightedText, brush1);
+        palette3.setBrush(QPalette::Inactive, QPalette::Highlight, brush);
+        palette3.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
+        palette3.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
+        listWidget_commentsFromSearch->setPalette(palette3);
         listWidget_commentsFromSearch->setFont(font);
 
         verticalLayout->addWidget(listWidget_commentsFromSearch);

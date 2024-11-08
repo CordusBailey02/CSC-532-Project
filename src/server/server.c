@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include  "../lib/terrorexchange.h"
 #include  "../lib/secure_connection.h"
+#include "../database/mysql.h"
 #define CONNECTION_BACKLOG_CAPACITY 128
 
 // used to pass multiple arguments to the pthread for each
@@ -149,6 +150,18 @@ void* handle_client(void *arg)
 	size_t payloads_received = 0;
 
 	char *temporary_response;
+
+	char ***mysql_result_table;
+	int *mysql_return_flag = SUCCESS;
+	int *mysql_num_fields = 0;
+	int *mysql_num_rows = 0;
+
+	// Extablish a connection to MYSQL for the client thread. Connection stays
+	// open as long as the client is connected.
+	if(mysql_connection_init())
+	{
+        fprintf(stderr, "[handle_client] Unable to establish a connection to MYSQL.\n");
+	}
 
 	// Maintain connection with client via loop
 	// The entire process of 1st receiving the request type and the number of
@@ -389,6 +402,22 @@ void* handle_client(void *arg)
 					}
 					printf("Got username: \"%s\", password: \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
 					// DO DATABASE THING HERE
+					mysql_result_table = mysql_query("check_user", inbound_payloads);
+					switch(mysql_return_flag)
+					{
+						case SUCCESS:
+							printf("Got result: %d rows, %d, fields.\n", mysql_num_rows, mysql_num_fields);
+							break;
+						case INEXISTENT_QUERY:
+							fprintf(stderr, "[handle_client] Attempted query given does not exist.");
+							break;
+						case INSUFFICIENT_PARAMETERS:
+							fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.");
+							break;
+						case default:
+							break;
+					}
+					
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
 					temporary_response = malloc(40 + strlen(inbound_payloads[0]->data) + strlen(inbound_payloads[1]->data) + 3);
 					if(temporary_response == NULL)
@@ -460,6 +489,7 @@ void* handle_client(void *arg)
 	}
 
 	close(client_socket);
+	mysql_cleanup();
 	return NULL;
 }
  

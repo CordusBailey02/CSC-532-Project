@@ -58,7 +58,7 @@ public:
     {
         if (Profile->objectName().isEmpty())
             Profile->setObjectName("Profile");
-        Profile->resize(490, 383);
+        Profile->resize(515, 403);
         gridLayout = new QGridLayout(Profile);
         gridLayout->setObjectName("gridLayout");
         horizontalLayout_8 = new QHBoxLayout();
@@ -175,6 +175,12 @@ public:
         label_5->setObjectName("label_5");
         sizePolicy1.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
         label_5->setSizePolicy(sizePolicy1);
+        QPalette palette;
+        QBrush brush(QColor(38, 162, 105, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        label_5->setPalette(palette);
         label_5->setFont(font);
         label_5->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
@@ -204,6 +210,17 @@ public:
         new QListWidgetItem(listWidget_postsFromProfile);
         new QListWidgetItem(listWidget_postsFromProfile);
         listWidget_postsFromProfile->setObjectName("listWidget_postsFromProfile");
+        QPalette palette1;
+        QBrush brush1(QColor(146, 194, 242, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette1.setBrush(QPalette::Active, QPalette::Highlight, brush1);
+        QBrush brush2(QColor(0, 0, 0, 255));
+        brush2.setStyle(Qt::SolidPattern);
+        palette1.setBrush(QPalette::Active, QPalette::HighlightedText, brush2);
+        palette1.setBrush(QPalette::Inactive, QPalette::Highlight, brush1);
+        palette1.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush2);
+        palette1.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush2);
+        listWidget_postsFromProfile->setPalette(palette1);
         listWidget_postsFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_postsFromProfile);
@@ -221,6 +238,13 @@ public:
         new QListWidgetItem(listWidget_answersFromProfile);
         new QListWidgetItem(listWidget_answersFromProfile);
         listWidget_answersFromProfile->setObjectName("listWidget_answersFromProfile");
+        QPalette palette2;
+        palette2.setBrush(QPalette::Active, QPalette::Highlight, brush1);
+        palette2.setBrush(QPalette::Active, QPalette::HighlightedText, brush2);
+        palette2.setBrush(QPalette::Inactive, QPalette::Highlight, brush1);
+        palette2.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush2);
+        palette2.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush2);
+        listWidget_answersFromProfile->setPalette(palette2);
         listWidget_answersFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_answersFromProfile);
@@ -242,6 +266,13 @@ public:
         new QListWidgetItem(listWidget_commentsFromProfile);
         new QListWidgetItem(listWidget_commentsFromProfile);
         listWidget_commentsFromProfile->setObjectName("listWidget_commentsFromProfile");
+        QPalette palette3;
+        palette3.setBrush(QPalette::Active, QPalette::Highlight, brush1);
+        palette3.setBrush(QPalette::Active, QPalette::HighlightedText, brush2);
+        palette3.setBrush(QPalette::Inactive, QPalette::Highlight, brush1);
+        palette3.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush2);
+        palette3.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush2);
+        listWidget_commentsFromProfile->setPalette(palette3);
         listWidget_commentsFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_commentsFromProfile);

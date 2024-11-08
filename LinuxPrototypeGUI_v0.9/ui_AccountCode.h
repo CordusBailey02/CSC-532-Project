@@ -80,6 +80,13 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(pushButton_submitCode->sizePolicy().hasHeightForWidth());
         pushButton_submitCode->setSizePolicy(sizePolicy2);
+        QPalette palette;
+        QBrush brush(QColor(0, 255, 0, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Button, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::Button, brush);
+        palette.setBrush(QPalette::Disabled, QPalette::Button, brush);
+        pushButton_submitCode->setPalette(palette);
         QFont font1;
         font1.setPointSize(30);
         pushButton_submitCode->setFont(font1);
@@ -90,6 +97,13 @@ public:
         pushButton->setObjectName("pushButton");
         sizePolicy2.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
         pushButton->setSizePolicy(sizePolicy2);
+        QPalette palette1;
+        QBrush brush1(QColor(255, 0, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette1.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette1.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette1.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        pushButton->setPalette(palette1);
         pushButton->setFont(font1);
 
         horizontalLayout->addWidget(pushButton);

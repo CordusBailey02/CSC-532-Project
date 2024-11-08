@@ -73,6 +73,13 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(pushButton_forgotConfirm->sizePolicy().hasHeightForWidth());
         pushButton_forgotConfirm->setSizePolicy(sizePolicy);
+        QPalette palette;
+        QBrush brush(QColor(0, 255, 0, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Button, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::Button, brush);
+        palette.setBrush(QPalette::Disabled, QPalette::Button, brush);
+        pushButton_forgotConfirm->setPalette(palette);
         pushButton_forgotConfirm->setFont(font);
 
         horizontalLayout->addWidget(pushButton_forgotConfirm);
@@ -81,6 +88,13 @@ public:
         pushButton_forgotCancel->setObjectName("pushButton_forgotCancel");
         sizePolicy.setHeightForWidth(pushButton_forgotCancel->sizePolicy().hasHeightForWidth());
         pushButton_forgotCancel->setSizePolicy(sizePolicy);
+        QPalette palette1;
+        QBrush brush1(QColor(255, 0, 0, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette1.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette1.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette1.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        pushButton_forgotCancel->setPalette(palette1);
         pushButton_forgotCancel->setFont(font);
 
         horizontalLayout->addWidget(pushButton_forgotCancel);
