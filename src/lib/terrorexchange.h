@@ -10,6 +10,7 @@
 #define CHUNK_SIZE 16384
 #define MAX_SEND_ATTEMPTS 10
 #define MAX_RECEIVE_ATTEMPTS 10
+#define MAX_FILE_SIZE_IN_BYTES 128000000 // 128 MB (decimal, not IEC)
 
 enum ACTION { GET, SEND, ACTION_ERROR};	// ERROR is for functions that return an ACTION
 					// enum. If they run into an error, then ERROR
@@ -34,6 +35,8 @@ enum ACKNOWLEDGEMENT_TYPE {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED, FA
 		 	   ACKNOWLEDGEMENT_TYPE_ERROR };
 
 enum DATABASE_ERROR { SUCCESS, CONNECTION_ERROR, INEXISTENT_QUERY, INSUFFIECIENT_PARAMETERS};
+
+enum FILE_IO_CODE { IO_OK, IO_TOO_LARGE, BAD_FILE_PATH, ZERO_UPPER_LIMIT, BYTES_READ_MISMATCH };
 
 struct request_header
 {
@@ -108,6 +111,8 @@ void print_acknowledgement_type_mismatch_error(int socket, char *function_name, 
 bool send_developer_test_message(int socket, struct request_header *outbound_request_header, char *message, uint32_t shared_secret);
 bool send_login_attempt(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *password, int password_length, uint32_t shared_secret);
 bool send_account_create(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *email, int email_length, char *password, int password_length, uint32_t shared_secret);
+
+void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t MAX_FILE_SIZE_IN_MEGABYTES);
 
 bool server_confirm_user_existence(char username[]);
 

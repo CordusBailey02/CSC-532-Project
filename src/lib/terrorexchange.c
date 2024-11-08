@@ -979,6 +979,65 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	return true;
 }
 
+void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t max_bytes)
+{
+	if(return_code == NULL)
+	{
+		fprintf(stderr, "[read_binary_file] Cannot load a FILE_IO_CODE into a pointer that points to NULL. Bad argument provided.\n");
+		return NULL;
+	}
+
+	if(file_path == NULL)
+	{
+		fprintf(stderr, "[read_binary_file] File path not provided. char *file_path points  to NULL.\n");
+		(*return_code) = BAD_FILE_PATH;
+		return NULL;
+	}
+	if(max_bytes == 0)
+	{
+		fprintf(stderr, "[read_binary_file] Max size in megabytes is 0. Minimum size is 1mb.\n");
+		(*return_code) = ZERO_UPPER_LIMIT;
+		return NULL;
+	}
+	
+	// Open file and ensure it actually exists
+	FILE *fh;
+	fh = fopen(file_path, "rb");
+	if(fh == NULL)
+	{
+		fprintf(stderr, "[read_binary_file] Failed to open the file stored at \"%s\".\n Does this file exist?\n", file_path);
+		(*return_code) = BAD_FILE_PATH;
+		return NULL;
+	}
+
+	// Make sure file is not too big
+	size_t file_size = 0;
+	fseek(fh, 0, SEEK_END);
+	file_size = ftell(fh);
+	if(file_size >= max_bytes)
+	{
+		fprintf(stderr, "[read_binary_file] File size is too large. Max file size is %ld bytes, but the given file is %zu bytes.\n", max_bytes, file_size);
+		fclose(fh);
+		(*return_code) = IO_TOO_LARGE;
+		return NULL;
+	}
+
+	// Read the entire file
+	void *file_data = malloc(file_size);
+	size_t bytes_read = fread(file_data, file_size, 1, fh); 
+	if(bytes_read != file_size)
+	{
+		fprintf(stderr, "[read_binary_file] Failed to read %zu bytes from the file. Stopped reading after %zu bytes.\n", file_size, bytes_read);
+		fclose(fh);
+		(*return_code) = BYTES_READ_MISMATCH;
+		free(file_data);
+	}
+
+	// Return OK code and pointer to the file's data
+	(*return_code) = IO_OK;
+	return file_data;
+}
+
 bool server_confirm_user_existence(char username[])
 {
 	// in the meantime, until DB is setup
