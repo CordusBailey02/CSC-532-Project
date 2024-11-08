@@ -6,44 +6,11 @@
 #include <stdint.h>
 #include "terrorexchange.h"
 
-struct request_header* request_header_create(enum ACTION action, enum SUBJECT subject, size_t parameter_count, size_t metadata_total_size, size_t parameters_total_size, size_t total_bytes)
-{
-	struct request_header *new_request_header = malloc(sizeof(struct request_header));
-	if(new_request_header == NULL)
-	{
-		fprintf(stderr, "[request_header_create]: Failed to allocate memory for a new request header struct.\n");
-		return NULL;
-	}
-	new_request_header->action = action;
-	new_request_header->subject = subject;
-	new_request_header->parameter_count = parameter_count;
-	new_request_header->metadata_total_size = metadata_total_size;
-	new_request_header->parameters_total_size = parameters_total_size;
-	new_request_header->total_bytes = total_bytes;
-
-	return new_request_header;
-} 
-
-struct payload* payload_create(size_t member_size, size_t member_count)
-{
-	struct payload *new_payload = malloc(sizeof(struct payload));
-	if(new_payload == NULL)
-	{
-		fprintf(stderr, "[payload_create]: Failed to allocate memory for new payload struct.\n");
-		return NULL;
-	}
-
-	new_payload->member_size = member_size;
-	new_payload->member_count = member_count;
-
-	return new_payload;
-}
-
-bool send_request_header(int socket, struct request_header *header)
+bool gui_send_request_header(int socket, struct request_header *header)
 {
 	if(header == NULL)
 	{
-		fprintf(stderr, "[send_request_header]: Cannot send request header that points to NULL.\n");
+		fprintf(stderr, "[gui_send_request_header]: Cannot send request header that points to NULL.\n");
 		return false;
 	}
 
@@ -67,7 +34,7 @@ bool send_request_header(int socket, struct request_header *header)
 	// Return false if bad connection
 	if(bytes_sent < 0)
 	{
-		fprintf(stderr, "[send_request_header]: Failed to send data. Send function returned -1.\n");
+		fprintf(stderr, "[gui_send_request_header]: Failed to send data. Send function returned -1.\n");
 		return false;
 	}
 
@@ -78,7 +45,7 @@ bool send_request_header(int socket, struct request_header *header)
 		bytes_sent = send(socket, header + total_bytes_sent, sizeof(struct request_header) - total_bytes_sent, 0);
 		if(bytes_sent < 0)
 		{
-			fprintf(stderr, "[send_request_header]: Unable to send remaining bytes. Send function returned -1.\n");
+			fprintf(stderr, "[gui_send_request_header]: Unable to send remaining bytes. Send function returned -1.\n");
 			return false;
 		}
 		total_bytes_sent += bytes_sent;
@@ -86,11 +53,11 @@ bool send_request_header(int socket, struct request_header *header)
 	return true;
 }
 
-bool receive_request_header(int socket, struct request_header *header)
+bool gui_receive_request_header(int socket, struct request_header *header)
 {
 	if(header == NULL)
 	{
-		fprintf(stderr, "[receive_request_header]: Cannot load received request header into a request header struct that points to NULL. Argument provided is bad.\n");
+		fprintf(stderr, "[gui_receive_request_header]: Cannot load received request header into a request header struct that points to NULL. Argument provided is bad.\n");
 		return false;
 	}
 
@@ -98,7 +65,7 @@ bool receive_request_header(int socket, struct request_header *header)
 	bytes_received = recv(socket, header, sizeof(struct request_header), 0);
 	if(bytes_received < 0)
 	{
-		fprintf(stderr, "[receive_request_header]: Failed to receive data. Recv function returned -1.\n");
+		fprintf(stderr, "[gui_receive_request_header]: Failed to receive data. Recv function returned -1.\n");
 		return false;
 	}
 
@@ -111,7 +78,7 @@ bool receive_request_header(int socket, struct request_header *header)
 			bytes_received = recv(socket, header + total_bytes_received, sizeof(struct request_header) - total_bytes_received, 0);
 			if(bytes_received < 0)
 			{
-				fprintf(stderr, "[receive_request_header]: Failed to receive data. Recv function returned -1 while trying to receive remaining bytes.\n");
+				fprintf(stderr, "[gui_receive_request_header]: Failed to receive data. Recv function returned -1 while trying to receive remaining bytes.\n");
 				return false;
 			}
 
@@ -131,10 +98,10 @@ bool receive_request_header(int socket, struct request_header *header)
 }
 
 // parameter_count member of outbound request header is used to signal the type of acknowledgement.
-bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type)
+bool gui_send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type)
 {
 	// (1) Create acknowledgement request header
-	// (2) DO NOT convert to network byte order, because send_request_header 
+	// (2) DO NOT convert to network byte order, because gui_send_request_header 
 	//     function will do it.
 	struct request_header acknowledgement; 
 	acknowledgement.action = SEND;
@@ -146,9 +113,9 @@ bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type)
 
 	// Send the acknowledgement
 	bool status;
-	status = send_request_header(socket, &acknowledgement);
+	status = gui_send_request_header(socket, &acknowledgement);
 	if(status == false)
-		fprintf(stderr, "[send_acknowledgement]: Could not send acknowledgement. send_request_header() returned false.\n");
+		fprintf(stderr, "[gui_send_acknowledgement]: Could not send acknowledgement. gui_send_request_header() returned false.\n");
 
 	return status;
 }
@@ -156,33 +123,33 @@ bool send_acknowledgement(int socket, enum ACKNOWLEDGEMENT_TYPE type)
 // This is not guaranteed to receive an OK acknowledgement. 
 // You should check if the subject is ACKNOWLEDGEMENT afterwards; it might be NOT_FOUND
 // instead.
-bool receive_acknowledgement(int socket, struct request_header *header)
+bool gui_receive_acknowledgement(int socket, struct request_header *header)
 {
 	if(header == NULL)
 	{
-		fprintf(stderr, "[receive_acknowledgement]: Cannot read to-be-received request header into a request header struct that points to NULL. Argument is bad.\n");
+		fprintf(stderr, "[gui_receive_acknowledgement]: Cannot read to-be-received request header into a request header struct that points to NULL. Argument is bad.\n");
 		return false;
 	}
 
 	// receive acknowledgement
 	bool status;
-	status = receive_request_header(socket, header);
+	status = gui_receive_request_header(socket, header);
 	if(status == false)
-		fprintf(stderr, "[receive_acknowledgement]: Failed to receive acknowledgement. receive_request_header returned false.\n");
+		fprintf(stderr, "[gui_receive_acknowledgement]: Failed to receive acknowledgement. gui_receive_request_header returned false.\n");
 
 	return status;
 }
 
-bool send_payload_metadata(int socket, struct payload *outbound_payload)
+bool gui_send_payload_metadata(int socket, struct payload *outbound_payload)
 {
 	if(outbound_payload == NULL)
 	{
-		fprintf(stderr, "[send_payload_metadata]: Cannot send the metadata of a payload struct that points to NULL. Bad argument.\n");
+		fprintf(stderr, "[gui_send_payload_metadata]: Cannot send the metadata of a payload struct that points to NULL. Bad argument.\n");
 		return false;
 	}
 
 	// (1) Create PAYLOAD METADATA request header
-	// (2) DO NOT convert to network byte order, because send_request_header 
+	// (2) DO NOT convert to network byte order, because gui_send_request_header 
 	//     function will do it.
 	struct request_header payload_metadata; 
 	payload_metadata.action = SEND;
@@ -194,16 +161,16 @@ bool send_payload_metadata(int socket, struct payload *outbound_payload)
 
 	// Send the payload metadata 
 	bool status;
-	status = send_request_header(socket, &payload_metadata);
+	status = gui_send_request_header(socket, &payload_metadata);
 	if(status == false)
-		fprintf(stderr, "[send_payload_metadata]: Could not send payload metadata. send_request_header() returned false.\n");
+		fprintf(stderr, "[gui_send_payload_metadata]: Could not send payload metadata. gui_send_request_header() returned false.\n");
 
 	return status;
 }
 
 // receives a SEND PAYLOAD METADATA request header and uses that data to initialize a
 // payload (the inbound_payload parameter)
-bool receive_payload_metadata(int socket, struct payload *inbound_payload)
+bool gui_receive_payload_metadata(int socket, struct payload *inbound_payload)
 {
 	if(inbound_payload == NULL)
 	{
@@ -214,23 +181,23 @@ bool receive_payload_metadata(int socket, struct payload *inbound_payload)
 	// receive payload metadata 
 	struct request_header header;
 	bool status;
-	status = receive_request_header(socket, &header);
+	status = gui_receive_request_header(socket, &header);
 	if(status == false)
-		fprintf(stderr, "[receive_payload_metadata]: Failed to receive payload metadata request header. receive_request_header returned false.\n");
+		fprintf(stderr, "[receive_payload_metadata]: Failed to receive payload metadata request header. gui_receive_request_header returned false.\n");
 
 	// Set the inbound payload with the data of the request header
-	// NOTE: data is already in host format, as per the receive_request_header function.
+	// NOTE: data is already in host format, as per the gui_receive_request_header function.
 	inbound_payload->member_size = header.parameters_total_size / header.parameter_count;
 	inbound_payload->member_count = header.parameter_count;
 
 	return status;
 }
 
-bool send_payload(int socket, struct payload *outbound_payload)
+bool gui_send_payload(int socket, struct payload *outbound_payload)
 {
 	if(outbound_payload == NULL)
 	{
-		fprintf(stderr, "[send_payload]: Cannot send a payload struct that points to NULL. Bad argument provided.\n");
+		fprintf(stderr, "[gui_send_payload]: Cannot send a payload struct that points to NULL. Bad argument provided.\n");
 		return false;
 	}
 
@@ -242,35 +209,35 @@ bool send_payload(int socket, struct payload *outbound_payload)
 	// try to send data all at once - payload is smaller than one chunk
 	if(total_bytes_to_send <= CHUNK_SIZE)
 	{
-		printf("[send_payload] Attempting to send payload data as a singular chunk (%zu total bytes).\n", total_bytes_to_send);
+		printf("[gui_send_payload] Attempting to send payload data as a singular chunk (%zu total bytes).\n", total_bytes_to_send);
 		bytes_sent = send(socket, payload_data, total_bytes_to_send, 0);
 		if(bytes_sent == total_bytes_to_send)
 		{
-			printf("[send_payload] All the bytes of the payload were sent with one call to send().\n");
+			printf("[gui_send_payload] All the bytes of the payload were sent with one call to send().\n");
 			return true;
 		}
 
 		if(bytes_sent < 0)
 		{
-			fprintf(stderr, "[send_payload]: Failed to send payload with %zu bytes - send() returned -1.\n", total_bytes_to_send);
+			fprintf(stderr, "[gui_send_payload]: Failed to send payload with %zu bytes - send() returned -1.\n", total_bytes_to_send);
 			return false;
 		}
 
 		// Continue sending the rest of the bytes
 		total_bytes_sent = bytes_sent;
-		printf("[send_payload] Attempting to send remaining %zu bytes of payload data.\n", total_bytes_to_send - total_bytes_sent);
+		printf("[gui_send_payload] Attempting to send remaining %zu bytes of payload data.\n", total_bytes_to_send - total_bytes_sent);
 		while(total_bytes_sent < total_bytes_to_send)
 		{
 			bytes_sent = send(socket, payload_data + total_bytes_sent, total_bytes_to_send - total_bytes_sent, 0);
 			if(bytes_sent < 0)
 			{
-				fprintf(stderr, "[send_payload]: Failed to send remaining %zu bytes of payload. Send() returned -1.\n", total_bytes_to_send - total_bytes_to_send);
+				fprintf(stderr, "[gui_send_payload]: Failed to send remaining %zu bytes of payload. Send() returned -1.\n", total_bytes_to_send - total_bytes_to_send);
 				return false;
 			}
 
 			total_bytes_sent += bytes_sent;
 		}
-		printf("[send_payload] All bytes were sent in one chunk!\n");
+		printf("[gui_send_payload] All bytes were sent in one chunk!\n");
 		return true; // all bytes sent
 	}
 
@@ -281,7 +248,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 	size_t total_chunk_bytes_sent;
 	bytes_sent = 0;
 	total_bytes_sent = 0;
-	printf("[send_payload] Attempting to send payload data in several chunks.\n");
+	printf("[gui_send_payload] Attempting to send payload data in several chunks.\n");
 	while(bytes_remaining > 0)
 	{
 		// set chunk
@@ -312,7 +279,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 			bytes_sent = send(socket, chunk_buffer + total_chunk_bytes_sent, chunk_buffer_used - total_chunk_bytes_sent, 0);
 			if(bytes_sent < 0)
 			{
-				fprintf(stderr, "[send_payload]: Failed to send %zu bytes of chunk buffer to recipient. %zu bytes of %zu were sent in total across all chunks. %zu bytes of the current chunk were sent. Send() function returned -1.\n", chunk_buffer_used - total_chunk_bytes_sent, total_bytes_sent, total_bytes_to_send, bytes_sent);
+				fprintf(stderr, "[gui_send_payload]: Failed to send %zu bytes of chunk buffer to recipient. %zu bytes of %zu were sent in total across all chunks. %zu bytes of the current chunk were sent. Send() function returned -1.\n", chunk_buffer_used - total_chunk_bytes_sent, total_bytes_sent, total_bytes_to_send, bytes_sent);
 				return false;
 			}
 
@@ -330,7 +297,7 @@ bool send_payload(int socket, struct payload *outbound_payload)
 
 // DATA BUFFER IN INBOUND_PAYLOAD->DATA SHOULD ALREADY BE ALLOCATED FROM THE INFORMATION
 // RECEIVED BY CALLING RECEIVE_PAYLOAD_METADATA
-bool receive_payload(int socket, struct payload *inbound_payload)
+bool gui_receive_payload(int socket, struct payload *inbound_payload)
 {
 	if(inbound_payload == NULL) {
 		fprintf(stderr, "[receive_payload]: Cannot load incoming payload data into a payload struct that points to NULL.\n");
@@ -431,27 +398,8 @@ bool receive_payload(int socket, struct payload *inbound_payload)
 	return true;
 }
 
-void print_too_many_send_attempts_error(int socket, char *function_name, char *outbound_thing, int item_number)
-{
-	printf("[%s] Failed to send %s #%d to connection with socket #%d. Send attempts reached/exceeded MAX_SEND_ATTEMPTS (%d). Maybe there is something wrong with the connection?\n", function_name, outbound_thing, item_number, socket, MAX_SEND_ATTEMPTS);
-}
-
-void print_too_many_receive_attempts_error(int socket, char *function_name, char *outbound_thing, int item_number, char *additional_comment)
-{
-	printf("[%s] Failed to receive %s #%d to connection with socket #%d. Send attempts reached/exceeded MAX_SEND_ATTEMPTS (%d). Maybe there is something wrong with the connection?", function_name, outbound_thing, item_number, socket, MAX_RECEIVE_ATTEMPTS);
-	if(additional_comment != NULL)
-		printf("%s", additional_comment);
-
-	printf("\n");
-}
-
-void print_acknowledgement_type_mismatch_error(int socket, char *function_name, char *message_type, enum ACKNOWLEDGEMENT_TYPE wrong_type, enum ACKNOWLEDGEMENT_TYPE right_type)
-{
-	fprintf(stderr, "[%s] Received acknowledgement from connection with socket %d for %s; however, the acknowledgement was of type %d (wanted %d). Maybe the data was sent erroneously?\n", function_name, socket, message_type, wrong_type, right_type);
-}
-
 // This sets the request header properly for you. There is no need to configure it in advance.
-bool send_developer_test_message(int connection_socket, struct request_header *outbound_request_header, char *message)
+bool gui_send_developer_test_message(int connection_socket, struct request_header *outbound_request_header, char *message)
 {
 	if(outbound_request_header == NULL)
 	{
@@ -482,10 +430,10 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 
 	// Send SEND DEVELOPER_TEST_MESSAGE message
 	printf("[send_developer_test_message] Trying to send SEND DEVELOPER_TEST_MESSAGE request header to connection with connection socket %d.\n", connection_socket);
-	send_status = send_request_header(connection_socket, outbound_request_header);
+	send_status = gui_send_request_header(connection_socket, outbound_request_header);
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
-		send_status = send_request_header(connection_socket, outbound_request_header);
+		send_status = gui_send_request_header(connection_socket, outbound_request_header);
 		send_attempts++;
 	}
 	if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -498,10 +446,10 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 
 	// Wait for OK acknowledgement
 	printf("[send_developer_test_message] Waiting to receive acknowledgement from connection with connection socket %d.\n", connection_socket);
-	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+	receive_status = gui_receive_acknowledgement(connection_socket, &inbound_request_header);
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{	
-		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+		receive_status = gui_receive_acknowledgement(connection_socket, &inbound_request_header);
 		receive_attempts++;
 	}
 	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -517,11 +465,11 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	outbound_payload.member_size = sizeof(char);
 	outbound_payload.member_count = message_length;
 	printf("[send_developer_test_message] Sending payload metadata. Member size is %zu and member count is %zu.\n", outbound_payload.member_size, outbound_payload.member_count);
-	send_status = send_payload_metadata(connection_socket, &outbound_payload);
+	send_status = gui_send_payload_metadata(connection_socket, &outbound_payload);
 	send_attempts = 1;
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
-		send_status = send_payload_metadata(connection_socket, &outbound_payload);
+		send_status = gui_send_payload_metadata(connection_socket, &outbound_payload);
 		send_attempts++;
 	}
 	if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -532,11 +480,11 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	send_attempts = 0;
 
 	// Receive acknowledgement for payload metadata
-	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+	receive_status = gui_receive_acknowledgement(connection_socket, &inbound_request_header);
 	receive_attempts = 1;
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{	
-		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+		receive_status = gui_receive_acknowledgement(connection_socket, &inbound_request_header);
 		receive_attempts++;
 	}
 	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -554,11 +502,11 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 		return false;
 	}
 	memcpy(outbound_payload.data, message, message_length);
-	send_status = send_payload(connection_socket, &outbound_payload);
+	send_status = gui_send_payload(connection_socket, &outbound_payload);
 	send_attempts = 1;
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
-		send_status = send_payload(connection_socket, &outbound_payload);
+		send_status = gui_send_payload(connection_socket, &outbound_payload);
 		send_attempts++;
 	}
 	if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -571,11 +519,11 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 	free(outbound_payload.data);
 	
 	// Receive acknowledgement for payload receipt
-	receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+	receive_status = gui_receive_acknowledgement(connection_socket, &inbound_request_header);
 	receive_attempts = 1;
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{
-		receive_status = receive_acknowledgement(connection_socket, &inbound_request_header);
+		receive_status = gui_receive_acknowledgement(connection_socket, &inbound_request_header);
 		receive_attempts++;
 	}
 	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -588,7 +536,7 @@ bool send_developer_test_message(int connection_socket, struct request_header *o
 }
 
 // This sets the request header properly for you. There is no need to configure it in advance.
-bool send_login_attempt(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *password, int password_length)
+bool gui_send_login_attempt(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *password, int password_length)
 {
 	if(outbound_request_header == NULL)
 	{
@@ -622,10 +570,10 @@ bool send_login_attempt(int socket, struct request_header *outbound_request_head
 
 	// Send SEND LOGIN_ATTEMPT message
 	printf("[send_login_attempt] Trying to send SEND LOGIN_ATTEMPT request header to connection with socket %d.\n", socket);
-	send_status = send_request_header(socket, outbound_request_header);
+	send_status = gui_send_request_header(socket, outbound_request_header);
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
-		send_status = send_request_header(socket, outbound_request_header);
+		send_status = gui_send_request_header(socket, outbound_request_header);
 		send_attempts++;
 	}
 	if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -637,10 +585,10 @@ bool send_login_attempt(int socket, struct request_header *outbound_request_head
 
 	// Receive acknowledgement
 	printf("[send_login_attempt] Waiting to receive acknowledgement from connection with socket #%d.\n", socket);
-	receive_status = receive_request_header(socket, &inbound_request_header);
+	receive_status = gui_receive_request_header(socket, &inbound_request_header);
 	while(receive_status == false)
 	{
-		receive_status == receive_request_header(socket, &inbound_request_header);
+		receive_status == gui_receive_request_header(socket, &inbound_request_header);
 		receive_attempts++;
 	}
 	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -685,10 +633,10 @@ bool send_login_attempt(int socket, struct request_header *outbound_request_head
 	while(payloads_sent < payloads_to_send)
 	{
 		// Send payload N metadata
-		send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent]);
+		send_status = gui_send_payload_metadata(socket, &outbound_payloads[payloads_sent]);
 		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 		{
-			send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent]);
+			send_status = gui_send_payload_metadata(socket, &outbound_payloads[payloads_sent]);
 			send_attempts++;
 		}
 		if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -701,10 +649,10 @@ bool send_login_attempt(int socket, struct request_header *outbound_request_head
 		send_attempts = 0;
 			
 		// Receive acknowledgement
-		receive_status = receive_acknowledgement(socket, &inbound_request_header);
+		receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
-			receive_status = receive_acknowledgement(socket, &inbound_request_header);
+			receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 			receive_attempts++;
 		}
 		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -726,10 +674,10 @@ bool send_login_attempt(int socket, struct request_header *outbound_request_head
 		}
 		
 		// Send payload N
-		send_status = send_payload(socket, &outbound_payloads[payloads_sent]);
+		send_status = gui_send_payload(socket, &outbound_payloads[payloads_sent]);
 		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 		{
-			send_status = send_payload(socket, &outbound_payloads[payloads_sent]);
+			send_status = gui_send_payload(socket, &outbound_payloads[payloads_sent]);
 			send_attempts++;
 		}
 		if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -743,10 +691,10 @@ bool send_login_attempt(int socket, struct request_header *outbound_request_head
 		send_attempts = 0;
 
 		// Receive acknowledgement
-		receive_status = receive_acknowledgement(socket, &inbound_request_header);
+		receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
-			receive_status = receive_acknowledgement(socket, &inbound_request_header);
+			receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 			receive_attempts++;
 		}
 		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -774,7 +722,7 @@ bool send_login_attempt(int socket, struct request_header *outbound_request_head
 }
 
 // This sets the request header properly for you. There is no need to configure it in advance.
-bool send_account_create(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *email, int email_length, char *password, int password_length)
+bool gui_send_account_create(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *email, int email_length, char *password, int password_length)
 {
 	if(outbound_request_header == NULL)
 	{
@@ -813,10 +761,10 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 
 	// Send SEND ACCOUNT_CREATE message
 	printf("[send_account_create] Trying to send SEND ACCOUNT_CREATE request header to connection with socket #%d.\n", socket);
-	send_status = send_request_header(socket, outbound_request_header);
+	send_status = gui_send_request_header(socket, outbound_request_header);
 	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 	{
-		send_status = send_request_header(socket, outbound_request_header);
+		send_status = gui_send_request_header(socket, outbound_request_header);
 		send_attempts++;
 	}
 	if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -828,10 +776,10 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 
 	// Receive acknowledgement
 	printf("[send_account_create] Waiting to receive acknowledgement from connection with socket #%d.\n", socket);
-	receive_status = receive_acknowledgement(socket, &inbound_request_header);
+	receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 	{
-		receive_status = receive_acknowledgement(socket, &inbound_request_header);
+		receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 		receive_attempts++;
 	}
 	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -885,10 +833,10 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	while(payloads_sent < payloads_to_send)
 	{
 		// Send metadata of payload N
-		send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent]);
+		send_status = gui_send_payload_metadata(socket, &outbound_payloads[payloads_sent]);
 		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 		{
-			send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent]);
+			send_status = gui_send_payload_metadata(socket, &outbound_payloads[payloads_sent]);
 			send_attempts++;
 		}
 		if(send_attempts >= MAX_SEND_ATTEMPTS)
@@ -902,10 +850,10 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 		send_attempts = 0;
 
 		// Receive acknowledgement
-		receive_status = receive_acknowledgement(socket, &inbound_request_header);
+		receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
-			receive_status = receive_acknowledgement(socket, &inbound_request_header);
+			receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 			receive_attempts++;
 		}
 		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -929,10 +877,10 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 		}
 		
 		// Send payload N
-		send_status = send_payload(socket, &outbound_payloads[payloads_sent]);
+		send_status = gui_send_payload(socket, &outbound_payloads[payloads_sent]);
 		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS)
 		{
-			send_status = send_payload(socket, &outbound_payloads[payloads_sent]);
+			send_status = gui_send_payload(socket, &outbound_payloads[payloads_sent]);
 			send_attempts++;
 		}
 		if(send_status >= MAX_SEND_ATTEMPTS)
@@ -946,10 +894,10 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 		send_attempts = 0;
 
 		// Receive acknowledgement 
-		receive_status = receive_acknowledgement(socket, &inbound_request_header);
+		receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
-			receive_status = receive_acknowledgement(socket, &inbound_request_header);
+			receive_status = gui_receive_acknowledgement(socket, &inbound_request_header);
 			receive_attempts++;
 		}
 		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
@@ -978,311 +926,3 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	}
 	return true;
 }
-
-bool server_confirm_user_existence(char username[])
-{
-	// in the meantime, until DB is setup
-	return true;
-}
-
-bool validate_username(char username[])
-{
-	if(username == NULL)
-	{
-		fprintf(stderr, "validate_username: Username argument is a NULL pointer.\n");
-		return false;
-	}
-
-	size_t username_length = strlen(username);
-	if(username_length == 0)
-	{
-		fprintf(stderr, "validate_username: Usernames must be at least 1 character long.\n");
-		return false;
-	}
-
-	if(username_length >= 16)
-	{
-		fprintf(stderr, "validate_username: Usernames can only be 15 characters long. Username \"%s\" exceeds this.\n", username);
-		return false;
-	}
-
-	byte counter = 0;
-	while(true)
-	{
-		char symbol = username[counter];
-		// Reject capital letters and certain symbols
-		if(symbol >= 58 && symbol <= 96)
-		{
-			fprintf(stderr, "validate_username: Usernames cannot contain symbols or capital letters. \"%c\" is an illegal character.\n", symbol);
-			return false;
-		}
-
-		// Reject other symbols not covered by previous check
-		if(symbol >= 32 && symbol <= 47)
-		{
-			fprintf(stderr, "validate_username: Usernames cannot contain symbols or capital letters. \"%c\" is an illegal character.\n", symbol);
-			return false;
-		}
-
-		// Reject even more symbols
-		if(symbol >= 123 && symbol <= 255)
-		{
-			fprintf(stderr, "validate_username: Usernames cannot contain symbols or capital letters. \"%c\" is an illegal character.\n", symbol);
-			return false;
-		}
-
-		if(symbol == '\0')
-			break;
-
-		counter++;
-	}
-	return true;
-}
-
-struct user* user_create(char username[], char fname[], char lname[], byte age)
-{
-	// validate username
-	if(!validate_username(username))
-	{
-		fprintf(stderr, "user_create: Cannot create user.\n");
-		return NULL;
-	}
-
-	// validate firstname
-	if(fname == NULL)
-	{
-		fprintf(stderr, "user_create: Firstname argument is a NULL pointer.\n");
-		return NULL;
-	}
-	size_t fname_length = strlen(fname);
-	if(fname_length == 0 || fname_length >= 32)
-	{
-		fprintf(stderr, "user_create: First name is too long. First names may only be 31 characters long.\n");
-		return NULL;
-	}
-
-	// validate lastname 
-	if(lname == NULL)
-	{
-		fprintf(stderr, "user_create: Lastname argument is a NULL pointer.\n");
-		return NULL;
-	}
-	size_t lname_length = strlen(lname);
-	if(lname_length == 0 || lname_length >= 32)
-	{
-		fprintf(stderr, "user_create: Last name is too long. First names may only be 31 characters long.\n");
-		return NULL;
-	}
-
-	// Create user
-	struct user *new_user = malloc(sizeof(struct user));
-	if(new_user == NULL)
-	{
-		fprintf(stderr, "user_create: Failed to create new user. Malloc call returned NULL.\n");
-		return NULL;
-	}
-	strcpy(new_user->username, username);
-	strcpy(new_user->fname, fname);
-	strcpy(new_user->lname, lname);
-	new_user->age = age;
-
-	return new_user;
-}
-
-struct post* post_create(size_t id, char creator[], char *text, unsigned short text_length, byte category, 
-		byte month, byte day, unsigned short year, bool qustion, size_t qid)
-{
-	// unimplemented
-	struct post *new_post = malloc(sizeof(struct post));
-	if(new_post == NULL)
-	{
-		fprintf(stderr, "post_create: Could not allocate memory for new post struct.\n");
-		return NULL;
-	}
-
-	return new_post;
-}
-
-bool client_sign_in_with_cache(void)
-{
-	// Check for cache file
-	FILE *fh = fopen("/user/lcache.bin", "rb");
-	if(fh == NULL)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Login cache does not exist.\n");
-		return false;
-	}
-
-	// Begin reading file
-	unsigned short read_v;
-	size_t bytes_read = fread(&read_v, 2, 1, fh);
-
-	// Exit if file's data cannot be read
-	if(bytes_read != 2)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Failed to read contents of login cache. File was opened, but data cannot be read.\n");
-		fclose(fh);
-		return false;
-	}
-
-	// Exit if file's data is malformed
-	if(read_v != 2)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Unrecognized control character at start.\n");
-		fclose(fh);
-		return false;
-	}
-
-	// Read data item 1
-	unsigned short unumbers[16];
-	byte numbers_len = 0;
-	read_v = 0;
-	bytes_read = fread(&read_v, 2, 1, fh);
-	while(true)
-	{
-		// Bad data is read --- exit
-		if(bytes_read != 2)
-		{
-			fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected 2 bytes, but read something else.\n");
-			fclose(fh);
-			return false;
-		}
-
-		// end of current item
-		if(read_v == 3) 
-			break; 
-
-		// max length reached
-		if(numbers_len >= 15)
-		{
-			// force value of read_v to be appropriate control
-			// value for next loop
-			bytes_read = fread(&read_v, 2, 1, fh);
-			if(bytes_read != 2)
-			{
-				fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected 2 bytes, but read something else.\n");
-				fclose(fh);
-				return false;
-			}
-			break;
-		}
-
-		// insert into buffer
-		unumbers[numbers_len] = read_v;
-		numbers_len++;
-
-		// Read next value
-		bytes_read = fread(&read_v, 2, 1, fh);
-	}
-
-	// expected that we are resuming after reading a control value
-	if(read_v != 3)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected control value, but read something else.\n");
-		fclose(fh);
-		return false;
-	}
-
-	// expect to read next control value
-	bytes_read = fread(&read_v, 2, 1, fh);
-	if(bytes_read != 2)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected to read 2 bytes, but read something else.\n");
-		fclose(fh);
-		return false;
-	}
-
-	// check that control value was read demarcating start of next item
-	if(read_v != 2)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected to read control value, but read something else.\n");
-		fclose(fh);
-		return false;
-	}
-
-	// New buffer to read from
-	unsigned short pnumbers[16];
-	byte pnumbers_len = 0;
-	while(true)
-	{
-		// Bad data is read --- exit
-		if(bytes_read != 2)
-		{
-			fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected 2 bytes, but read something else.\n");
-			fclose(fh);
-			return false;
-		}
-
-		// end of current item
-		if(read_v == 3) 
-			break; 
-
-		// max length reached
-		if(pnumbers_len >= 15)
-		{
-			// force value of read_v to be appropriate control
-			// value for next loop
-			bytes_read = fread(&read_v, 2, 1, fh);
-			if(bytes_read != 2)
-			{
-				fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected 2 bytes, but read something else.\n");
-				fclose(fh);
-				return false;
-			}
-			break;
-		}
-
-		// insert into buffer
-		pnumbers[pnumbers_len] = read_v;
-		pnumbers_len++;
-
-		// Read next value
-		bytes_read = fread(&read_v, 2, 1, fh);
-	}
-
-	// Double-check that control value was read.
-	if(read_v != 3)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Login cache is malformed. Expected to read control value, but read something else.\n");
-		fclose(fh);
-		return false;
-	}
-
-	// cache file no longer necessary, close it.
-	fclose(fh);
-
-	// Decode values
-	char *uname = malloc(sizeof(char) * (numbers_len + 1));
-	if(uname == NULL)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Failed to allocate memory for username credential.\n");
-		return false;	
-	}
-	
-	char *pbuf = malloc(sizeof(char) * (pnumbers_len + 1)); 
-	if(pbuf == NULL)
-	{
-		fprintf(stderr, "[client_sign_in_with_cache]: Failed to allocate memory for password credential.\n");
-		free(uname);
-		return false;
-	}
-
-	// decode uname
-	for(byte i = 0; i < numbers_len; i++)
-		uname[i] = unumbers[i] / 31;
-
-	// decode password
-	for(byte i = 0; i < pnumbers_len; i++)
-		pbuf[i] = pnumbers[i] / 31;
-
-	// insert null terminators
-	uname[numbers_len] = '\0';
-	pbuf[pnumbers_len] = '\0';
-
-	// Send credentials to server IMPLEMENT THIS LATER! 
-	free(uname);
-	free(pbuf);
-	return true;
-}
-
-bool client_create_login_cache(char uname[], char pass[]);
