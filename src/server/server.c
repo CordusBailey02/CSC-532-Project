@@ -409,7 +409,7 @@ void* handle_client(void *arg)
 					}
 					printf("Got username: \"%s\", password: \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
 					// DO DATABASE THING HERE
-					mysql_result_table = mysql_database_query("check_user", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
+					mysql_result_table = mysql_database_query("get_all_users", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
 					switch(*mysql_return_flag)
 					{
 						case SUCCESS:
@@ -428,7 +428,13 @@ void* handle_client(void *arg)
 					}
 					for(int i = 0; i < *mysql_num_rows; i++)
 					{
-						printf("Result: %s\n", **(mysql_result_table + i));
+						// printf("Result: %s\n", **(mysql_result_table + i));
+						printf("[ ");
+						for(int j = 0; j < *mysql_num_fields; j++)
+						{
+							printf("\"%s\"", mysql_result_table[i][j]);
+						}
+						printf("]\n");	
 					}
 					
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
