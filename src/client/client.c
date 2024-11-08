@@ -136,14 +136,27 @@ int main(int argc, char **argv)
 	struct payload *current_inbound_payload;
 	size_t payloads_received = 0;
 	size_t payloads_expected = 0;
-
-	char *username;
+	
+	char default_username[] = "guest";
+	char *username = default_username;
 	char *password;
 	char *email;
 	int username_length = 0;
 	int password_length = 0;
 	int email_length = 0;
 	bool valid_email = false;
+
+	char *verification_type;
+	int verification_type_length = 0;
+	char **file_paths = malloc(sizeof(char *) * 5);
+	if(file_paths == NULL)
+	{
+		fprintf(stderr, "Failed to allocate memory for a buffer to hold 5 file paths.\n");
+		close(tcp_socket);
+		exit(EXIT_FAILURE);
+	}
+	int file_paths_length = 0;
+	int file_paths_capacity = 5;
 	
 	// Used to prevent client from waiting to receive something when data was 
 	// input erroneously. If nothing was sent, it will never receive anything.
@@ -208,7 +221,7 @@ int main(int argc, char **argv)
 	while(true)
 	{
 		// get user input
-		printf("\ndemake$ ");
+		printf("\n%s@demake$ ", username);
 		fgets(input_buffer, 4096, stdin);
 		input_buffer_length = strlen(input_buffer);
 
@@ -377,7 +390,38 @@ int main(int argc, char **argv)
 					break;
 
 				case VERIFICATION_REQUEST:
-					fprintf(stderr, "Send verification_request unimplemented.\n");
+					printf("WARNING: File paths cannot contain spaces! Replace spaces with hyphens (-) until a better parsing system is created.\n");
+					DATA_SENT_FLAG = false;
+					file_paths_length = 0;
+					// Parse for type of verification
+					verification_type = strtok(outbound_buffer, " ");
+					if(verification_type == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve type of verification request.\n");
+						continue;
+					}
+					
+					// Parse for paths of documents to be uploaded
+					file_paths[file_paths_length] = strtok(NULL, " ");
+					while(file_paths[file_paths_length] != NULL)
+					{
+						file_paths_length++;
+						if(file_paths_length >= file_paths_capacity)
+						{
+							file_paths_capacity += 5;
+							file_paths = realloc(file_paths, sizeof(char *) * file_paths_capacity);
+							if(file_paths == NULL)
+							{
+								fprintf(stderr, "Failed to allocate more memory for the file paths buffer. Current length is %d and the call to realloc tried to expand it to %d. Maybe the system is low on memory?\n", file_paths_length, file_paths_capacity);
+								close(tcp_connection);
+								exit(EXIT_FAILURE);
+							}
+						}
+						file_paths[file_paths_length] = strtok(NULL, " ");
+					}
+
+					// try to send this information off to the server
+
 					break;
 
 				default:
@@ -541,12 +585,30 @@ int main(int argc, char **argv)
 			payloads_received++;
 		}
 		
-		// Review data received.	
-		if(inbound_request_header.action == SEND && inbound_request_header.subject == DEVELOPER_TEST_MESSAGE)
+		// Review data received.
+		if(inbound_request_header.action == GET)
 		{
-			printf("Received: ");
-			for(int i = 0; i < payloads_received; i++)
-				printf("\"%s\" ", (char *) inbound_payloads[i]->data);
+			switch(inbound_request_header.subject)
+			{
+				default:
+					fprintf(stderr, "Received a GET request header from server with unknown/unimplemented subject (code %d). No action will be taken.\n", inbound_request_header.subject);
+					break;
+			}
+		}
+		else // server is SENDING us stuff
+		{
+			switch(inbound_request_header.subject)
+			{
+				case DEVELOPER_TEST_MESSAGE:
+					printf("Received: ");
+					for(int i = 0; i < payloads_received; i++)
+						printf("\"%s\" ", (char *) inbound_payloads[i]->data);
+					break;
+
+				default:
+					fprintf(stderr, "Received a SEND request header from server with unknown/unimplemented subject (code %d). No action will be taken.\n", inbound_request_header.subject);
+					break;
+			}
 		}
 	}
 
