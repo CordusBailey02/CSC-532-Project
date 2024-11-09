@@ -223,6 +223,11 @@ int main(int argc, char **argv)
 	// MAINLOOP: Input data and send off to the server. Then, receive data.
 	while(true)
 	{
+		// temporary. Later this doesnt have to get checked each time.
+		// The LOGIN_ATTEMPT and ACCOUNT_CREATE procedure will update the 
+		// username pointer.
+		if(signed_in == false) username = default_username;
+
 		// get user input
 		printf("\n%s@demake$ ", username);
 		fgets(input_buffer, 4096, stdin);
