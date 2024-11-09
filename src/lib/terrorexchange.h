@@ -35,7 +35,7 @@ enum ACKNOWLEDGEMENT_TYPE {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED, FA
 			   INSUFFICIENT_MEMORY, 
 		 	   ACKNOWLEDGEMENT_TYPE_ERROR };
 
-enum FILE_IO_CODE { IO_OK, IO_TOO_LARGE, BAD_FILE_PATH, ZERO_UPPER_LIMIT, BYTES_READ_MISMATCH };
+enum FILE_IO_CODE { IO_OK, IO_TOO_LARGE, BAD_FILE_PATH, ZERO_UPPER_LIMIT, BYTES_READ_MISMATCH, INITIAL_IO_VALUE };
 
 struct request_header
 {
@@ -110,9 +110,10 @@ void print_acknowledgement_type_mismatch_error(int socket, char *function_name, 
 bool send_developer_test_message(int socket, struct request_header *outbound_request_header, char *message, uint32_t shared_secret);
 bool send_login_attempt(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *password, int password_length, uint32_t shared_secret);
 bool send_account_create(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *email, int email_length, char *password, int password_length, uint32_t shared_secret);
-bool send_verification_request(int socket, struct request_header *outbound_request_header, char **file_paths, int file_paths_length);
+bool send_verification_request(int socket, struct request_header *outbound_request_header, char *verification_type, char **file_paths, int file_paths_length);
 
-void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t MAX_FILE_SIZE_IN_MEGABYTES);
+size_t get_file_size(char *file_path, enum FILE_IO_CODE *return_code);
+void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t file_size);
 
 bool server_confirm_user_existence(char username[]);
 

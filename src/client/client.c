@@ -61,6 +61,7 @@ enum SUBJECT string_to_request_header_subject(char *str, size_t str_length)
 	else if(strcmp(str, "USERNAME_CHANGE") == 0)		return USERNAME_CHANGE;
 	else if(strcmp(str, "PASSWORD_CHANGE") == 0)		return PASSWORD_CHANGE;
 	else if(strcmp(str, "ACCOUNT_CREATE") == 0)		return ACCOUNT_CREATE;
+	else if(strcmp(str, "VERIFICATION_REQUEST") == 0)	return VERIFICATION_REQUEST;
 	else 							return SUBJECT_ERROR;
 }
 
@@ -423,7 +424,7 @@ int main(int argc, char **argv)
 					}
 
 					// try to send this information off to the server
-
+					
 					break;
 
 				default:
@@ -606,6 +607,7 @@ int main(int argc, char **argv)
 					for(int i = 0; i < payloads_received; i++)
 						printf("\"%s\" ", (char *) inbound_payloads[i]->data);
 					break;
+
 				case LOGIN_ATTEMPT_RESPONSE:
 					// check response
 					if(strcmp(inbound_payloads[0]->data, "not exists") == 0)
@@ -617,6 +619,7 @@ int main(int argc, char **argv)
 						signed_in = true;	
 					// if valid sign-in, change username
 					break;
+
 				default:
 					fprintf(stderr, "Received a SEND request header from server with unknown/unimplemented subject (code %d). No action will be taken.\n", inbound_request_header.subject);
 					break;

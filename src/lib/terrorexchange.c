@@ -450,6 +450,89 @@ void print_acknowledgement_type_mismatch_error(int socket, char *function_name, 
 	fprintf(stderr, "[%s] Received acknowledgement from connection with socket %d for %s; however, the acknowledgement was of type %d (wanted %d). Maybe the data was sent erroneously?\n", function_name, socket, message_type, wrong_type, right_type);
 }
 
+size_t get_file_size(char *file_path, enum FILE_IO_CODE *return_code)
+{
+	if(return_code == NULL){
+		fprintf(stderr, "[get_file_size] Cannot load a FILE_IO_CODE into a pointer that points to NULL. Bad argument provided.\n");
+		return 0;
+	}
+
+	if(file_path == NULL){
+		fprintf(stderr, "[get_file_size] File path not provided. char *file_path points  to NULL.\n");
+		(*return_code) = BAD_FILE_PATH;
+		return 0;
+	}
+
+	FILE *fh;
+	fh = fopen(file_path, "rb");
+	if(fh == NULL) {
+		fprintf(stderr, "[get_file_size] Cannot open \"%s\" for reading. Does it exist? Are there permission errors?\n", file_path);
+		(*return_code) = BAD_FILE_PATH;
+		return 0;
+	}
+
+	size_t file_size = 0;
+	fseek(fh, 0, SEEK_END);
+	file_size = ftell(fh);
+	fclose(fh);
+	(*return_code) = IO_OK;
+	return file_size;
+}
+
+void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t file_size)
+{
+	if(return_code == NULL)
+	{
+		fprintf(stderr, "[read_binary_file] Cannot load a FILE_IO_CODE into a pointer that points to NULL. Bad argument provided.\n");
+		return NULL;
+	}
+
+	if(file_path == NULL)
+	{
+		fprintf(stderr, "[read_binary_file] File path not provided. char *file_path points  to NULL.\n");
+		(*return_code) = BAD_FILE_PATH;
+		return NULL;
+	}
+	
+	// Open file and ensure it actually exists
+	FILE *fh;
+	fh = fopen(file_path, "rb");
+	if(fh == NULL)
+	{
+		fprintf(stderr, "[read_binary_file] Failed to open the file stored at \"%s\".\n Does this file exist?\n", file_path);
+		(*return_code) = BAD_FILE_PATH;
+		return NULL;
+	}
+
+	// Make sure file is not too big
+	size_t file_size = 0;
+	fseek(fh, 0, SEEK_END);
+	file_size = ftell(fh);
+	if(file_size >= max_bytes)
+	{
+		fprintf(stderr, "[read_binary_file] File size is too large. Max file size is %ld bytes, but the given file is %zu bytes.\n", max_bytes, file_size);
+		fclose(fh);
+		(*return_code) = IO_TOO_LARGE;
+		return NULL;
+	}
+
+	// Read the entire file
+	void *file_data = malloc(file_size);
+	size_t bytes_read = fread(file_data, file_size, 1, fh); 
+	if(bytes_read != file_size)
+	{
+		fprintf(stderr, "[read_binary_file] Failed to read %zu bytes from the file. Stopped reading after %zu bytes.\n", file_size, bytes_read);
+		fclose(fh);
+		(*return_code) = BYTES_READ_MISMATCH;
+		free(file_data);
+	}
+
+	// Return OK code and pointer to the file's data
+	(*return_code) = IO_OK;
+	return file_data;
+}
+
+
 // This sets the request header properly for you. There is no need to configure it in advance.
 bool send_developer_test_message(int connection_socket, struct request_header *outbound_request_header, char *message, uint32_t shared_secret)
 {
@@ -979,7 +1062,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	return true;
 }
 
-bool send_verification_request(int socket, struct request_header *outbound_request_header, char *verification_type, char **file_paths, int file_paths_length)
+bool send_verification_request(int socket, struct request_header *outbound_request_header, char *verification_type, char **file_paths, int file_paths_length, uint32_t shared_secret)
 { 
 	if(outbound_request_header == NULL){
 		fprintf(stderr, "[send_verification_request] Cannot use request header struct that points to NULL for an outbound request header. Bad argument provided.\n");
@@ -1012,100 +1095,158 @@ bool send_verification_request(int socket, struct request_header *outbound_reque
 	int send_attempts = 0;
 	int receive_attempts = 0;
 	struct request_header inbound_request_header;
-	
+	size_t file_sizes[file_paths_length];
+
+	// Determine size of files so that outbound request header can have
+	// proper metadata
+	enum FILE_IO_CODE io_code = INITIAL_IO_VALUE;
+	size_t sum_of_file_sizes = 0;
+	for(int i = 0; i < file_paths_length; i++)
+	{
+		file_sizes[i] = get_file_size(file_paths[i], &io_code);
+		if(io_code != IO_OK)
+		{
+			fprintf(stderr, "[send_verification_request] Something went wrong while trying to get the file size of file #%d (\"%s\") in the provided list of file paths. Function get_file_size() returned a FILE_IO_CODE other than IO_OK. Returned code was %d.\n", i + 1, file_paths[i], io_code);
+			return false;
+		}
+		if(file_sizes[i] == 0)
+		{
+			fprintf(stderr, "[send_verification_request] Provided file #%d (\"%s\") is too small (0 bytes) to be sent off. Surely verification documents are larger than that.\n", i + 1, file_paths[i]);
+			return false;
+		}
+		sum_of_file_sizes += file_sizes[i];
+	}
+
 	// set the outbound request header with the proper values
 	outbound_request_header->action = SEND;
 	outbound_request_header->subject = VERIFICATION_REQUEST;
-	outbound_request_header->parameter_count = 1 + file_paths_length;
-	outbound_request_header->metadata_total_size = 
-	outbound_request_header->
-	outbound_request_header->
+	outbound_request_header->parameter_count = 1 + file_paths_length; // +1 for verification type (e.g. "programmer")
+	outbound_request_header->metadata_total_size = (2 * sizeof(size_t)) * (1 + file_paths_length) // metadata is 2 size_t variables
+	outbound_request_header->parameters_total_size = sum_of_file_sizes;
+	outbound_request_header->total_bytes = sum_of_file_sizes + outbound_request_header->metadata_total_size;
+	
+	// Send SEND VERIFICATION_REQUEST message
+	printf("[send_verification_request] Trying to send SEND VERIFICATION_REQUEST request header to connection with socket #%d.\n", socket);
+	send_status = send_request_header(socket, outbound_request_header, shared_secret);
+	while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS){
+		send_status = send_request_header(socket, outbound_request_header, shared_secret);
+		send_attempts++;
+	}
+	if(send_attempts >= MAX_SEND_ATTEMPTS) {
+		fprintf(stderr, "[send_verification_request] Failed to send SEND VERIFICATION_REQUEST request header to connection with socket #%d. Send attempts reached/exceeded MAX_SEND_ATTEMPTS (%d). Maybe there is something wrong with the connection?\n", socket, MAX_SEND_ATTEMPTS);
+		return false;
+	}
+	send_attempts = 0;
+	printf("[send_verification_request] Successfuly sent request header.\n");
+
+	// Receive acknowledgement for the request header
+	printf("[send_verification_request] Waiting to receive acknowledgement from connection with socket %d.\n", socket);
+	receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
+	while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS) {
+		receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
+		receive_attempts++;
+	}
+	if(receive_attempts >= MAX_RECEIVE_ATTEMPTS) {
+		fprintf(stderr, "[send_verification_request] Failed to receive acknowledgement from connection with socket %d. Receive attempts reached/exceeded MAX_RECEIVE_ATTEMPTS (%d). Maybe there is something wrong with the connection?\n", socket, MAX_RECEIVE_ATTEMPTS);
+		return false;
+	}
+	receive_attempts = 0;
+	printf("[send_verification_request] Successfully received acknowledgement.");
+
+	// Check that the acknowledgement is OK
+	printf("[send_verification_request] Checking type of acknowledgement...\n");
+	if(inbound_request_header.parameter_count != OK)
+	{
+		fprintf(stderr, "[send_verification_request] Received acknowledgement from connection with socket %d, but the acknowledgement type is not the OK code. Received code %d but needed %d to continue.\n", socket, inbound_request_header.parameters_count, OK);
+		return false;
+	}
+	printf("[send_verification_request] Acknowledgement had OK code.\n");
+	
+	// Prepare payloads to be sent
+	int payloads_sent = 0;
+	int payloads_to_send = 1 + file_paths_length;
+	struct payload outbound_payloads[1 + file_paths_length]; 
+	outbound_payloads[0].member_size = 1;
+	outbound_payloads[0].member_count = strlen(verification_type) + 1;
+	outbound_payloads[0].data = malloc(outbound_payloads[0].member_count);
+	if(outbound_payloads[0].data == NULL)
+	{
+		fprintf(stderr, "[send_verification_request] Failed to allocate memory for a buffer to store the verification type in the 1st outbound payload. Needed %zu bytes. Is the system low on memory?\n", outbound_payloads[0].member_count);
+		return false;
+	}
+	memcpy(outbound_payloads[0].data, verification_type, outbound_payloads[0].member_count - 1);
+	outbound_payloads[0].data[outbound_payloads[0].member_count - 1] = '\0';
+
 	// read the binary data of the files to be sent off
-	for(int i = 0; i < file_paths_length; i++)
+	for(int i = 0; i < file_paths_length; i++){
+		outbound_payloads[i + 1].member_size = file_sizes[i];
+		outbound_payloads[i + 1].member_count = 1;
+		outbound_payloads[i + 1].data = read_binary_file(file_paths[i], &io_code, file_sizes[i]);
+		if(outbound_payloads[i + 1].data == NULL)
+		{
+			fprintf(stderr, "[send_verification_request] Failed to set the data outbound payload of file #%d point to a memory chunk containing the file's data.\n", i + 1);
+			for(int j = 0; j < i; j++)
+				free(outbound_payloads[j].data);
+
+			return false;
+		}
+	}
+
+	// Begin sending payload metadata and payload data buffer
+	while(payloads_sent < payloads_to_send)
 	{
+		// Send the payload metadata
+		printf("[send_verification_request] Trying to send payload #%d's metadata.\n", payloads_sent + 1);
+		send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent], shared_secret);
+		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS) {
+			send_status = send_payload_metadata(socket, &outbound_payloads[payloads_sent], shared_secret);
+			send_attempts++;
+		}
+		if(send_attempts >= MAX_SEND_ATTEMPTS) {
+			fprintf(stderr, "[send_verification_request] Failed to send the metadata for payload #%d to connection with socket #%d. Send attempts reached/exceeded MAX_SEND_ATTEMPTS (%d). Maybe there is something with the connection?\n", payloads_sent + 1, socket, MAX_SEND_ATTEMPTS);
+			for(int i = 0; i < payloads_to_send) {
+				if(outbound_payloads[i].data == NULL) continue;
+
+				free(outbound_payloads[i].data);
+			}
+			return false;
+		}
+		send_attempts = 0;
+		printf("[send_verification_request] Payload #%d's metadata was sent.\n", payloads_sent + 1);
 		
-	}
-}
+		// Receive acknowledgement
+		receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
+		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS) {		
+			receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
+			receive_attempts++;
+		}
+		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS) {
+			fprintf(stderr, "[send_verification_request] Failed to receive an acknowledgement from connection with socket #%d for the receipt of payload #%d's metadata. Receive attempts reached/exceeded MAX_RECEIVE_ATTEMPTS (%d). Maybe something is wrong with the connection?\n");
+			for(int i = 0; i < payloads_to_send; i++) {
+				if(outbound_payloads[i].data == NULL) continue;
 
-size_t get_file_size(char *file_path, enum FILE_IO_CODE *return_code)
-{
-	if(return_code == NULL){
-		fprintf(stderr, "[get_file_size] Cannot load a FILE_IO_CODE into a pointer that points to NULL. Bad argument provided.\n");
-		return NULL;
-	}
+				free(outbound_payloads[i].data);
+			}
+			return false;
+		}
+		receive_attempts = 0;
+		
+		// Check validity of acknowledgement
+		if(inbound_request_header.parameters_count != OK) {
+			fprintf(stderr, "[send_verification_request] Received acknowledgment, but the acknowledgement code was %d instead of %d for OK. Maybe the data was sent incorrectly?\n", inbound_request_header.parameter_count, OK);
+			for(int i = 0; i < payloads_to_send; i++) {
+				if(outbound_payloads[i].data == NULL) continue;
 
-	if(file_path == NULL){
-		fprintf(stderr, "[get_file_size] File path not provided. char *file_path points  to NULL.\n");
-		(*return_code) = BAD_FILE_PATH;
-		return NULL;
-	}
+				free(outbound_payloads[i].data);
+			}
+			return false;
+		}
+		// Send the payload data buffer
+		// Receive acknowledgement
+		// Check validity of acknowledgement
+		// Move onto next payload
 
-	FILE *fh;
-	fh = fopen(file_path, "rb");
-	if(fh == NULL) {
-		fprintf(stderr, "[get_file_size] Cannot open \"%s\" for reading. Does it exist? Are there permission errors?\n", file_path);
-		(*return_code) = BAD_FILE_PATH;
-		return 0;
 	}
-	
-	fseek(fh, 0, SEEK_END);
-	file_size = ftell(fh);
-	fclose(fh);
-	(*return_code) = IO_OK;
-	return file_size;
-}
-
-void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t file_size)
-{
-	if(return_code == NULL)
-	{
-		fprintf(stderr, "[read_binary_file] Cannot load a FILE_IO_CODE into a pointer that points to NULL. Bad argument provided.\n");
-		return NULL;
-	}
-
-	if(file_path == NULL)
-	{
-		fprintf(stderr, "[read_binary_file] File path not provided. char *file_path points  to NULL.\n");
-		(*return_code) = BAD_FILE_PATH;
-		return NULL;
-	}
-	
-	// Open file and ensure it actually exists
-	FILE *fh;
-	fh = fopen(file_path, "rb");
-	if(fh == NULL)
-	{
-		fprintf(stderr, "[read_binary_file] Failed to open the file stored at \"%s\".\n Does this file exist?\n", file_path);
-		(*return_code) = BAD_FILE_PATH;
-		return NULL;
-	}
-
-	// Make sure file is not too big
-	size_t file_size = 0;
-	fseek(fh, 0, SEEK_END);
-	file_size = ftell(fh);
-	if(file_size >= max_bytes)
-	{
-		fprintf(stderr, "[read_binary_file] File size is too large. Max file size is %ld bytes, but the given file is %zu bytes.\n", max_bytes, file_size);
-		fclose(fh);
-		(*return_code) = IO_TOO_LARGE;
-		return NULL;
-	}
-
-	// Read the entire file
-	void *file_data = malloc(file_size);
-	size_t bytes_read = fread(file_data, file_size, 1, fh); 
-	if(bytes_read != file_size)
-	{
-		fprintf(stderr, "[read_binary_file] Failed to read %zu bytes from the file. Stopped reading after %zu bytes.\n", file_size, bytes_read);
-		fclose(fh);
-		(*return_code) = BYTES_READ_MISMATCH;
-		free(file_data);
-	}
-
-	// Return OK code and pointer to the file's data
-	(*return_code) = IO_OK;
-	return file_data;
 }
 
 bool server_confirm_user_existence(char username[])
