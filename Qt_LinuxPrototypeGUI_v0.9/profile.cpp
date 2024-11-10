@@ -3,6 +3,7 @@
 #include "comment_1.h"
 #include "post_1.h"
 #include "answerwindow.h"
+#include "requestverification.h"
 #include <QPixmap>
 #include <QIcon>
 
@@ -14,13 +15,7 @@ Profile::Profile(QWidget *parent)
 
     ui->pushButton_profilePic->setFocusPolicy(Qt::NoFocus);
     ui->pushButton_changeIcon->setFocusPolicy(Qt::NoFocus);
-    ui->pushButton_AddCertificates->setFocusPolicy(Qt::NoFocus);
-    ui->pushButton_AddDegree->setFocusPolicy(Qt::NoFocus);
-    ui->pushButton_AddDriverLicense->setFocusPolicy(Qt::NoFocus);
-    ui->pushButton_AddResume->setFocusPolicy(Qt::NoFocus);
-    ui->pushButton_ViewCertificates->setFocusPolicy(Qt::NoFocus);
-    ui->pushButton_ViewDegree->setFocusPolicy(Qt::NoFocus);
-    ui->pushButton_ViewResume->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_requestVerification->setFocusPolicy(Qt::NoFocus);
 
 
     /*
@@ -157,7 +152,7 @@ void Profile::on_listWidget_answersFromProfile_itemDoubleClicked(QListWidgetItem
     answerWindow_3.exec();
 }
 
-
+/*
 void Profile::on_lineEdit_LinkedInLine_returnPressed()
 {
     if (ui->lineEdit_LinkedInLine->text().length() < 3)
@@ -175,27 +170,6 @@ void Profile::on_lineEdit_LinkedInLine_returnPressed()
         //ui->lineEdit_LinkedInLine->setText("LFEAZEL");
         ui->lineEdit_LinkedInLine->setReadOnly(true);
     }
-}
-
-
-void Profile::on_pushButton_changeIcon_clicked()
-{
-    QString filepath_profilePic=QFileDialog::getOpenFileName(this, tr("Open file"), "C://", "JPG File(*.jpg);; PNG File(*.png)");
-    if (filepath_profilePic == "")
-    {
-        QMessageBox::information(this, "Received File", "<font size = 13>No file selected.</font>");
-    } else {
-        //QPixmap pix33"/home/vboxuser/Pictures/otherPic.jpg");
-        QPixmap pix33(filepath_profilePic);
-        QIcon ButtonIcon(pix33);
-        ui->pushButton_profilePic->setIcon(ButtonIcon);
-        ui->pushButton_profilePic->setIconSize(QSize(700,700));
-        ui->label_savedPath->setText(filepath_profilePic);
-
-        QMessageBox::information(this, "Received File", filepath_profilePic);
-        //int sendInt = send(int socket, filepath_profilePic, size_t len, int flag);
-    }
-    // Will be C:/users/blah blah blah
 }
 
 
@@ -250,6 +224,27 @@ void Profile::on_pushButton_AddDriverLicense_clicked()
     }
 }
 
+*/
+
+void Profile::on_pushButton_changeIcon_clicked()
+{
+    QString filepath_profilePic=QFileDialog::getOpenFileName(this, tr("Open file"), "C://", "JPG File(*.jpg);; PNG File(*.png)");
+    if (filepath_profilePic == "")
+    {
+        QMessageBox::information(this, "Received File", "<font size = 13>No file selected.</font>");
+    } else {
+        //QPixmap pix33"/home/vboxuser/Pictures/otherPic.jpg");
+        QPixmap pix33(filepath_profilePic);
+        QIcon ButtonIcon(pix33);
+        ui->pushButton_profilePic->setIcon(ButtonIcon);
+        ui->pushButton_profilePic->setIconSize(QSize(700,700));
+        ui->label_savedPath->setText(filepath_profilePic);
+
+        QMessageBox::information(this, "Received File", filepath_profilePic);
+        //int sendInt = send(int socket, filepath_profilePic, size_t len, int flag);
+    }
+    // Will be C:/users/blah blah blah
+}
 
 void Profile::on_pushButton_profilePic_clicked()
 {
@@ -271,9 +266,10 @@ void Profile::on_pushButton_profilePic_clicked()
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
 }
 
+/*
 void Profile::on_pushButton_ViewResume_clicked()
 {
-    /*
+
 
     int sendInt = send(int socket, void *data, size_t len, int flag);
 
@@ -283,13 +279,13 @@ void Profile::on_pushButton_ViewResume_clicked()
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(filepath_resumeFromClient));
 
-    */
+
 }
 
 
 void Profile::on_pushButton_ViewDegree_clicked()
 {
-    /*
+
 
     int sendInt = send(int socket, void *data, size_t len, int flag);
 
@@ -299,13 +295,13 @@ void Profile::on_pushButton_ViewDegree_clicked()
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(filepath_degreeFromClient));
 
-    */
+
 }
 
 
 void Profile::on_pushButton_ViewCertificates_clicked()
 {
-    /*
+
 
     int sendInt = send(int socket, void *data, size_t len, int flag);
 
@@ -315,6 +311,14 @@ void Profile::on_pushButton_ViewCertificates_clicked()
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(filepath_certificateFromClient));
 
-    */
+
+}
+*/
+
+void Profile::on_pushButton_requestVerification_clicked()
+{
+    requestVerification requestVerification_1;
+    requestVerification_1.showMaximized();
+    requestVerification_1.exec();
 }
 

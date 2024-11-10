@@ -23,25 +23,27 @@ private slots:
 
     void on_listWidget_answersFromProfile_itemDoubleClicked(QListWidgetItem *item);
 
-    void on_lineEdit_LinkedInLine_returnPressed();
+    //void on_lineEdit_LinkedInLine_returnPressed();
 
     void on_pushButton_changeIcon_clicked();
 
-    void on_pushButton_AddResume_clicked();
+    //void on_pushButton_AddResume_clicked();
 
-    void on_pushButton_AddDegree_clicked();
+    //void on_pushButton_AddDegree_clicked();
 
-    void on_pushButton_AddCertificates_clicked();
+    //void on_pushButton_AddCertificates_clicked();
 
-    void on_pushButton_AddDriverLicense_clicked();
+    //void on_pushButton_AddDriverLicense_clicked();
 
     void on_pushButton_profilePic_clicked();
 
-    void on_pushButton_ViewResume_clicked();
+    //void on_pushButton_ViewResume_clicked();
 
-    void on_pushButton_ViewDegree_clicked();
+    //void on_pushButton_ViewDegree_clicked();
 
-    void on_pushButton_ViewCertificates_clicked();
+    //void on_pushButton_ViewCertificates_clicked();
+
+    void on_pushButton_requestVerification_clicked();
 
 private:
     Ui::Profile *ui;

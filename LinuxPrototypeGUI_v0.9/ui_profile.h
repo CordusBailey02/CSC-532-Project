@@ -15,7 +15,6 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
@@ -31,21 +30,8 @@ public:
     QVBoxLayout *verticalLayout_4;
     QPushButton *pushButton_profilePic;
     QPushButton *pushButton_changeIcon;
-    QVBoxLayout *verticalLayout;
-    QHBoxLayout *horizontalLayout;
-    QLabel *label_4;
-    QLineEdit *lineEdit_LinkedInLine;
-    QHBoxLayout *horizontalLayout_2;
-    QPushButton *pushButton_AddResume;
-    QPushButton *pushButton_ViewResume;
-    QHBoxLayout *horizontalLayout_3;
-    QPushButton *pushButton_AddDegree;
-    QPushButton *pushButton_ViewDegree;
-    QHBoxLayout *horizontalLayout_4;
-    QPushButton *pushButton_AddCertificates;
-    QPushButton *pushButton_ViewCertificates;
-    QPushButton *pushButton_AddDriverLicense;
-    QLabel *label_5;
+    QPushButton *pushButton_requestVerification;
+    QLabel *label_verifiedOrNot;
     QLabel *label_savedPath;
     QVBoxLayout *verticalLayout_7;
     QLabel *label;
@@ -86,122 +72,45 @@ public:
 
         verticalLayout_4->addWidget(pushButton_changeIcon);
 
-        verticalLayout = new QVBoxLayout();
-        verticalLayout->setObjectName("verticalLayout");
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName("horizontalLayout");
-        label_4 = new QLabel(Profile);
-        label_4->setObjectName("label_4");
+        pushButton_requestVerification = new QPushButton(Profile);
+        pushButton_requestVerification->setObjectName("pushButton_requestVerification");
+        pushButton_requestVerification->setFont(font);
+
+        verticalLayout_4->addWidget(pushButton_requestVerification);
+
+        label_verifiedOrNot = new QLabel(Profile);
+        label_verifiedOrNot->setObjectName("label_verifiedOrNot");
         QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
-        label_4->setSizePolicy(sizePolicy1);
-        label_4->setFont(font);
+        sizePolicy1.setHeightForWidth(label_verifiedOrNot->sizePolicy().hasHeightForWidth());
+        label_verifiedOrNot->setSizePolicy(sizePolicy1);
+        label_verifiedOrNot->setFont(font);
+        label_verifiedOrNot->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        horizontalLayout->addWidget(label_4);
-
-        lineEdit_LinkedInLine = new QLineEdit(Profile);
-        lineEdit_LinkedInLine->setObjectName("lineEdit_LinkedInLine");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Maximum);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(lineEdit_LinkedInLine->sizePolicy().hasHeightForWidth());
-        lineEdit_LinkedInLine->setSizePolicy(sizePolicy2);
-        lineEdit_LinkedInLine->setFont(font);
-
-        horizontalLayout->addWidget(lineEdit_LinkedInLine);
-
-
-        verticalLayout->addLayout(horizontalLayout);
-
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName("horizontalLayout_2");
-        pushButton_AddResume = new QPushButton(Profile);
-        pushButton_AddResume->setObjectName("pushButton_AddResume");
-        pushButton_AddResume->setFont(font);
-
-        horizontalLayout_2->addWidget(pushButton_AddResume);
-
-        pushButton_ViewResume = new QPushButton(Profile);
-        pushButton_ViewResume->setObjectName("pushButton_ViewResume");
-        pushButton_ViewResume->setFont(font);
-
-        horizontalLayout_2->addWidget(pushButton_ViewResume);
-
-
-        verticalLayout->addLayout(horizontalLayout_2);
-
-        horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName("horizontalLayout_3");
-        pushButton_AddDegree = new QPushButton(Profile);
-        pushButton_AddDegree->setObjectName("pushButton_AddDegree");
-        pushButton_AddDegree->setFont(font);
-
-        horizontalLayout_3->addWidget(pushButton_AddDegree);
-
-        pushButton_ViewDegree = new QPushButton(Profile);
-        pushButton_ViewDegree->setObjectName("pushButton_ViewDegree");
-        pushButton_ViewDegree->setFont(font);
-
-        horizontalLayout_3->addWidget(pushButton_ViewDegree);
-
-
-        verticalLayout->addLayout(horizontalLayout_3);
-
-        horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName("horizontalLayout_4");
-        pushButton_AddCertificates = new QPushButton(Profile);
-        pushButton_AddCertificates->setObjectName("pushButton_AddCertificates");
-        pushButton_AddCertificates->setFont(font);
-
-        horizontalLayout_4->addWidget(pushButton_AddCertificates);
-
-        pushButton_ViewCertificates = new QPushButton(Profile);
-        pushButton_ViewCertificates->setObjectName("pushButton_ViewCertificates");
-        pushButton_ViewCertificates->setFont(font);
-
-        horizontalLayout_4->addWidget(pushButton_ViewCertificates);
-
-
-        verticalLayout->addLayout(horizontalLayout_4);
-
-        pushButton_AddDriverLicense = new QPushButton(Profile);
-        pushButton_AddDriverLicense->setObjectName("pushButton_AddDriverLicense");
-        pushButton_AddDriverLicense->setFont(font);
-
-        verticalLayout->addWidget(pushButton_AddDriverLicense);
-
-        label_5 = new QLabel(Profile);
-        label_5->setObjectName("label_5");
-        sizePolicy1.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
-        label_5->setSizePolicy(sizePolicy1);
-        QPalette palette;
-        QBrush brush(QColor(38, 162, 105, 255));
-        brush.setStyle(Qt::SolidPattern);
-        palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
-        palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
-        label_5->setPalette(palette);
-        label_5->setFont(font);
-        label_5->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        verticalLayout->addWidget(label_5);
+        verticalLayout_4->addWidget(label_verifiedOrNot);
 
         label_savedPath = new QLabel(Profile);
         label_savedPath->setObjectName("label_savedPath");
         sizePolicy.setHeightForWidth(label_savedPath->sizePolicy().hasHeightForWidth());
         label_savedPath->setSizePolicy(sizePolicy);
-        QPalette palette1;
+        QPalette palette;
+        QBrush brush(QColor(255, 255, 255, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
         QBrush brush1(QColor(252, 252, 252, 255));
         brush1.setStyle(Qt::SolidPattern);
-        palette1.setBrush(QPalette::Active, QPalette::WindowText, brush1);
-        palette1.setBrush(QPalette::Inactive, QPalette::WindowText, brush1);
-        label_savedPath->setPalette(palette1);
+        palette.setBrush(QPalette::Active, QPalette::Text, brush1);
+        palette.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::Text, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        label_savedPath->setPalette(palette);
+        QFont font1;
+        font1.setPointSize(6);
+        label_savedPath->setFont(font1);
 
-        verticalLayout->addWidget(label_savedPath);
-
-
-        verticalLayout_4->addLayout(verticalLayout);
+        verticalLayout_4->addWidget(label_savedPath);
 
 
         verticalLayout_5->addLayout(verticalLayout_4);
@@ -224,17 +133,17 @@ public:
         new QListWidgetItem(listWidget_postsFromProfile);
         new QListWidgetItem(listWidget_postsFromProfile);
         listWidget_postsFromProfile->setObjectName("listWidget_postsFromProfile");
-        QPalette palette2;
+        QPalette palette1;
         QBrush brush2(QColor(146, 194, 242, 255));
         brush2.setStyle(Qt::SolidPattern);
-        palette2.setBrush(QPalette::Active, QPalette::Highlight, brush2);
+        palette1.setBrush(QPalette::Active, QPalette::Highlight, brush2);
         QBrush brush3(QColor(0, 0, 0, 255));
         brush3.setStyle(Qt::SolidPattern);
-        palette2.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
-        palette2.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
-        palette2.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
-        palette2.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
-        listWidget_postsFromProfile->setPalette(palette2);
+        palette1.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
+        palette1.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
+        palette1.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
+        palette1.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
+        listWidget_postsFromProfile->setPalette(palette1);
         listWidget_postsFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_postsFromProfile);
@@ -252,13 +161,13 @@ public:
         new QListWidgetItem(listWidget_answersFromProfile);
         new QListWidgetItem(listWidget_answersFromProfile);
         listWidget_answersFromProfile->setObjectName("listWidget_answersFromProfile");
-        QPalette palette3;
-        palette3.setBrush(QPalette::Active, QPalette::Highlight, brush2);
-        palette3.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
-        palette3.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
-        palette3.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
-        palette3.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
-        listWidget_answersFromProfile->setPalette(palette3);
+        QPalette palette2;
+        palette2.setBrush(QPalette::Active, QPalette::Highlight, brush2);
+        palette2.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
+        palette2.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
+        palette2.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
+        palette2.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
+        listWidget_answersFromProfile->setPalette(palette2);
         listWidget_answersFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_answersFromProfile);
@@ -280,13 +189,13 @@ public:
         new QListWidgetItem(listWidget_commentsFromProfile);
         new QListWidgetItem(listWidget_commentsFromProfile);
         listWidget_commentsFromProfile->setObjectName("listWidget_commentsFromProfile");
-        QPalette palette4;
-        palette4.setBrush(QPalette::Active, QPalette::Highlight, brush2);
-        palette4.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
-        palette4.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
-        palette4.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
-        palette4.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
-        listWidget_commentsFromProfile->setPalette(palette4);
+        QPalette palette3;
+        palette3.setBrush(QPalette::Active, QPalette::Highlight, brush2);
+        palette3.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
+        palette3.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
+        palette3.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
+        palette3.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
+        listWidget_commentsFromProfile->setPalette(palette3);
         listWidget_commentsFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_commentsFromProfile);
@@ -308,16 +217,9 @@ public:
         Profile->setWindowTitle(QCoreApplication::translate("Profile", "Profile", nullptr));
         pushButton_profilePic->setText(QString());
         pushButton_changeIcon->setText(QCoreApplication::translate("Profile", "Change Icon", nullptr));
-        label_4->setText(QCoreApplication::translate("Profile", "LinkedIn", nullptr));
-        pushButton_AddResume->setText(QCoreApplication::translate("Profile", "Add Resume", nullptr));
-        pushButton_ViewResume->setText(QCoreApplication::translate("Profile", "View Resume", nullptr));
-        pushButton_AddDegree->setText(QCoreApplication::translate("Profile", "Add Degree", nullptr));
-        pushButton_ViewDegree->setText(QCoreApplication::translate("Profile", "View Degree", nullptr));
-        pushButton_AddCertificates->setText(QCoreApplication::translate("Profile", "Add Certificates", nullptr));
-        pushButton_ViewCertificates->setText(QCoreApplication::translate("Profile", "View Certificates", nullptr));
-        pushButton_AddDriverLicense->setText(QCoreApplication::translate("Profile", "Add Driver's License", nullptr));
-        label_5->setText(QCoreApplication::translate("Profile", "You are not verified", nullptr));
-        label_savedPath->setText(QCoreApplication::translate("Profile", "TextLabel", nullptr));
+        pushButton_requestVerification->setText(QCoreApplication::translate("Profile", "Request Verification", nullptr));
+        label_verifiedOrNot->setText(QCoreApplication::translate("Profile", "You are not verified", nullptr));
+        label_savedPath->setText(QString());
         label->setText(QCoreApplication::translate("Profile", "Questions", nullptr));
 
         const bool __sortingEnabled = listWidget_postsFromProfile->isSortingEnabled();

@@ -21,6 +21,7 @@ SOURCES += \
     makequestion.cpp \
     post_1.cpp \
     profile.cpp \
+    requestverification.cpp \
     searchresults.cpp \
     secdialog.cpp
 
@@ -36,6 +37,7 @@ HEADERS += \
     makequestion.h \
     post_1.h \
     profile.h \
+    requestverification.h \
     searchresults.h \
     secdialog.h
 
@@ -51,6 +53,7 @@ FORMS += \
     makequestion.ui \
     post_1.ui \
     profile.ui \
+    requestverification.ui \
     searchresults.ui \
     secdialog.ui
 
