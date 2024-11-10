@@ -76,6 +76,7 @@ public:
         comboBox_occupations->addItem(QString());
         comboBox_occupations->addItem(QString());
         comboBox_occupations->addItem(QString());
+        comboBox_occupations->addItem(QString());
         comboBox_occupations->setObjectName("comboBox_occupations");
         QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
         sizePolicy1.setHorizontalStretch(0);
@@ -99,6 +100,11 @@ public:
 
         lineEdit_linkedInLine = new QLineEdit(requestVerification);
         lineEdit_linkedInLine->setObjectName("lineEdit_linkedInLine");
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(4);
+        sizePolicy3.setHeightForWidth(lineEdit_linkedInLine->sizePolicy().hasHeightForWidth());
+        lineEdit_linkedInLine->setSizePolicy(sizePolicy3);
         lineEdit_linkedInLine->setFont(font);
 
         horizontalLayout->addWidget(lineEdit_linkedInLine);
@@ -110,22 +116,25 @@ public:
         horizontalLayout_3->setObjectName("horizontalLayout_3");
         pushButton_addResume = new QPushButton(requestVerification);
         pushButton_addResume->setObjectName("pushButton_addResume");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Preferred);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(pushButton_addResume->sizePolicy().hasHeightForWidth());
-        pushButton_addResume->setSizePolicy(sizePolicy3);
+        QSizePolicy sizePolicy4(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Preferred);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(pushButton_addResume->sizePolicy().hasHeightForWidth());
+        pushButton_addResume->setSizePolicy(sizePolicy4);
         pushButton_addResume->setFont(font);
 
         horizontalLayout_3->addWidget(pushButton_addResume);
 
         label_resumeFilePath = new QLabel(requestVerification);
         label_resumeFilePath->setObjectName("label_resumeFilePath");
-        QSizePolicy sizePolicy4(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(label_resumeFilePath->sizePolicy().hasHeightForWidth());
-        label_resumeFilePath->setSizePolicy(sizePolicy4);
+        QSizePolicy sizePolicy5(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+        sizePolicy5.setHorizontalStretch(0);
+        sizePolicy5.setVerticalStretch(0);
+        sizePolicy5.setHeightForWidth(label_resumeFilePath->sizePolicy().hasHeightForWidth());
+        label_resumeFilePath->setSizePolicy(sizePolicy5);
+        QFont font1;
+        font1.setPointSize(15);
+        label_resumeFilePath->setFont(font1);
 
         horizontalLayout_3->addWidget(label_resumeFilePath);
 
@@ -136,16 +145,17 @@ public:
         horizontalLayout_4->setObjectName("horizontalLayout_4");
         pushButton_addDegree = new QPushButton(requestVerification);
         pushButton_addDegree->setObjectName("pushButton_addDegree");
-        sizePolicy3.setHeightForWidth(pushButton_addDegree->sizePolicy().hasHeightForWidth());
-        pushButton_addDegree->setSizePolicy(sizePolicy3);
+        sizePolicy4.setHeightForWidth(pushButton_addDegree->sizePolicy().hasHeightForWidth());
+        pushButton_addDegree->setSizePolicy(sizePolicy4);
         pushButton_addDegree->setFont(font);
 
         horizontalLayout_4->addWidget(pushButton_addDegree);
 
         label_degreeFilePath = new QLabel(requestVerification);
         label_degreeFilePath->setObjectName("label_degreeFilePath");
-        sizePolicy4.setHeightForWidth(label_degreeFilePath->sizePolicy().hasHeightForWidth());
-        label_degreeFilePath->setSizePolicy(sizePolicy4);
+        sizePolicy5.setHeightForWidth(label_degreeFilePath->sizePolicy().hasHeightForWidth());
+        label_degreeFilePath->setSizePolicy(sizePolicy5);
+        label_degreeFilePath->setFont(font1);
 
         horizontalLayout_4->addWidget(label_degreeFilePath);
 
@@ -156,16 +166,17 @@ public:
         horizontalLayout_5->setObjectName("horizontalLayout_5");
         pushButton_addCertificate = new QPushButton(requestVerification);
         pushButton_addCertificate->setObjectName("pushButton_addCertificate");
-        sizePolicy3.setHeightForWidth(pushButton_addCertificate->sizePolicy().hasHeightForWidth());
-        pushButton_addCertificate->setSizePolicy(sizePolicy3);
+        sizePolicy4.setHeightForWidth(pushButton_addCertificate->sizePolicy().hasHeightForWidth());
+        pushButton_addCertificate->setSizePolicy(sizePolicy4);
         pushButton_addCertificate->setFont(font);
 
         horizontalLayout_5->addWidget(pushButton_addCertificate);
 
         label_certificateFilePath = new QLabel(requestVerification);
         label_certificateFilePath->setObjectName("label_certificateFilePath");
-        sizePolicy4.setHeightForWidth(label_certificateFilePath->sizePolicy().hasHeightForWidth());
-        label_certificateFilePath->setSizePolicy(sizePolicy4);
+        sizePolicy5.setHeightForWidth(label_certificateFilePath->sizePolicy().hasHeightForWidth());
+        label_certificateFilePath->setSizePolicy(sizePolicy5);
+        label_certificateFilePath->setFont(font1);
 
         horizontalLayout_5->addWidget(label_certificateFilePath);
 
@@ -176,16 +187,17 @@ public:
         horizontalLayout_6->setObjectName("horizontalLayout_6");
         pushButton_addDriverLicense = new QPushButton(requestVerification);
         pushButton_addDriverLicense->setObjectName("pushButton_addDriverLicense");
-        sizePolicy3.setHeightForWidth(pushButton_addDriverLicense->sizePolicy().hasHeightForWidth());
-        pushButton_addDriverLicense->setSizePolicy(sizePolicy3);
+        sizePolicy4.setHeightForWidth(pushButton_addDriverLicense->sizePolicy().hasHeightForWidth());
+        pushButton_addDriverLicense->setSizePolicy(sizePolicy4);
         pushButton_addDriverLicense->setFont(font);
 
         horizontalLayout_6->addWidget(pushButton_addDriverLicense);
 
         label_driverLicenseFilePath = new QLabel(requestVerification);
         label_driverLicenseFilePath->setObjectName("label_driverLicenseFilePath");
-        sizePolicy4.setHeightForWidth(label_driverLicenseFilePath->sizePolicy().hasHeightForWidth());
-        label_driverLicenseFilePath->setSizePolicy(sizePolicy4);
+        sizePolicy5.setHeightForWidth(label_driverLicenseFilePath->sizePolicy().hasHeightForWidth());
+        label_driverLicenseFilePath->setSizePolicy(sizePolicy5);
+        label_driverLicenseFilePath->setFont(font1);
 
         horizontalLayout_6->addWidget(label_driverLicenseFilePath);
 
@@ -196,8 +208,8 @@ public:
         horizontalLayout_7->setObjectName("horizontalLayout_7");
         pushButton_submitVerificationRequest = new QPushButton(requestVerification);
         pushButton_submitVerificationRequest->setObjectName("pushButton_submitVerificationRequest");
-        sizePolicy3.setHeightForWidth(pushButton_submitVerificationRequest->sizePolicy().hasHeightForWidth());
-        pushButton_submitVerificationRequest->setSizePolicy(sizePolicy3);
+        sizePolicy4.setHeightForWidth(pushButton_submitVerificationRequest->sizePolicy().hasHeightForWidth());
+        pushButton_submitVerificationRequest->setSizePolicy(sizePolicy4);
         QPalette palette;
         QBrush brush(QColor(0, 255, 0, 255));
         brush.setStyle(Qt::SolidPattern);
@@ -211,8 +223,8 @@ public:
 
         pushButton_cancelVerificationRequest = new QPushButton(requestVerification);
         pushButton_cancelVerificationRequest->setObjectName("pushButton_cancelVerificationRequest");
-        sizePolicy3.setHeightForWidth(pushButton_cancelVerificationRequest->sizePolicy().hasHeightForWidth());
-        pushButton_cancelVerificationRequest->setSizePolicy(sizePolicy3);
+        sizePolicy4.setHeightForWidth(pushButton_cancelVerificationRequest->sizePolicy().hasHeightForWidth());
+        pushButton_cancelVerificationRequest->setSizePolicy(sizePolicy4);
         QPalette palette1;
         QBrush brush1(QColor(255, 0, 0, 255));
         brush1.setStyle(Qt::SolidPattern);
@@ -237,13 +249,14 @@ public:
     {
         requestVerification->setWindowTitle(QCoreApplication::translate("requestVerification", "Request Verification Window", nullptr));
         label->setText(QCoreApplication::translate("requestVerification", "Requesting verification for the occupation of:", nullptr));
-        comboBox_occupations->setItemText(0, QCoreApplication::translate("requestVerification", "Programmer", nullptr));
-        comboBox_occupations->setItemText(1, QCoreApplication::translate("requestVerification", "Lawyer", nullptr));
-        comboBox_occupations->setItemText(2, QCoreApplication::translate("requestVerification", "Politician", nullptr));
-        comboBox_occupations->setItemText(3, QCoreApplication::translate("requestVerification", "Mathematician", nullptr));
-        comboBox_occupations->setItemText(4, QCoreApplication::translate("requestVerification", "Physician", nullptr));
-        comboBox_occupations->setItemText(5, QCoreApplication::translate("requestVerification", "Retail Store Manager", nullptr));
-        comboBox_occupations->setItemText(6, QCoreApplication::translate("requestVerification", "Dentist", nullptr));
+        comboBox_occupations->setItemText(0, QString());
+        comboBox_occupations->setItemText(1, QCoreApplication::translate("requestVerification", "Programmer", nullptr));
+        comboBox_occupations->setItemText(2, QCoreApplication::translate("requestVerification", "Lawyer", nullptr));
+        comboBox_occupations->setItemText(3, QCoreApplication::translate("requestVerification", "Politician", nullptr));
+        comboBox_occupations->setItemText(4, QCoreApplication::translate("requestVerification", "Mathematician", nullptr));
+        comboBox_occupations->setItemText(5, QCoreApplication::translate("requestVerification", "Physician", nullptr));
+        comboBox_occupations->setItemText(6, QCoreApplication::translate("requestVerification", "Retail Store Manager", nullptr));
+        comboBox_occupations->setItemText(7, QCoreApplication::translate("requestVerification", "Dentist", nullptr));
 
         label_2->setText(QCoreApplication::translate("requestVerification", "LinkedIn:", nullptr));
         pushButton_addResume->setText(QCoreApplication::translate("requestVerification", "Add Resume", nullptr));
