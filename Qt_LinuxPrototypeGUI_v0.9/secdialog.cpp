@@ -15,11 +15,14 @@ SecDialog::SecDialog(QWidget *parent)
     , ui(new Ui::SecDialog)
 {
     ui->setupUi(this);
+
     QPixmap pix2("/home/vboxuser/Pictures/profilePic.jpg");
     QIcon ButtonIcon(pix2);
     ui->pushButton_profileButton->setIcon(ButtonIcon);
     ui->pushButton_profileButton->setIconSize(QSize(200,200));
     //ui->pushButton_profileButton->setPixmap(pix2.scaled(100,100,Qt::KeepAspectRatio));
+
+    ui->pushButton_askAQuestion->setFocusPolicy(Qt::NoFocus);
 
     /*
     int sendInt = send(int socket, void *data, size_t len, int flag);
@@ -148,5 +151,14 @@ void SecDialog::on_pushButton_searchButton_clicked()
         searchResults_1.showMaximized();
         searchResults_1.exec();
     }
+}
+
+
+void SecDialog::on_listWidget_faveCommunitiesList_itemDoubleClicked(QListWidgetItem *item)
+{
+    item->text();
+    communitiesTab communitiesTab_1;
+    communitiesTab_1.showMaximized();
+    communitiesTab_1.exec();
 }
 

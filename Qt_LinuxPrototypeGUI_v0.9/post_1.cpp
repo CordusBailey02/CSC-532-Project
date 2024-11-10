@@ -85,7 +85,7 @@ Post_1::Post_1(QWidget *parent)
     */
 
     QPixmap pix4("/home/vboxuser/Pictures/profilePic.jpg");
-    ui->label_userPic->setPixmap(pix4.scaled(100,100,Qt::KeepAspectRatio));
+    ui->label_userPic->setPixmap(pix4.scaled(300,300,Qt::KeepAspectRatio));
 
     QPixmap pix6("/home/vboxuser/Pictures/upvote.png");
     QIcon ButtonIcon(pix6);
@@ -98,6 +98,11 @@ Post_1::Post_1(QWidget *parent)
     ui->pushButton_downPost->setIconSize(QSize(40,40));
 
     ui->plainTextEdit_questionText->setReadOnly(true);
+
+    ui->pushButton->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_2->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_upPost->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_downPost->setFocusPolicy(Qt::NoFocus);
 
     //if already upvoted/downvoted
     //ui->pushButton_upPost->hide();
@@ -175,7 +180,7 @@ void Post_1::on_pushButton_clicked()
     //}
     // else // (not verified)
     //{
-    //  QMessageBox::critical(this, "Answer option not availlable to you", "You must be a verified user to post an answer.");
+    //QMessageBox::critical(this, "Answer option not availlable to you", "<font size = 13>You must be a verified user in this topic to post an answer.</font>");
     //}
 }
 

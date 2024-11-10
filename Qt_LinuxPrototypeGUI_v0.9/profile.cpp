@@ -12,6 +12,17 @@ Profile::Profile(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->pushButton_profilePic->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_changeIcon->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_AddCertificates->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_AddDegree->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_AddDriverLicense->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_AddResume->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_ViewCertificates->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_ViewDegree->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_ViewResume->setFocusPolicy(Qt::NoFocus);
+
+
     /*
 
     int sendInt = send(int socket, void *data, size_t len, int flag);
@@ -44,11 +55,13 @@ Profile::Profile(QWidget *parent)
 
     */
 
-    QPixmap pix3("/home/vboxuser/Pictures/profilePic.jpg");
+    QString filepath_profPic = "/home/vboxuser/Pictures/profilePic.jpg";
+    QPixmap pix3(filepath_profPic);
     QIcon ButtonIcon(pix3);
     ui->pushButton_profilePic->setIcon(ButtonIcon);
     ui->pushButton_profilePic->setIconSize(QSize(700,700));
-    //ui->pushButton_profilePic->setPixmap(pix3.scaled(700,700,Qt::KeepAspectRatio));
+    //ui->pushButton_profilePic->setPixmap(pix3.scaled(700,700,Qt::KeepAspectRatio)); //for labels onlyy
+    ui->label_savedPath->setText(filepath_profPic);
 
     /*
 
@@ -149,7 +162,7 @@ void Profile::on_lineEdit_LinkedInLine_returnPressed()
 {
     if (ui->lineEdit_LinkedInLine->text().length() < 3)
     {
-        QMessageBox::warning(this, "Link too short", "<font size = 13>Your Linkedin link is too short. Include only the part after linkedin.com/in/</font>");
+        QMessageBox::warning(this, "Link too short", "<font size = 13>Your Linkedin link is too short.</font>");
     }
     else if (ui->lineEdit_LinkedInLine->text().contains("linkedin.com"))
     {
@@ -165,13 +178,20 @@ void Profile::on_lineEdit_LinkedInLine_returnPressed()
 }
 
 
-void Profile::on_pushButton_viewIcon_clicked()
+void Profile::on_pushButton_changeIcon_clicked()
 {
     QString filepath_profilePic=QFileDialog::getOpenFileName(this, tr("Open file"), "C://", "JPG File(*.jpg);; PNG File(*.png)");
     if (filepath_profilePic == "")
     {
         QMessageBox::information(this, "Received File", "<font size = 13>No file selected.</font>");
     } else {
+        //QPixmap pix33"/home/vboxuser/Pictures/otherPic.jpg");
+        QPixmap pix33(filepath_profilePic);
+        QIcon ButtonIcon(pix33);
+        ui->pushButton_profilePic->setIcon(ButtonIcon);
+        ui->pushButton_profilePic->setIconSize(QSize(700,700));
+        ui->label_savedPath->setText(filepath_profilePic);
+
         QMessageBox::information(this, "Received File", filepath_profilePic);
         //int sendInt = send(int socket, filepath_profilePic, size_t len, int flag);
     }
@@ -246,7 +266,8 @@ void Profile::on_pushButton_profilePic_clicked()
 
     */
 
-    QString fileName = "/home/vboxuser/Pictures/profilePic.jpg";
+    QString fileName = ui->label_savedPath->text();
+    //QString fileName = "/home/vboxuser/Pictures/otherPic.jpg";
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
 }
 

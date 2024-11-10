@@ -29,6 +29,8 @@ private slots:
 
     void on_pushButton_searchButton_clicked();
 
+    void on_listWidget_faveCommunitiesList_itemDoubleClicked(QListWidgetItem *item);
+
 private:
     Ui::SecDialog *ui;
 };

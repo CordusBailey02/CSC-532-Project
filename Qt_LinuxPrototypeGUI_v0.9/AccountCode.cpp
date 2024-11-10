@@ -37,7 +37,7 @@ void AccountCode::on_pushButton_submitCode_clicked()
 {
     if (ui->lineEdit_code->text().length() != 4)
     {
-        QMessageBox::critical(this, "Incorrect Length", "<font size = 13>Submitted code is not the correct length.</font>>");
+        QMessageBox::critical(this, "Incorrect Length", "<font size = 13>Submitted code is not the correct length.</font>");
     }
     else
     {
@@ -52,6 +52,10 @@ void AccountCode::on_pushButton_submitCode_clicked()
         else if (codeInInteger == 0)
         {
             QMessageBox::critical(this, "Incorrect Format", "<font size = 13>Submitted code is not a number.</font>");
+        }
+        else
+        {
+            QMessageBox::information(this, "Code Accepted", "<font size = 13>Your account has been verified and you may now login.</font>");
         }
 
         /*

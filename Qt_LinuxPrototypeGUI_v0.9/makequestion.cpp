@@ -10,6 +10,10 @@ makeQuestion::makeQuestion(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->pushButton_uploadQuestionImage->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_postQuestion->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_cancel->setFocusPolicy(Qt::NoFocus);
+
     /*
 
     */

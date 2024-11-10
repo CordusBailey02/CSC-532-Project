@@ -10,7 +10,7 @@ comment_1::comment_1(QWidget *parent)
     ui->setupUi(this);
 
     QPixmap pix5("/home/vboxuser/Pictures/profilePic.jpg");
-    ui->label_commentUserPic->setPixmap(pix5.scaled(100,100,Qt::KeepAspectRatio));
+    ui->label_commentUserPic->setPixmap(pix5.scaled(300,300,Qt::KeepAspectRatio));
 
     QPixmap pix8("/home/vboxuser/Pictures/upvote.png");
     QIcon ButtonIcon(pix8);
@@ -23,6 +23,9 @@ comment_1::comment_1(QWidget *parent)
     ui->pushButton_downComment->setIconSize(QSize(40,40));
 
     ui->plainTextEdit_commentText->setReadOnly(true);
+
+    ui->pushButton_upComment->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_downComment->setFocusPolicy(Qt::NoFocus);
 
     /*
 

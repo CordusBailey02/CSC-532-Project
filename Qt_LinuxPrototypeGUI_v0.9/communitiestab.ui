@@ -119,6 +119,76 @@
        <string>Volume of a sphere</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>Does math scare users?</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Can a math formula or math algorithm be patented?</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Publish math formulas on Blogger</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>ThunderBird math equations</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kotlin math vs math</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Math in Japanese</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Math exchange rates</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Proving the summability of a Sequence under Measure-Theoretic conditions</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>The set of pairs in the image of a discrete function</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Help with uniqueness proof</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Linear deconvolution using FFT</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Derive relation between slopes of a quadrilateral with vertices on a parabola using analog of Laguerre formula?</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>If gradient is bounded then absolute difference in images is bounded</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>What is the number of events within an interval with Gamma-distributed waiting times?</string>
+      </property>
+     </item>
     </widget>
    </item>
   </layout>

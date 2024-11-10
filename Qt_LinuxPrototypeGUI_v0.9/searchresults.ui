@@ -7,13 +7,56 @@
     <x>0</x>
     <y>0</y>
     <width>445</width>
-    <height>452</height>
+    <height>484</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Search Results</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Showing results for:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_searchPrompt">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QLabel" name="label">
      <property name="sizePolicy">
@@ -115,7 +158,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Posts</string>
+      <string>Questions</string>
      </property>
     </widget>
    </item>
@@ -183,7 +226,7 @@
      </property>
      <item>
       <property name="text">
-       <string>Post 1</string>
+       <string>Question 1</string>
       </property>
      </item>
     </widget>

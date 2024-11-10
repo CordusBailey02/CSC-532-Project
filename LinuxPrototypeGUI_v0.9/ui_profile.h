@@ -30,7 +30,7 @@ public:
     QVBoxLayout *verticalLayout_5;
     QVBoxLayout *verticalLayout_4;
     QPushButton *pushButton_profilePic;
-    QPushButton *pushButton_viewIcon;
+    QPushButton *pushButton_changeIcon;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QLabel *label_4;
@@ -46,6 +46,7 @@ public:
     QPushButton *pushButton_ViewCertificates;
     QPushButton *pushButton_AddDriverLicense;
     QLabel *label_5;
+    QLabel *label_savedPath;
     QVBoxLayout *verticalLayout_7;
     QLabel *label;
     QListWidget *listWidget_postsFromProfile;
@@ -58,7 +59,7 @@ public:
     {
         if (Profile->objectName().isEmpty())
             Profile->setObjectName("Profile");
-        Profile->resize(515, 403);
+        Profile->resize(543, 448);
         gridLayout = new QGridLayout(Profile);
         gridLayout->setObjectName("gridLayout");
         horizontalLayout_8 = new QHBoxLayout();
@@ -77,13 +78,13 @@ public:
 
         verticalLayout_4->addWidget(pushButton_profilePic);
 
-        pushButton_viewIcon = new QPushButton(Profile);
-        pushButton_viewIcon->setObjectName("pushButton_viewIcon");
+        pushButton_changeIcon = new QPushButton(Profile);
+        pushButton_changeIcon->setObjectName("pushButton_changeIcon");
         QFont font;
         font.setPointSize(15);
-        pushButton_viewIcon->setFont(font);
+        pushButton_changeIcon->setFont(font);
 
-        verticalLayout_4->addWidget(pushButton_viewIcon);
+        verticalLayout_4->addWidget(pushButton_changeIcon);
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
@@ -186,6 +187,19 @@ public:
 
         verticalLayout->addWidget(label_5);
 
+        label_savedPath = new QLabel(Profile);
+        label_savedPath->setObjectName("label_savedPath");
+        sizePolicy.setHeightForWidth(label_savedPath->sizePolicy().hasHeightForWidth());
+        label_savedPath->setSizePolicy(sizePolicy);
+        QPalette palette1;
+        QBrush brush1(QColor(252, 252, 252, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette1.setBrush(QPalette::Active, QPalette::WindowText, brush1);
+        palette1.setBrush(QPalette::Inactive, QPalette::WindowText, brush1);
+        label_savedPath->setPalette(palette1);
+
+        verticalLayout->addWidget(label_savedPath);
+
 
         verticalLayout_4->addLayout(verticalLayout);
 
@@ -210,17 +224,17 @@ public:
         new QListWidgetItem(listWidget_postsFromProfile);
         new QListWidgetItem(listWidget_postsFromProfile);
         listWidget_postsFromProfile->setObjectName("listWidget_postsFromProfile");
-        QPalette palette1;
-        QBrush brush1(QColor(146, 194, 242, 255));
-        brush1.setStyle(Qt::SolidPattern);
-        palette1.setBrush(QPalette::Active, QPalette::Highlight, brush1);
-        QBrush brush2(QColor(0, 0, 0, 255));
+        QPalette palette2;
+        QBrush brush2(QColor(146, 194, 242, 255));
         brush2.setStyle(Qt::SolidPattern);
-        palette1.setBrush(QPalette::Active, QPalette::HighlightedText, brush2);
-        palette1.setBrush(QPalette::Inactive, QPalette::Highlight, brush1);
-        palette1.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush2);
-        palette1.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush2);
-        listWidget_postsFromProfile->setPalette(palette1);
+        palette2.setBrush(QPalette::Active, QPalette::Highlight, brush2);
+        QBrush brush3(QColor(0, 0, 0, 255));
+        brush3.setStyle(Qt::SolidPattern);
+        palette2.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
+        palette2.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
+        palette2.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
+        palette2.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
+        listWidget_postsFromProfile->setPalette(palette2);
         listWidget_postsFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_postsFromProfile);
@@ -238,13 +252,13 @@ public:
         new QListWidgetItem(listWidget_answersFromProfile);
         new QListWidgetItem(listWidget_answersFromProfile);
         listWidget_answersFromProfile->setObjectName("listWidget_answersFromProfile");
-        QPalette palette2;
-        palette2.setBrush(QPalette::Active, QPalette::Highlight, brush1);
-        palette2.setBrush(QPalette::Active, QPalette::HighlightedText, brush2);
-        palette2.setBrush(QPalette::Inactive, QPalette::Highlight, brush1);
-        palette2.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush2);
-        palette2.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush2);
-        listWidget_answersFromProfile->setPalette(palette2);
+        QPalette palette3;
+        palette3.setBrush(QPalette::Active, QPalette::Highlight, brush2);
+        palette3.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
+        palette3.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
+        palette3.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
+        palette3.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
+        listWidget_answersFromProfile->setPalette(palette3);
         listWidget_answersFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_answersFromProfile);
@@ -266,13 +280,13 @@ public:
         new QListWidgetItem(listWidget_commentsFromProfile);
         new QListWidgetItem(listWidget_commentsFromProfile);
         listWidget_commentsFromProfile->setObjectName("listWidget_commentsFromProfile");
-        QPalette palette3;
-        palette3.setBrush(QPalette::Active, QPalette::Highlight, brush1);
-        palette3.setBrush(QPalette::Active, QPalette::HighlightedText, brush2);
-        palette3.setBrush(QPalette::Inactive, QPalette::Highlight, brush1);
-        palette3.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush2);
-        palette3.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush2);
-        listWidget_commentsFromProfile->setPalette(palette3);
+        QPalette palette4;
+        palette4.setBrush(QPalette::Active, QPalette::Highlight, brush2);
+        palette4.setBrush(QPalette::Active, QPalette::HighlightedText, brush3);
+        palette4.setBrush(QPalette::Inactive, QPalette::Highlight, brush2);
+        palette4.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush3);
+        palette4.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush3);
+        listWidget_commentsFromProfile->setPalette(palette4);
         listWidget_commentsFromProfile->setFont(font);
 
         verticalLayout_7->addWidget(listWidget_commentsFromProfile);
@@ -293,7 +307,7 @@ public:
     {
         Profile->setWindowTitle(QCoreApplication::translate("Profile", "Profile", nullptr));
         pushButton_profilePic->setText(QString());
-        pushButton_viewIcon->setText(QCoreApplication::translate("Profile", "Change Icon", nullptr));
+        pushButton_changeIcon->setText(QCoreApplication::translate("Profile", "Change Icon", nullptr));
         label_4->setText(QCoreApplication::translate("Profile", "LinkedIn", nullptr));
         pushButton_AddResume->setText(QCoreApplication::translate("Profile", "Add Resume", nullptr));
         pushButton_ViewResume->setText(QCoreApplication::translate("Profile", "View Resume", nullptr));
@@ -303,6 +317,7 @@ public:
         pushButton_ViewCertificates->setText(QCoreApplication::translate("Profile", "View Certificates", nullptr));
         pushButton_AddDriverLicense->setText(QCoreApplication::translate("Profile", "Add Driver's License", nullptr));
         label_5->setText(QCoreApplication::translate("Profile", "You are not verified", nullptr));
+        label_savedPath->setText(QCoreApplication::translate("Profile", "TextLabel", nullptr));
         label->setText(QCoreApplication::translate("Profile", "Questions", nullptr));
 
         const bool __sortingEnabled = listWidget_postsFromProfile->isSortingEnabled();

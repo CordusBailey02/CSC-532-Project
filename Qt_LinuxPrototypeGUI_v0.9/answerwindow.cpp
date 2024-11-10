@@ -12,9 +12,12 @@ answerWindow::answerWindow(QWidget *parent)
     ui->setupUi(this);
 
     ui->plainTextEdit_answerText->setReadOnly(true);
+    ui->pushButton_commentBtn->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_upAnswer->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_downAnswer->setFocusPolicy(Qt::NoFocus);
 
     QPixmap pix5("/home/vboxuser/Pictures/otherPic.jpg");
-    ui->label_answerPic->setPixmap(pix5.scaled(100,100,Qt::KeepAspectRatio));
+    ui->label_answerPic->setPixmap(pix5.scaled(300,300,Qt::KeepAspectRatio));
 
     QPixmap pix10("/home/vboxuser/Pictures/upvote.png");
     QIcon ButtonIcon(pix10);

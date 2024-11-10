@@ -28,24 +28,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="5" column="0" colspan="2">
-      <widget class="QLabel" name="label_3">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>20</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>You might be interested</string>
-       </property>
-      </widget>
-     </item>
      <item row="6" column="0" colspan="4">
       <widget class="QListWidget" name="listWidget_defaultList">
        <property name="sizePolicy">
@@ -215,7 +197,25 @@
         </font>
        </property>
        <property name="text">
-        <string>From Favorite Communities</string>
+        <string>From Followed Communities</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QLabel" name="label_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Recent Questions</string>
        </property>
       </widget>
      </item>
@@ -309,7 +309,12 @@
        </item>
        <item>
         <property name="text">
-         <string>[Science] Where does most of Earth's oxygen come from?</string>
+         <string>[Politics] Why do communists claim that capitalism began at the Industrial Revolution?</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>[Religion] Does God the Son have faith?</string>
         </property>
        </item>
        <item>
@@ -319,219 +324,27 @@
        </item>
        <item>
         <property name="text">
-         <string>[Politics] Why do communists claim that capitalism began at the Industrial Revolution?</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>[Religion] Does God the Son have faith?</string>
+         <string>[Science] Where does most of Earth's oxygen come from?</string>
         </property>
        </item>
       </widget>
      </item>
-     <item row="4" column="4" rowspan="3" colspan="2">
-      <widget class="QListWidget" name="listWidget_communitiesList">
+     <item row="3" column="4" colspan="2">
+      <widget class="QLabel" name="label">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="palette">
-        <palette>
-         <active>
-          <colorrole role="Highlight">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>146</red>
-             <green>194</green>
-             <blue>242</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="HighlightedText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </active>
-         <inactive>
-          <colorrole role="Highlight">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>146</red>
-             <green>194</green>
-             <blue>242</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="HighlightedText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </inactive>
-         <disabled>
-          <colorrole role="HighlightedText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </disabled>
-        </palette>
-       </property>
        <property name="font">
         <font>
-         <pointsize>15</pointsize>
+         <pointsize>20</pointsize>
         </font>
        </property>
-       <item>
-        <property name="text">
-         <string>Animals</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Architecture</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Astronomy</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Coding</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Computer Hardware</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Computer Science</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Cryptography</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Cycling</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Dating</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Drinks</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Economy</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Engagement</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Engineering</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Finances</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Food</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Furniture</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Housing</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Jobs</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Marriage</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Math</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Parenting</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Technology</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Traveling</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Politics</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Psychology</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Religion</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Science</string>
-        </property>
-       </item>
+       <property name="text">
+        <string>Followed Communities</string>
+       </property>
       </widget>
      </item>
      <item row="2" column="0" colspan="6">
@@ -681,22 +494,296 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="4" colspan="2">
-      <widget class="QLabel" name="label">
+     <item row="6" column="4" colspan="2">
+      <widget class="QListWidget" name="listWidget_communitiesList">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="Highlight">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>146</red>
+             <green>194</green>
+             <blue>242</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="Highlight">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>146</red>
+             <green>194</green>
+             <blue>242</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Animals</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Architecture</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Astronomy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Computer Hardware</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Computer Science</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Cycling</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Dating</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Drinks</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Economy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Engagement</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Engineering</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Finances</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Food</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Furniture</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Housing</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Jobs</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Marriage</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Parenting</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Technology</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Traveling</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Psychology</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Science</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="5" column="4" colspan="2">
+      <widget class="QLabel" name="label_4">
        <property name="font">
         <font>
          <pointsize>20</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Communities</string>
+        <string>Other Communities</string>
        </property>
+      </widget>
+     </item>
+     <item row="4" column="4" colspan="2">
+      <widget class="QListWidget" name="listWidget_faveCommunitiesList">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="Highlight">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>146</red>
+             <green>194</green>
+             <blue>242</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="Highlight">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>146</red>
+             <green>194</green>
+             <blue>242</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Coding</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Cryptography</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Math</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Science</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Politics</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Religion</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

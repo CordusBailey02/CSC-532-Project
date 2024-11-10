@@ -11,6 +11,8 @@ searchResults::searchResults(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->label_searchPrompt->setText("No prompt given");
+
     /*
 
     int sendInt = send(int socket, void *data, size_t len, int flag);

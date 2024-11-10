@@ -25,7 +25,7 @@ private slots:
 
     void on_lineEdit_LinkedInLine_returnPressed();
 
-    void on_pushButton_viewIcon_clicked();
+    void on_pushButton_changeIcon_clicked();
 
     void on_pushButton_AddResume_clicked();
 

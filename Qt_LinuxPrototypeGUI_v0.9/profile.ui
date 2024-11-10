@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>515</width>
-    <height>403</height>
+    <width>543</width>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_viewIcon">
+          <widget class="QPushButton" name="pushButton_changeIcon">
            <property name="font">
             <font>
              <pointsize>15</pointsize>
@@ -225,6 +225,46 @@
              </property>
              <property name="alignment">
               <set>Qt::AlignmentFlag::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_savedPath">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="palette">
+              <palette>
+               <active>
+                <colorrole role="WindowText">
+                 <brush brushstyle="SolidPattern">
+                  <color alpha="255">
+                   <red>252</red>
+                   <green>252</green>
+                   <blue>252</blue>
+                  </color>
+                 </brush>
+                </colorrole>
+               </active>
+               <inactive>
+                <colorrole role="WindowText">
+                 <brush brushstyle="SolidPattern">
+                  <color alpha="255">
+                   <red>252</red>
+                   <green>252</green>
+                   <blue>252</blue>
+                  </color>
+                 </brush>
+                </colorrole>
+               </inactive>
+               <disabled/>
+              </palette>
+             </property>
+             <property name="text">
+              <string>TextLabel</string>
              </property>
             </widget>
            </item>

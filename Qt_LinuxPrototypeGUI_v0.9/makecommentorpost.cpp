@@ -7,6 +7,9 @@ makeCommentOrPost::makeCommentOrPost(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->pushButton->setFocusPolicy(Qt::NoFocus);
+    ui->pushButton_2->setFocusPolicy(Qt::NoFocus);
+
     /*
 
     */

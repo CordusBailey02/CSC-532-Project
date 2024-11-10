@@ -45,7 +45,7 @@ constexpr auto qt_meta_stringdata_CLASSProfileENDCLASS = QtMocHelpers::stringDat
     "on_listWidget_commentsFromProfile_itemDoubleClicked",
     "on_listWidget_answersFromProfile_itemDoubleClicked",
     "on_lineEdit_LinkedInLine_returnPressed",
-    "on_pushButton_viewIcon_clicked",
+    "on_pushButton_changeIcon_clicked",
     "on_pushButton_AddResume_clicked",
     "on_pushButton_AddDegree_clicked",
     "on_pushButton_AddCertificates_clicked",
@@ -126,7 +126,7 @@ Q_CONSTINIT const QMetaObject Profile::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<QListWidgetItem *, std::false_type>,
         // method 'on_lineEdit_LinkedInLine_returnPressed'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_pushButton_viewIcon_clicked'
+        // method 'on_pushButton_changeIcon_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_pushButton_AddResume_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
@@ -158,7 +158,7 @@ void Profile::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         case 1: _t->on_listWidget_commentsFromProfile_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
         case 2: _t->on_listWidget_answersFromProfile_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
         case 3: _t->on_lineEdit_LinkedInLine_returnPressed(); break;
-        case 4: _t->on_pushButton_viewIcon_clicked(); break;
+        case 4: _t->on_pushButton_changeIcon_clicked(); break;
         case 5: _t->on_pushButton_AddResume_clicked(); break;
         case 6: _t->on_pushButton_AddDegree_clicked(); break;
         case 7: _t->on_pushButton_AddCertificates_clicked(); break;
