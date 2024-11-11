@@ -47,7 +47,7 @@ public:
         horizontalLayout_4->setObjectName("horizontalLayout_4");
         label_ask = new QLabel(makeQuestion);
         label_ask->setObjectName("label_ask");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(label_ask->sizePolicy().hasHeightForWidth());
@@ -75,8 +75,11 @@ public:
 
         label_questionFileSelected = new QLabel(makeQuestion);
         label_questionFileSelected->setObjectName("label_questionFileSelected");
-        sizePolicy.setHeightForWidth(label_questionFileSelected->sizePolicy().hasHeightForWidth());
-        label_questionFileSelected->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label_questionFileSelected->sizePolicy().hasHeightForWidth());
+        label_questionFileSelected->setSizePolicy(sizePolicy1);
         label_questionFileSelected->setFont(font);
 
         horizontalLayout_4->addWidget(label_questionFileSelected);
@@ -94,8 +97,8 @@ public:
         horizontalLayout->setObjectName("horizontalLayout");
         pushButton_postQuestion = new QPushButton(makeQuestion);
         pushButton_postQuestion->setObjectName("pushButton_postQuestion");
-        sizePolicy.setHeightForWidth(pushButton_postQuestion->sizePolicy().hasHeightForWidth());
-        pushButton_postQuestion->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(pushButton_postQuestion->sizePolicy().hasHeightForWidth());
+        pushButton_postQuestion->setSizePolicy(sizePolicy1);
         QPalette palette1;
         QBrush brush1(QColor(0, 255, 0, 255));
         brush1.setStyle(Qt::SolidPattern);
@@ -109,8 +112,8 @@ public:
 
         pushButton_cancel = new QPushButton(makeQuestion);
         pushButton_cancel->setObjectName("pushButton_cancel");
-        sizePolicy.setHeightForWidth(pushButton_cancel->sizePolicy().hasHeightForWidth());
-        pushButton_cancel->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(pushButton_cancel->sizePolicy().hasHeightForWidth());
+        pushButton_cancel->setSizePolicy(sizePolicy1);
         QPalette palette2;
         QBrush brush2(QColor(255, 0, 0, 255));
         brush2.setStyle(Qt::SolidPattern);

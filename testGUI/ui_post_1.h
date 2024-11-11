@@ -39,8 +39,12 @@ public:
     QPlainTextEdit *plainTextEdit_questionText;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *pushButton_upPost;
+    QVBoxLayout *verticalLayout_3;
+    QLabel *label;
     QLabel *label_upPostCount;
     QPushButton *pushButton_downPost;
+    QVBoxLayout *verticalLayout_4;
+    QLabel *label_2;
     QLabel *label_downPostCount;
     QLabel *label_3;
 
@@ -48,7 +52,7 @@ public:
     {
         if (Post_1->objectName().isEmpty())
             Post_1->setObjectName("Post_1");
-        Post_1->resize(530, 400);
+        Post_1->resize(622, 480);
         formLayout = new QFormLayout(Post_1);
         formLayout->setObjectName("formLayout");
         listWidget = new QListWidget(Post_1);
@@ -143,27 +147,84 @@ public:
         horizontalLayout_3->setObjectName("horizontalLayout_3");
         pushButton_upPost = new QPushButton(Post_1);
         pushButton_upPost->setObjectName("pushButton_upPost");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Preferred);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(pushButton_upPost->sizePolicy().hasHeightForWidth());
+        pushButton_upPost->setSizePolicy(sizePolicy2);
+        QPalette palette2;
+        QBrush brush2(QColor(252, 252, 252, 255));
+        brush2.setStyle(Qt::SolidPattern);
+        palette2.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette2.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette2.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette2.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette2.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette2.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette2.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette2.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette2.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        pushButton_upPost->setPalette(palette2);
 
         horizontalLayout_3->addWidget(pushButton_upPost);
+
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setObjectName("verticalLayout_3");
+        label = new QLabel(Post_1);
+        label->setObjectName("label");
+        QFont font1;
+        font1.setPointSize(12);
+        label->setFont(font1);
+        label->setAlignment(Qt::AlignmentFlag::AlignCenter);
+
+        verticalLayout_3->addWidget(label);
 
         label_upPostCount = new QLabel(Post_1);
         label_upPostCount->setObjectName("label_upPostCount");
         label_upPostCount->setFont(font);
         label_upPostCount->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        horizontalLayout_3->addWidget(label_upPostCount);
+        verticalLayout_3->addWidget(label_upPostCount);
+
+
+        horizontalLayout_3->addLayout(verticalLayout_3);
 
         pushButton_downPost = new QPushButton(Post_1);
         pushButton_downPost->setObjectName("pushButton_downPost");
+        sizePolicy2.setHeightForWidth(pushButton_downPost->sizePolicy().hasHeightForWidth());
+        pushButton_downPost->setSizePolicy(sizePolicy2);
+        QPalette palette3;
+        palette3.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette3.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette3.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette3.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette3.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette3.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette3.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette3.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette3.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        pushButton_downPost->setPalette(palette3);
 
         horizontalLayout_3->addWidget(pushButton_downPost);
+
+        verticalLayout_4 = new QVBoxLayout();
+        verticalLayout_4->setObjectName("verticalLayout_4");
+        label_2 = new QLabel(Post_1);
+        label_2->setObjectName("label_2");
+        label_2->setFont(font1);
+        label_2->setAlignment(Qt::AlignmentFlag::AlignCenter);
+
+        verticalLayout_4->addWidget(label_2);
 
         label_downPostCount = new QLabel(Post_1);
         label_downPostCount->setObjectName("label_downPostCount");
         label_downPostCount->setFont(font);
         label_downPostCount->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        horizontalLayout_3->addWidget(label_downPostCount);
+        verticalLayout_4->addWidget(label_downPostCount);
+
+
+        horizontalLayout_3->addLayout(verticalLayout_4);
 
 
         verticalLayout_2->addLayout(horizontalLayout_3);
@@ -216,8 +277,10 @@ public:
         pushButton_2->setText(QCoreApplication::translate("Post_1", "View File", nullptr));
         plainTextEdit_questionText->setPlainText(QCoreApplication::translate("Post_1", "Read only", nullptr));
         pushButton_upPost->setText(QString());
+        label->setText(QCoreApplication::translate("Post_1", "Upvotes", nullptr));
         label_upPostCount->setText(QCoreApplication::translate("Post_1", "0", nullptr));
         pushButton_downPost->setText(QString());
+        label_2->setText(QCoreApplication::translate("Post_1", "Downvotes", nullptr));
         label_downPostCount->setText(QCoreApplication::translate("Post_1", "0", nullptr));
         label_3->setText(QCoreApplication::translate("Post_1", "Answers", nullptr));
     } // retranslateUi

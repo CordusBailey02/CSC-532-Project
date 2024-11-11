@@ -12,6 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QVBoxLayout>
@@ -22,6 +23,9 @@ class Ui_searchResults
 {
 public:
     QVBoxLayout *verticalLayout;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label_5;
+    QLabel *label_searchPrompt;
     QLabel *label;
     QListWidget *listWidget_communitiesFromSearch;
     QLabel *label_2;
@@ -35,19 +39,46 @@ public:
     {
         if (searchResults->objectName().isEmpty())
             searchResults->setObjectName("searchResults");
-        searchResults->resize(445, 452);
+        searchResults->resize(445, 484);
         verticalLayout = new QVBoxLayout(searchResults);
         verticalLayout->setObjectName("verticalLayout");
-        label = new QLabel(searchResults);
-        label->setObjectName("label");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
+        label_5 = new QLabel(searchResults);
+        label_5->setObjectName("label_5");
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Maximum, QSizePolicy::Policy::Maximum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy);
+        sizePolicy.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
+        label_5->setSizePolicy(sizePolicy);
         QFont font;
-        font.setPointSize(17);
-        label->setFont(font);
+        font.setPointSize(15);
+        label_5->setFont(font);
+        label_5->setAlignment(Qt::AlignmentFlag::AlignCenter);
+
+        horizontalLayout_2->addWidget(label_5);
+
+        label_searchPrompt = new QLabel(searchResults);
+        label_searchPrompt->setObjectName("label_searchPrompt");
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label_searchPrompt->sizePolicy().hasHeightForWidth());
+        label_searchPrompt->setSizePolicy(sizePolicy1);
+        label_searchPrompt->setFont(font);
+
+        horizontalLayout_2->addWidget(label_searchPrompt);
+
+
+        verticalLayout->addLayout(horizontalLayout_2);
+
+        label = new QLabel(searchResults);
+        label->setObjectName("label");
+        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy1);
+        QFont font1;
+        font1.setPointSize(17);
+        label->setFont(font1);
 
         verticalLayout->addWidget(label);
 
@@ -65,15 +96,15 @@ public:
         palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
         palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
         listWidget_communitiesFromSearch->setPalette(palette);
-        listWidget_communitiesFromSearch->setFont(font);
+        listWidget_communitiesFromSearch->setFont(font1);
 
         verticalLayout->addWidget(listWidget_communitiesFromSearch);
 
         label_2 = new QLabel(searchResults);
         label_2->setObjectName("label_2");
-        sizePolicy.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
-        label_2->setSizePolicy(sizePolicy);
-        label_2->setFont(font);
+        sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
+        label_2->setSizePolicy(sizePolicy1);
+        label_2->setFont(font1);
 
         verticalLayout->addWidget(label_2);
 
@@ -87,15 +118,15 @@ public:
         palette1.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
         palette1.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
         listWidget_postsFromSearch->setPalette(palette1);
-        listWidget_postsFromSearch->setFont(font);
+        listWidget_postsFromSearch->setFont(font1);
 
         verticalLayout->addWidget(listWidget_postsFromSearch);
 
         label_4 = new QLabel(searchResults);
         label_4->setObjectName("label_4");
-        sizePolicy.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
-        label_4->setSizePolicy(sizePolicy);
-        label_4->setFont(font);
+        sizePolicy1.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
+        label_4->setSizePolicy(sizePolicy1);
+        label_4->setFont(font1);
 
         verticalLayout->addWidget(label_4);
 
@@ -109,15 +140,15 @@ public:
         palette2.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
         palette2.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
         listWidget_answersFromSearch->setPalette(palette2);
-        listWidget_answersFromSearch->setFont(font);
+        listWidget_answersFromSearch->setFont(font1);
 
         verticalLayout->addWidget(listWidget_answersFromSearch);
 
         label_3 = new QLabel(searchResults);
         label_3->setObjectName("label_3");
-        sizePolicy.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
-        label_3->setSizePolicy(sizePolicy);
-        label_3->setFont(font);
+        sizePolicy1.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
+        label_3->setSizePolicy(sizePolicy1);
+        label_3->setFont(font1);
 
         verticalLayout->addWidget(label_3);
 
@@ -131,7 +162,7 @@ public:
         palette3.setBrush(QPalette::Inactive, QPalette::HighlightedText, brush1);
         palette3.setBrush(QPalette::Disabled, QPalette::HighlightedText, brush1);
         listWidget_commentsFromSearch->setPalette(palette3);
-        listWidget_commentsFromSearch->setFont(font);
+        listWidget_commentsFromSearch->setFont(font1);
 
         verticalLayout->addWidget(listWidget_commentsFromSearch);
 
@@ -144,6 +175,8 @@ public:
     void retranslateUi(QDialog *searchResults)
     {
         searchResults->setWindowTitle(QCoreApplication::translate("searchResults", "Search Results", nullptr));
+        label_5->setText(QCoreApplication::translate("searchResults", "Showing results for:", nullptr));
+        label_searchPrompt->setText(QString());
         label->setText(QCoreApplication::translate("searchResults", "Communities", nullptr));
 
         const bool __sortingEnabled = listWidget_communitiesFromSearch->isSortingEnabled();
@@ -152,12 +185,12 @@ public:
         ___qlistwidgetitem->setText(QCoreApplication::translate("searchResults", "Community 1", nullptr));
         listWidget_communitiesFromSearch->setSortingEnabled(__sortingEnabled);
 
-        label_2->setText(QCoreApplication::translate("searchResults", "Posts", nullptr));
+        label_2->setText(QCoreApplication::translate("searchResults", "Questions", nullptr));
 
         const bool __sortingEnabled1 = listWidget_postsFromSearch->isSortingEnabled();
         listWidget_postsFromSearch->setSortingEnabled(false);
         QListWidgetItem *___qlistwidgetitem1 = listWidget_postsFromSearch->item(0);
-        ___qlistwidgetitem1->setText(QCoreApplication::translate("searchResults", "Post 1", nullptr));
+        ___qlistwidgetitem1->setText(QCoreApplication::translate("searchResults", "Question 1", nullptr));
         listWidget_postsFromSearch->setSortingEnabled(__sortingEnabled1);
 
         label_4->setText(QCoreApplication::translate("searchResults", "Answers", nullptr));
