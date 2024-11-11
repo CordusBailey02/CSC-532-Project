@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include "terrorexchange.h"
 
+int client_tcp_socket = -1;
+
 bool gui_send_request_header(int socket, struct request_header *header)
 {
 	if(header == NULL)
@@ -885,7 +887,6 @@ bool gui_send_account_create(int socket, struct request_header *outbound_request
 		}
 		if(send_status >= MAX_SEND_ATTEMPTS)
 		{
-			print_too_many_send_attempts_error(socket, "send_account_create", "data member of payload", payloads_sent + 1);
 			free(outbound_payloads[0].data);
 			free(outbound_payloads[1].data);
 			free(outbound_payloads[2].data);
@@ -902,7 +903,6 @@ bool gui_send_account_create(int socket, struct request_header *outbound_request
 		}
 		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS)
 		{
-			print_too_many_receive_attempts_error(socket, "send_account_create", "acknowledgement for receipt of data member for payload", payloads_sent + 1, NULL);
 			free(outbound_payloads[0].data);
 			free(outbound_payloads[1].data);
 			free(outbound_payloads[2].data);
@@ -913,7 +913,6 @@ bool gui_send_account_create(int socket, struct request_header *outbound_request
 		// Check valid acknowledgement
 		if(inbound_request_header.parameter_count != OK)
 		{
-			print_acknowledgement_type_mismatch_error(socket, "send_account_create", "SEND ACCOUNT_CREATE", inbound_request_header.parameter_count, OK);
 			fprintf(stderr, "This happened after trying to get an acknowledgement for the receipt of the data member of payload #%d.\n", payloads_sent + 1);
 			free(outbound_payloads[0].data);
 			free(outbound_payloads[1].data);

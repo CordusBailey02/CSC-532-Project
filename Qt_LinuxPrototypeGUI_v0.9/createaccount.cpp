@@ -2,6 +2,9 @@
 #include "ui_createaccount.h"
 #include "AccountCode.h"
 #include <QMessageBox>
+extern "C" {
+#include "terrorexchangegui.h"
+}
 
 createAccount::createAccount(QWidget *parent)
     : QDialog(parent)
@@ -35,6 +38,43 @@ void createAccount::on_pushButton_createCancel_clicked()
 
 void createAccount::on_pushButton_createConfirm_clicked()
 {
+    // Get field inputs
+    /*
+    QString username = ui->lineEdit_accountNewUsername->text();
+    QString password = ui->lineEdit_accountNewPassword->text();
+    QString email = ui->lineEdit_accountNewEmail->text();
+
+    std::string username_str = username.toStdString();
+    char* username_c_str = new char[username_str.size() + 1];
+    strcpy(username_c_str, username_str.c_str());
+
+    std::string password_str = password.toStdString();
+    char* password_c_str = new char[password_str.size() + 1];
+    strcpy(password_c_str, password_str.c_str());
+
+    std::string email_str = email.toStdString();
+    char* email_c_str = new char[email_str.size() + 1];
+    strcpy(email_c_str, email_str.c_str());
+
+    size_t username_size = username_str.size();
+    size_t password_size = password_str.size();
+    size_t email_size = email_str.size();
+
+    struct request_header outbound_request_header;
+
+    bool account_create = gui_send_account_create(client_tcp_socket, &outbound_request_header, username_c_str, username_size, email_c_str, email_size, password_c_str, password_size);
+
+    if(account_create)
+    {
+        QMessageBox::information(this, "Account Created", "<font size = 13>Your account was created. Check your email for a verification link with a code.</font>");
+
+    }
+    else
+    {
+        // Handle errors
+        printf("Error creating account...");
+    }
+    */
     // if statements to check newPassword and newPasswordConfirm are equal
     if (ui->lineEdit_accountNewEmail->text().length() < 7)
     {

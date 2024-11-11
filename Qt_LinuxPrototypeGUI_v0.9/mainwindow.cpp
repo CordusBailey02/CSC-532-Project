@@ -80,6 +80,41 @@ void MainWindow::on_pushButton_login_clicked()
     {
         QMessageBox::warning(this, "Login Failed", "<font size = 13>Incorrect username or password</font>");
     }
+
+    /*
+     // Convert the QString to char*
+    std::string username_str = username.toStdString();
+    char* username_c_str = new char[username_str.size() + 1];
+    strcpy(username_c_str, username_str.c_str());
+
+    std::string password_str = password.toStdString();
+    char* password_c_str = new char[password_str.size() + 1];
+    strcpy(password_c_str, password_str.c_str());
+
+    // Get Length of the username and password
+    size_t username_size = username_str.size();
+    size_t password_size = password_str.size();
+
+    //Request struct
+    struct request_header outbound_request_header;
+
+    // Send login attempt to client
+    bool login_attempt = gui_send_login_attempt(client_tcp_socket, &outbound_request_header, username_c_str, username_size, password_c_str, password_size);
+
+    if(login_attempt)
+    {
+        SecDialog secDialog;
+        //secDialog.setModal(true); // not needed
+        hide();
+        QMessageBox::information(this, "Login Successful", "<font size = 13>Login successful. Click OK to proceed</font>");
+        secDialog.showMaximized();
+        secDialog.exec();
+    }
+    else
+    {
+        QMessageBox::warning(this, "Login Failed", "<font size = 13>Incorrect username or password</font>");
+    }
+    */
 }
 
 

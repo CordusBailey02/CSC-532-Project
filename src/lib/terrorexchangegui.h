@@ -11,7 +11,7 @@
 //#define MAX_SEND_ATTEMPTS 10
 //#define MAX_RECEIVE_ATTEMPTS 10
 
-extern int client_tcp_socket = 0;
+extern int client_tcp_socket;
 
 bool gui_send_request_header(int socket, struct request_header *header);
 bool gui_receive_request_header(int socket, struct request_header *header);
