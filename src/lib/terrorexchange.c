@@ -1019,7 +1019,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 		}
 		send_attempts = 0;
 
-		// Receive acknowledgement 
+		// Receive acknowledgement
 		receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
 		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS)
 		{
@@ -1049,6 +1049,12 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 
 		// update for the loop condition
 		payloads_sent++;
+	}
+	// cleanup
+	for(int i = 0; i < payloads_to_send; i++) {
+		if(outbound_payloads[i].data == NULL) continue;
+
+		free(outbound_payloads[i].data);
 	}
 	return true;
 }
@@ -1231,14 +1237,71 @@ bool send_verification_request(int socket, struct request_header *outbound_reque
 
 				free(outbound_payloads[i].data);
 			}
+			return false; 
+		}
+
+		// Send the payload data buffer
+		printf("[send_verification_request] Trying to send data buffer of payload #%d to connection with socket %d.\n", payloads_sent + 1, socket);
+		send_status = send_payload(socket, &outbound_payloads[payloads_sent], shared_secret);
+		while(send_status == false && send_attempts < MAX_SEND_ATTEMPTS) {
+			send_status = send_payload(socket, &outbound_payloads[payloads_sent], shared_secret);
+			send_attempts++;
+		}
+		if(send_attempts >= MAX_SEND_ATTEMPTS) {
+			fprintf(stderr, "[send_verification_request] Failed to send the data buffer of payload #%d to connection with socket #%d. Send attempts reached/exceeded MAX_SEND_ATTEMPTS (%d). Maybe there is something wrong with the connection?\n", payloads_sent + 1, socket, MAX_SEND_ATTEMPTS);
+			for(int i = 0; i < payloads_to_send; i++)  {
+				if(outbound_payloads[i].data == NULL) continue;
+
+				free(outbound_payloads[i].data);
+			}
 			return false;
 		}
-		// Send the payload data buffer
-		// Receive acknowledgement
-		// Check validity of acknowledgement
-		// Move onto next payload
+		send_attempts = 0;
+		printf("[send_verification_request] Successfully sent payload data buffer.\n");
 
+		// Receive acknowledgement
+		printf("[send_verification_request] Waiting to receive acknowledgement from connection with socket #%d.\n", socket);
+		receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
+		while(receive_status == false && receive_attempts < MAX_RECEIVE_ATTEMPTS) {		
+			receive_status = receive_acknowledgement(socket, &inbound_request_header, shared_secret);
+			receive_attempts++;
+		}
+		if(receive_attempts >= MAX_RECEIVE_ATTEMPTS) {
+			fprintf(stderr, "[send_verification_request] Failed to receive acknowledgement from connection with socket %d for the receipt of payload %d's data buffer. Receive attempts reached/exceeded MAX_RECEIVE_ATTEMPTS (%d).\n", socket, payloads_sent + 1, MAX_RECEIVE_ATTEMPTS);
+			for(int i = 0; i < payloads_to_send; i++) {
+				if(outbound_payloads[i].data == NULL) continue;
+
+				free(outbound_payloads[i].data);
+			}
+			return false;	
+		}
+		receive_attempts = 0;
+		printf("[send_verification_request] Received acknowledgement from connection with socket %d.\n", socket);
+		
+		// Check validity of acknowledgement
+		if(inbound_request_header.parameter_count != OK) {
+			fprintf(stderr, "[send_verification_request] Successfully received acknowledgement from connection with socket %d, but a code other than OK (%d) was received. Wanted to receive code %d but received %ld instead. Maybe the data was sent erroneously or the metadata was incorrect?\n", socket, OK, OK, inbound_request_header.parameter_count);
+			for(int i = 0; i < payloads_to_send; i++) {
+				if(outbound_payloads[i].data == NULL) continue;
+
+				free(outbound_payloads[i].data);
+			}
+
+			return false;
+		}
+
+		// Move onto next payload
+		payloads_sent++;	
 	}
+
+	// clean up and return true
+	for(int i = 0; i < payloads_to_send; i++) {
+		if(outbound_payloads[i].data == NULL) continue; 
+
+		free(outbound_payloads[i].data);
+	}
+
+	return true;
 }
 
 bool server_confirm_user_existence(char username[])
