@@ -61,6 +61,7 @@ enum SUBJECT string_to_request_header_subject(char *str, size_t str_length)
 	else if(strcmp(str, "USERNAME_CHANGE") == 0)		return USERNAME_CHANGE;
 	else if(strcmp(str, "PASSWORD_CHANGE") == 0)		return PASSWORD_CHANGE;
 	else if(strcmp(str, "ACCOUNT_CREATE") == 0)		return ACCOUNT_CREATE;
+	else if(strcmp(str, "VERIFICATION_REQUEST") == 0)	return VERIFICATION_REQUEST;
 	else 							return SUBJECT_ERROR;
 }
 
@@ -157,6 +158,8 @@ int main(int argc, char **argv)
 	}
 	int file_paths_length = 0;
 	int file_paths_capacity = 5;
+
+	bool signed_in = false;
 	
 	// Used to prevent client from waiting to receive something when data was 
 	// input erroneously. If nothing was sent, it will never receive anything.
@@ -220,6 +223,11 @@ int main(int argc, char **argv)
 	// MAINLOOP: Input data and send off to the server. Then, receive data.
 	while(true)
 	{
+		// temporary. Later this doesnt have to get checked each time.
+		// The LOGIN_ATTEMPT and ACCOUNT_CREATE procedure will update the 
+		// username pointer.
+		if(signed_in == false) username = default_username;
+
 		// get user input
 		printf("\n%s@demake$ ", username);
 		fgets(input_buffer, 4096, stdin);
@@ -421,7 +429,7 @@ int main(int argc, char **argv)
 					}
 
 					// try to send this information off to the server
-
+					
 					break;
 
 				default:
@@ -603,6 +611,18 @@ int main(int argc, char **argv)
 					printf("Received: ");
 					for(int i = 0; i < payloads_received; i++)
 						printf("\"%s\" ", (char *) inbound_payloads[i]->data);
+					break;
+
+				case LOGIN_ATTEMPT_RESPONSE:
+					// check response
+					if(strcmp(inbound_payloads[0]->data, "not exists") == 0)
+					{
+						fprintf(stderr, "[sign in error] No user found with provided credentials.\n");
+						username = default_username;
+					}
+					else
+						signed_in = true;	
+					// if valid sign-in, change username
 					break;
 
 				default:

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "secure_connection.h" 
+#include "terrorexchange.h"
 
 int main(int argc, char **argv)
 {
@@ -24,5 +25,14 @@ int main(int argc, char **argv)
 	xor_encrypt_decrypt( (uint8_t *) data, data_length, (uint8_t *) &key, sizeof(key));	
 	printf("\"%s\"", data);	
 	free(data);
+	
+	enum FILE_IO_CODE io_code; 
+	size_t file_size = get_file_size("terrorexchange.o", &io_code);
+	if(io_code != IO_OK)
+	{
+		fprintf(stderr, "Something went wrong reading the file.\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("File size is %zu bytes.\n", file_size);
 	return 0;
 }
