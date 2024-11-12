@@ -11,6 +11,8 @@
 #include  "../lib/secure_connection.h"
 #include "../database/terrorbase.h"
 #define CONNECTION_BACKLOG_CAPACITY 128
+#define PATH_MAX_SIZE 1024
+#define VERIFICATION_FS_ROOT "verification-requests"
 
 // used to pass multiple arguments to the pthread for each
 // client connection
@@ -163,6 +165,9 @@ void* handle_client(void *arg)
 	*mysql_return_flag = SUCCESS;
 	*mysql_num_fields = 0;
 	*mysql_num_rows = 0;
+
+	bool variable_arguments_are_not_null = true;
+	char file_system_write_path[PATH_MAX_SIZE];
 
 	// Extablish a connection to MYSQL for the client thread. Connection stays
 	// open as long as the client is connected.
@@ -497,7 +502,39 @@ void* handle_client(void *arg)
 					}
 					printf("Successfully sent temporary response to client with socket #%d for their send account_create request.\n", client_socket);
 					break;
+
+				case VERIFICATION_REQUEST:
+					printf("Received SEND VERIFICATION_REQUEST request header from client with socket %d.\n", client_socket);
+
+					// Check that verification category exists (e.g. "programmer")
+					if(inbound_payloads[0]->data == NULL) {
+						fprintf(stderr, "[handle_client] Inbound payload 0's data buffer is NULL. For a SEND VERIFICATION_REQUEST request header, at least 2 non-NULL parameters must be sent.\n");
+						break;
+					}
 					
+					
+					// Check that the binary data of the files is not NULL
+					variable_arguments_are_not_null = true;
+					for(int i = 1; i < inbound_payloads_length; i++) {
+						if(inbound_payloads[i]->data != NULL) continue;
+
+						fprintf(stderr, "[handle_client] Inbound payload #%d has a data buffer that is NULL. Expected file binary data, but there is nothing there. No files can be stored and reviewed later.\n");
+						variable_arguments_are_not_null = false;
+					}
+					
+					// Jump out of this section if files are not loaded
+					if(variable_arguments_are_not_null == false) 
+						break;
+
+					// Check validity of professional category
+					//
+					// Resolve file path on system to save it
+
+					// Write files into file system
+
+
+					break;
+
 				default:
 					printf("Unimplemented subject code for SEND message from client with socket #%d.\n", client_socket);
 					break;
