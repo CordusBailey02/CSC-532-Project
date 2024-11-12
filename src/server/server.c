@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <mysql/mysql.h>
+#include <openssl/sha.h>
 #include  "../lib/terrorexchange.h"
 #include  "../lib/secure_connection.h"
 #include "../database/terrorbase.h"
@@ -161,14 +162,7 @@ void* handle_client(void *arg)
 	*mysql_num_fields = 0;
 	*mysql_num_rows = 0;
 
-	// Extablish a connection to MYSQL for the client thread. Connection stays
-	// open as long as the client is connected.
-	mysql_cleanup();
-	if(mysql_connection_init())
-	{
-        fprintf(stderr, "[handle_client] Unable to establish a connection to MYSQL.\n");
-	}
-	printf("Connection to MYSQL successful.\n");
+	
 
 	// Maintain connection with client via loop
 	// The entire process of 1st receiving the request type and the number of
@@ -396,6 +390,7 @@ void* handle_client(void *arg)
 					break;
 
 				case LOGIN_ATTEMPT:
+					bool login_success = false;
 					printf("SEND LOGIN_ATTEMPT received from client with client socket %d.\n", client_socket);
 					if(inbound_payloads[0]->data == NULL)
 					{
@@ -416,12 +411,12 @@ void* handle_client(void *arg)
 							printf("Got result: %d rows, %d fields.\n", (*mysql_num_rows), (*mysql_num_fields));
 							break;
 						case CONNECTION_ERROR:
-							fprintf(stderr,"[handle_client] Connection to MYSQL when running query produced an error. Check error given.");
+							fprintf(stderr,"[handle_client] Connection to MYSQL when running query produced an error. Check error given.\n");
 						case INEXISTENT_QUERY:
-							fprintf(stderr, "[handle_client] Attempted query given does not exist.");
+							fprintf(stderr, "[handle_client] Attempted query given does not exist.\n");
 							break;
 						case INSUFFICIENT_PARAMETERS:
-							fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.");
+							fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.\n");
 							break;
 						default:
 							break;
@@ -433,6 +428,34 @@ void* handle_client(void *arg)
 							printf("\"%s\" ", mysql_result_table[i][j]);
 						printf("]\n"); 	
 					}
+
+					if(!strcmp(mysql_result_table[0][0], "exists"))
+					{
+						unsigned char hash[20];
+						SHA1(inbound_payloads[1]->data, inbound_payloads[1]->member_size, hash);
+						mysql_result_table = mysql_database_query("get_user_sha", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
+						switch(*mysql_return_flag)
+						{
+							case SUCCESS:
+								printf("Got result: %d rows, %d fields.\n", (*mysql_num_rows), (*mysql_num_fields));
+								break;
+							case CONNECTION_ERROR:
+								fprintf(stderr,"[handle_client] Connection to MYSQL when running query produced an error. Check error given.\n");
+							case INEXISTENT_QUERY:
+								fprintf(stderr, "[handle_client] Attempted query given does not exist.\n");
+								break;
+							case INSUFFICIENT_PARAMETERS:
+								fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.\n");
+								break;
+							default:
+								break;
+						}
+						if(!strcmp(mysql_result_table[0][0], hash))
+						{
+							login_success = true;
+						}
+					}
+					printf("Login Success: %s\n", login_success ? "false" : "true");
 					
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
 					temporary_response = malloc(40 + strlen(inbound_payloads[0]->data) + strlen(inbound_payloads[1]->data) + 3);
@@ -505,7 +528,6 @@ void* handle_client(void *arg)
 	}
 
 	close(client_socket);
-	mysql_cleanup();
 	return NULL;
 }
  
