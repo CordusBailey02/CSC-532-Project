@@ -69,6 +69,9 @@ bool check_valid_request_header(struct request_header *header)
 			break;
 		case ACCOUNT_CREATE:
 			break;
+		case VERIFICATION_REQUEST:
+			break;
+
 		default:
 			return false;
 			break;
