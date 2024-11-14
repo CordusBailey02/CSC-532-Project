@@ -547,6 +547,7 @@ void* handle_client(void *arg)
 						inbound_payloads[2]->data = realloc(inbound_payloads[2]->data, 200);
 						strcpy(inbound_payloads[2]->data, convert_hash);
 						printf("Converted hash: %s\n", (char *) inbound_payloads[2]->data);
+						// mysql_result_table = realloc(mysql_result_table, sizeof(char ***));
 						mysql_result_table = mysql_database_query("add_new_user", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
 						printf("[handle client] Result returned...\n");
 						switch(*mysql_return_flag)
@@ -624,6 +625,61 @@ void* handle_client(void *arg)
 					// Write files into file system
 
 
+					break;
+				case POST_CREATE:
+					bool post_success = false;
+					printf("SEND ACCOUNT_CREATE received from client with client socket %d.\n", client_socket);
+					if(inbound_payloads[0]->data == NULL)
+					{
+						fprintf(stderr, "[handle_client] Inbound payload #%d's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously?\n", client_socket);
+						break;
+					}
+					if(inbound_payloads[1]->data == NULL)
+					{
+						fprintf(stderr, "[handle_client] Inbound payload #2's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
+						break;
+					}
+					// Review what was received
+					printf("Got username: \"%s\", email: \"%s\", password: \"%s\" from client with socket #%d.\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data, client_socket);
+
+					mysql_result_table = mysql_database_query("create_new_post", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
+					switch(*mysql_return_flag)
+					{
+						case SUCCESS:
+							printf("Got result: %d rows, %d fields.\n", (*mysql_num_rows), (*mysql_num_fields));
+							post_success = true;
+							break;
+						case CONNECTION_ERROR:
+							fprintf(stderr,"[handle_client] Connection to MYSQL when running query produced an error. Check error given.\n");
+						case INEXISTENT_QUERY:
+							fprintf(stderr, "[handle_client] Attempted query given does not exist.\n");
+							break;
+						case INSUFFICIENT_PARAMETERS:
+							fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.\n");
+							break;
+						case QUERY_ERROR:
+							fprintf(stderr, "[handle client] The stored procedure errored. Information could not be pushed or pulled.\n");
+							break;
+						default:
+							break;
+					}
+
+					temporary_response = malloc(10);
+					if(temporary_response == NULL)
+					{
+						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
+						continue;
+					}
+					sprintf(temporary_response, "%s", post_success ? "TRUE" : "FALSE");
+					printf("Temporary response to send off to client is \"%s\"\n", temporary_response);
+					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
+					free(temporary_response);
+					if(send_status == false)
+					{
+						fprintf(stderr, "[handle_client] Failed to send developer test message to client as part of temporary response to send_account_create to client with socket #%d.\n", client_socket);
+						break;
+					}
+					printf("Successfully sent temporary response to client with socket #%d for their send account_create request.\n", client_socket);
 					break;
 
 				default:

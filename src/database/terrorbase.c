@@ -9,7 +9,6 @@
 
 
 MYSQL *conn;
-MYSQL_RES *result;
 
 
 void mysql_cleanup()
@@ -50,12 +49,11 @@ int mysql_connection_init()
 
 char ***mysql_database_query(char *query_name, struct payload **inbound_payloads, char ***results_table, int *return_flag, int *num_fields, int *num_rows)
 {
-    printf("Queryname: %d\n", strcmp(query_name, "check_user"));
-    char query[100];
+    MYSQL_RES *result;
+    char *query = malloc(sizeof(char)*200);
 
     size_t payload_length = inbound_payloads[0]->member_count;
     bool query_length_check = false;
-    // **results_table = "NULL";
 
     // reset return_flag, num_fields, num_rows
     *return_flag = SUCCESS;
@@ -135,18 +133,25 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
         int j = snprintf(query, 100, "CALL get_user_sha(\'%s\');",
             (char *) inbound_payloads[0]->data);
     }
+    else if(!strcmp(query_name, "create_new_post"))
+    {
+        query = realloc(query, 8200);
+        int j = snprintf(query, 8200, "CALL create_new_post(\'%s\', \'%s\');",
+            (char *) inbound_payloads[0]->data,
+            (char *) inbound_payloads[1]->data);
+    }
     else
     {
         printf("[mysql_database_query] No query found...\n");
         *return_flag = INEXISTENT_QUERY;
-        return results_table;
+        return NULL;
     }
 
     if(query_length_check)
     {
         printf("[mysql_database_query] Inbound payload had an insuffucient amount of data.\n");
         *return_flag = INSUFFICIENT_PARAMETERS;
-        return results_table;
+        return NULL;
     }
 
     printf("[mysql_database_query] Query: %s\n", query);
@@ -156,8 +161,9 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
         printf("[mysql_database_query] Query Failed...\n");
         fprintf(stderr, "[mysql_database_query] Error: %s\n", mysql_error(conn));
         *return_flag = QUERY_ERROR;
-        return results_table;
+        return NULL;
     }
+    free(query);
 
     printf("[mysql_database_query] Query success...\n");
 
@@ -167,38 +173,29 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
 
     result = mysql_store_result(conn);
 
-    if(result) 
+    if(!result) 
     {
-        *num_rows = mysql_num_rows(result);
-        *num_fields = mysql_num_fields(result);
-        results_table = realloc(results_table, sizeof(row) * (*num_rows) + 5);
-        while ((row = mysql_fetch_row(result)) != 0)
-        {
-            *(results_table + table_index) = row;
-            table_index = table_index + 1;
-        }
-        // mysql_free_result(result);
+        printf("[mysql_database_query] No Result...\n");
+        mysql_free_result(result);
+        mysql_close(conn);
+        return NULL;
     }
-    else 
+    *num_rows = mysql_num_rows(result);
+    *num_fields = mysql_num_fields(result);
+    results_table = realloc(results_table, sizeof(row) * (*num_rows) + 5);
+    if(results_table == NULL)
     {
-        results_table = realloc(results_table, sizeof(char)*5);
-        printf("[mysql_database_query] No result...\n");
-        if(mysql_field_count(conn) == 0)
-        {
-            // *num_rows = mysql_affected_rows(conn);
-            results_table[0][0] = "OK";
-            printf("[mysql_database_query] %s\n", results_table[0][0]);
-            // return results_table;
-        }
-        else 
-        {
-            fprintf(stderr, "[mysql_database_query] Error: %s\n", mysql_error(conn));
-            *return_flag = QUERY_ERROR;
-            // return results_table;
-        }
+        printf("[mysql_database_query] Could not allocate enough memory.\n");
+        return NULL;
     }
+    while ((row = mysql_fetch_row(result)) != 0)
+    {
+        *(results_table + table_index) = row;
+        table_index = table_index + 1;
+    }
+    // mysql_free_result(result);
     mysql_free_result(result);
-	// mysql_close(conn);
+	mysql_close(conn);
     printf("[mysql_database_query] Result freed and connection closed...\n");
     return results_table;
 }

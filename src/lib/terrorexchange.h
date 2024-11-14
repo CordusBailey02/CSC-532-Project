@@ -27,6 +27,8 @@ enum SUBJECT { // Typical data objects
 
 	       VERIFICATION_REQUEST,
 
+		   POST_CREATE,
+
 	       SUBJECT_ERROR,
 
 	       INITIAL_SUBJECT_CODE
