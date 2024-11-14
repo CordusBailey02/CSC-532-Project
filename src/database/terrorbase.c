@@ -130,6 +130,11 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
         int j = snprintf(query, 100, "CALL check_user(\'%s\');",
             (char *) inbound_payloads[0]->data);
     }
+    else if(!strcmp(query_name, "get_user_sha"))
+    {
+        int j = snprintf(query, 100, "CALL get_user_sha(\'%s\');",
+            (char *) inbound_payloads[0]->data);
+    }
     else
     {
         printf("[mysql_database_query] No query found...\n");
