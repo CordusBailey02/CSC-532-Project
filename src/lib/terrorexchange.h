@@ -91,6 +91,8 @@ struct post
 	size_t qid; // question id (foreign key to other posts)	
 };
 
+bool professional_category_exists(char *professional_category);
+
 struct payload* payload_create(size_t member_size, size_t member_count);
 
 bool send_request_header(int socket, struct request_header *header, uint32_t shared_secret);

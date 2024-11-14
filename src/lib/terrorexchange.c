@@ -6,6 +6,14 @@
 #include <stdint.h>
 #include "terrorexchange.h"
 
+bool professional_category_exists(char *professional_category) 
+{
+	if(professional_category == NULL) return false;
+
+	if(strcmp(professional_category, "programmer") == 0) return true;
+	else return false;
+}
+
 struct request_header* request_header_create(enum ACTION action, enum SUBJECT subject, size_t parameter_count, size_t metadata_total_size, size_t parameters_total_size, size_t total_bytes)
 {
 	struct request_header *new_request_header = malloc(sizeof(struct request_header));
