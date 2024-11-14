@@ -664,13 +664,13 @@ int main(int argc, char **argv)
 					// Receiving developer test message as a response for an attempt at signing in
 					if(client_user_state.last_thing_sent == LOGIN_ATTEMPT) {
 						// User entered wrong credentials
-						if(strcmp(inbound_payloads[0]->data, "false") == 0) {
+						if(strcmp(inbound_payloads[0]->data, "FALSE") == 0) {
 							printf("[System] Sign-in credentials are incorrect.\n");
 							break;
 						}
 
 						// User entered valid credentials
-						if(client_user_state.username == default_username) {
+						if(strcmp(client_user_state.username, "guest") == 0) {
 							client_user_state.username = malloc(sizeof(char) * (strlen(username) + 1));
 							if(client_user_state.username == NULL) {
 								fprintf(stderr, "[Fatal Error] Cannot allocate memory for username buffer in client state. Maybe the system has run out of memory?\n");
@@ -678,7 +678,9 @@ int main(int argc, char **argv)
 								exit(EXIT_FAILURE);
 							}
 							strcpy(client_user_state.username, username);
+							client_user_state.signed_in = true;
 						}
+						break;
 					}
 					// CASE (2): Receiving developer test message for other reason
 					printf("Received: ");
