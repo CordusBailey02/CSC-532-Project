@@ -4,8 +4,12 @@
 #include <string.h>
 #include "terrorbase.h"
 
+// For later fixing.
+// Undo restablishing of conenction everytime
+
 
 MYSQL *conn;
+MYSQL_RES *result;
 
 
 void mysql_cleanup()
@@ -58,7 +62,18 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
     *num_fields = 0;
     *num_rows = 0;
 
+    MYSQL_ROW row;
+
     printf("[mysql_database_query] Variables set.\n");
+
+    // Extablish a connection to MYSQL for the client thread. Connection stays
+	// open as long as the client is connected.
+	// mysql_cleanup();
+	if(mysql_connection_init())
+	{
+        fprintf(stderr, "[handle_client] Unable to establish a connection to MYSQL.\n");
+	}
+	printf("Connection to MYSQL successful.\n");
 
     // Check the given query name and send a call to MYSQL run the corresponding 
     // stored procedure.
@@ -143,9 +158,7 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
     printf("[mysql_database_query] Query success...\n");
 
     // Now that the query has successfully completed, gather the results and return each row.
-    
-    MYSQL_RES *result;
-    MYSQL_ROW row;
+
     unsigned int table_index = 0;
 
     result = mysql_store_result(conn);
@@ -153,7 +166,7 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
     *num_fields = mysql_num_fields(result);
     results_table = realloc(results_table, sizeof(row) * (*num_rows));
 
-    if (result) 
+    if(result) 
     {
         printf("[mysql_database_query] Gathering result...\n");
         while ((row = mysql_fetch_row(result)) != 0)
@@ -161,6 +174,7 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
             *(results_table + table_index) = row;
             table_index = table_index + 1;
         }
+        // mysql_free_result(result);
     }
     else 
     {
@@ -169,14 +183,16 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
         {
             // *num_rows = mysql_affected_rows(conn);
             **results_table = "OK";
-            return results_table;
+            // return results_table;
         }
         else 
         {
             fprintf(stderr, "[mysql_database_query] Error: %s\n", mysql_error(conn));
-            return results_table;
+            // return results_table;
         }
     }
-
+    mysql_free_result(result);
+    printf("[mysql_database_query] Result freed...\n");
+	mysql_cleanup();
     return results_table;
 }
