@@ -480,7 +480,7 @@ void* handle_client(void *arg)
 						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
 						break;
 					}
-					sprintf(temporary_response, "%s \n", login_success ? "TRUE" : "FALSE");
+					sprintf(temporary_response, "%s", login_success ? "TRUE" : "FALSE");
 					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
 					free(temporary_response);
 					if(send_status == false)
