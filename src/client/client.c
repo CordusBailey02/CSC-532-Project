@@ -662,23 +662,32 @@ int main(int argc, char **argv)
 			{
 				case DEVELOPER_TEST_MESSAGE:
 					// Receiving developer test message as a response for an attempt at signing in
+					printf("Client_user_state.last_thing_sent holds code %d. The code for LOGIN_ATTEMPT is %d.\n", client_user_state.last_thing_sent, LOGIN_ATTEMPT); 
 					if(client_user_state.last_thing_sent == LOGIN_ATTEMPT) {
+						printf("Entered branch to check user sign-in");
+
 						// User entered wrong credentials
-						if(strcmp(inbound_payloads[0]->data, "false") == 0) {
+						if(strcmp(inbound_payloads[0]->data, "FALSE") == 0) {
 							printf("[System] Sign-in credentials are incorrect.\n");
 							break;
 						}
 
 						// User entered valid credentials
-						if(client_user_state.username == default_username) {
+						printf("Checking client state username against \"guest\".\n");
+						if(strcmp(client_user_state.username, "guest") == 0) {
+							printf("They were equal.\n");
 							client_user_state.username = malloc(sizeof(char) * (strlen(username) + 1));
 							if(client_user_state.username == NULL) {
 								fprintf(stderr, "[Fatal Error] Cannot allocate memory for username buffer in client state. Maybe the system has run out of memory?\n");
 								close(tcp_socket);
 								exit(EXIT_FAILURE);
 							}
+							printf("Attempting to copy username into client_user_state.\n");
 							strcpy(client_user_state.username, username);
+							printf("Copied.\n");
+							client_user_state.signed_in = true;
 						}
+						break;
 					}
 					// CASE (2): Receiving developer test message for other reason
 					printf("Received: ");
