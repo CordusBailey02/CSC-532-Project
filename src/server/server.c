@@ -538,7 +538,7 @@ void* handle_client(void *arg)
 					{
 						printf("[handle_client] Creating account for user: %s\n", (char *) inbound_payloads[0]->data);
 						unsigned char hash[20];
-						SHA1(inbound_payloads[2]->data, inbound_payloads[2]->member_size * inbound_payloads[1]->member_count, hash);
+						SHA1(inbound_payloads[2]->data, inbound_payloads[2]->member_size * inbound_payloads[2]->member_count, hash);
 						char convert_hash[61]; //null terminator
 						for (int i = 0; i < 20; i++) {
 							snprintf(convert_hash+i*3, 4, "%02x ", hash[i]);
