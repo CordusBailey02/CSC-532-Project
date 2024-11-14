@@ -375,6 +375,7 @@ int main(int argc, char **argv)
 					// remove later
 					printf("Got username: \"%s\", email: \"%s\", password: \"%s\".\n", username, email, password);
 					// send the information off to the server
+					printf("Password length: %d\n", password_length);
 					send_status = send_account_create(tcp_socket, &outbound_request_header, username, username_length, email, email_length, password, password_length, shared_secret);
 					if(send_status == false)
 					{

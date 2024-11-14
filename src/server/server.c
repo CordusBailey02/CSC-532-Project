@@ -424,6 +424,9 @@ void* handle_client(void *arg)
 						case INSUFFICIENT_PARAMETERS:
 							fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.\n");
 							break;
+						case QUERY_ERROR:
+							fprintf(stderr, "[handle client] The stored procedure errored. Information could not be pushed or pulled.\n");
+							break;
 						default:
 							break;
 					}
@@ -452,6 +455,9 @@ void* handle_client(void *arg)
 								break;
 							case INSUFFICIENT_PARAMETERS:
 								fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.\n");
+								break;
+							case QUERY_ERROR:
+								fprintf(stderr, "[handle client] The stored procedure errored. Information could not be pushed or pulled.\n");
 								break;
 							default:
 								break;
@@ -482,6 +488,7 @@ void* handle_client(void *arg)
 					break;
 
 				case ACCOUNT_CREATE:
+					bool create_success = false;
 					printf("SEND ACCOUNT_CREATE received from client with client socket %d.\n", client_socket);
 					if(inbound_payloads[0]->data == NULL)
 					{
@@ -501,6 +508,62 @@ void* handle_client(void *arg)
 					// Review what was received
 					printf("Got username: \"%s\", email: \"%s\", password: \"%s\" from client with socket #%d.\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data, client_socket);
 
+					mysql_result_table = mysql_database_query("check_user", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
+					switch(*mysql_return_flag)
+					{
+						case SUCCESS:
+							printf("Got result: %d rows, %d fields.\n", (*mysql_num_rows), (*mysql_num_fields));
+							break;
+						case CONNECTION_ERROR:
+							fprintf(stderr,"[handle_client] Connection to MYSQL when running query produced an error. Check error given.\n");
+						case INEXISTENT_QUERY:
+							fprintf(stderr, "[handle_client] Attempted query given does not exist.\n");
+							break;
+						case INSUFFICIENT_PARAMETERS:
+							fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.\n");
+							break;
+						case QUERY_ERROR:
+							fprintf(stderr, "[handle client] The stored procedure errored. Information could not be pushed or pulled.\n");
+							break;
+						default:
+							break;
+					}
+					if(!strcmp(mysql_result_table[0][0], "not exists"))
+					{
+						printf("[handle_client] Creating account for user: %s\n", (char *) inbound_payloads[0]->data);
+						unsigned char hash[20];
+						SHA1(inbound_payloads[2]->data, inbound_payloads[2]->member_size, hash);
+						char convert_hash[160]; //null terminator
+						for (int i = 0; i < 20; i++) {
+							snprintf(convert_hash+i*3, 4, "%02x ", hash[i]);
+						}
+						inbound_payloads[2]->member_size = strlen(convert_hash);
+						inbound_payloads[2]->data = realloc(inbound_payloads[2]->data, 200);
+						strcpy(inbound_payloads[2]->data, convert_hash);
+						printf("Converted hash: %s\n", (char *) inbound_payloads[2]->data);
+						mysql_result_table = mysql_database_query("add_new_user", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
+						switch(*mysql_return_flag)
+						{
+							case SUCCESS:
+								printf("Got result: %d rows, %d fields.\n", (*mysql_num_rows), (*mysql_num_fields));
+								create_success = true;
+								break;
+							case CONNECTION_ERROR:
+								fprintf(stderr,"[handle_client] Connection to MYSQL when running query produced an error. Check error given.\n");
+							case INEXISTENT_QUERY:
+								fprintf(stderr, "[handle_client] Attempted query given does not exist.\n");
+								break;
+							case INSUFFICIENT_PARAMETERS:
+								fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.\n");
+								break;
+							case QUERY_ERROR:
+								fprintf(stderr, "[handle client] The stored procedure errored. Information could not be pushed or pulled.\n");
+								break;
+							default:
+								break;
+						}
+					}
+
 					// Send a temporary response
 					int username_length, email_length, password_length;
 					username_length = strlen(inbound_payloads[0]->data);
@@ -512,7 +575,8 @@ void* handle_client(void *arg)
 						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
 						continue;
 					}
-					sprintf(temporary_response, "Got username: \"%s\", email: \"%s\", password: \"%s\".\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data);
+					// sprintf(temporary_response, "Got username: \"%s\", email: \"%s\", password: \"%s\".\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data);
+					sprintf(temporary_response, "%s", create_success ? "TRUE" : "FALSE");
 					printf("Temporary response to send off to client is \"%s\"\n", temporary_response);
 					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
 					free(temporary_response);

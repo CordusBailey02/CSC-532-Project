@@ -108,17 +108,16 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
     }
     else if(!strcmp(query_name, "add_new_user"))
     {
-        if(payload_length < 4)
+        if(payload_length < 3)
         {
             query_length_check = true;
         }
         else
         {
-            int j = snprintf(query, 100, "CALL add_new_user(\'%s\', \'%s\', \'%s\', \'%s\', 0, 0);",
+            int j = snprintf(query, 200, "CALL add_new_user(\'%s\', \'%s\', \'%s\', 0, 0);",
                 (char *) inbound_payloads[0]->data,
                 (char *) inbound_payloads[1]->data,
-                (char *) inbound_payloads[2]->data,
-                (char *) inbound_payloads[3]->data);
+                (char *) inbound_payloads[2]->data);
         }
         
     }
@@ -151,7 +150,7 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
     {
         printf("[mysql_database_query] Query Failed...\n");
         fprintf(stderr, "[mysql_database_query] Error: %s\n", mysql_error(conn));
-        *return_flag = CONNECTION_ERROR;
+        *return_flag = QUERY_ERROR;
         return results_table;
     }
 
