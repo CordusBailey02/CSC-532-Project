@@ -250,12 +250,33 @@ int main(int argc, char **argv)
 		input_buffer[input_buffer_length - 1] = '\0';
 		input_buffer_length -= 1;
 
+		// exit the program when user enters "exit"
+		if(strcmp(input_buffer, "exit") == 0) {
+			if(inbound_payloads != NULL) { 
+				for(int i = 0; i < inbound_payloads_length; i++) {
+					if(inbound_payloads[i]->data == NULL) continue;
+					
+					free(inbound_payloads[i]->data);
+					free(inbound_payloads[i]);
+				}
+				free(inbound_payloads);
+			}
+			if(client_user_state.username != default_username && client_user_state.username != NULL) {
+				free(client_user_state.username);
+			}
+
+			close(tcp_socket);
+			exit(EXIT_SUCCESS);
+		} 
+
+		// if user was not exiting, get ACTION and SUBJECT 
 		action_type = strtok(input_buffer, " ");
 		if(action_type == NULL)
 		{
 			fprintf(stderr, "Unable to parse input. Action type is incorrect.\n");
 			break;
-		}
+		}	
+
 		subject_type = strtok(NULL, " ");
 		if(action_type == NULL)
 		{
@@ -271,23 +292,6 @@ int main(int argc, char **argv)
 		printf("Got subject as \"%s\" (code %d).\n", subject_type, outbound_request_header.subject);
 		printf("Got data as \"%s\" (length %zu).\n", data, strlen(data));
 		memcpy(outbound_buffer, data, strlen(data) + 1);
-
-		// exit the program when user enters "exit"
-		if(strcmp(action_type, "exit") == 0) {
-			for(int i = 0; i < inbound_payloads_length; i++) {
-				if(inbound_payloads[i]->data == NULL) continue;
-
-				free(inbound_payloads[i]->data);
-				free(inbound_payloads[i]);
-			}
-			free(inbound_payloads);
-			
-			if(client_user_state.username != default_username)
-				free(client_user_state.username);
-	
-			close(tcp_socket);
-			exit(EXIT_SUCCESS);
-		} 
 
 		// SEND SOMETHING TO THE SERVER BASED ON WHAT THE USER INPUT
 		if(outbound_request_header.action == GET)
