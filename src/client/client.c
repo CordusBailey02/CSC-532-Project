@@ -177,6 +177,10 @@ int main(int argc, char **argv)
 	// input erroneously. If nothing was sent, it will never receive anything.
 	// So, it shouldn't enter the waiting logic as it will wait forever.
 	bool DATA_SENT_FLAG = false;
+
+	struct sockaddr_in GUI_PROCESS_ADDR;	
+	int gui_process_addrlen = sizeof(GUI_PROCESS_ADDR);
+	int *gui_socket = malloc(sizeof(int));
 	
 	if(use_gui == true)
 	{
@@ -211,12 +215,16 @@ int main(int argc, char **argv)
 		printf("Listening on port 55000 for a connection from the GUI.\n");
 		
 		// (4) spawn GUI process
-		system("../../LinuxProtoTypeGUI_v0.8/clientGUI");
+		pid_t gui_pid;
+
+		gui_pid = fork();
+		if(gui_pid == 0) 
+		{
+			system("../../testGUI/newew");
+		}
+		
 
 		// (5) Accept GUI connection
-		struct sockaddr_in GUI_PROCESS_ADDR;	
-		int gui_process_addrlen = sizeof(GUI_PROCESS_ADDR);
-		int *gui_socket = malloc(sizeof(int));
 		if(gui_socket == NULL)
 		{ 
 			fprintf(stderr, "Failed to allocate memory for client socket.\n");
@@ -240,10 +248,31 @@ int main(int argc, char **argv)
 		// username pointer.
 		if(client_user_state.signed_in == false) client_user_state.username = default_username;
 
-		// get user input
-		printf("\n%s@demake$ ", client_user_state.username);
-		fgets(input_buffer, 4096, stdin);
-		input_buffer_length = strlen(input_buffer);
+		// Handle the client if GUI is being used
+		if(use_gui)
+		{
+			memset(input_buffer, 0, sizeof(input_buffer));
+			//char *gui_result = handle_gui((void *) connection_data);
+			ssize_t bytes_received = recv(*gui_socket, &input_buffer, sizeof(input_buffer), 0);
+
+			if (bytes_received > 0) {
+				printf("Message received: %.*s.\n", (int)bytes_received, input_buffer);
+				input_buffer_length = strlen(input_buffer) + 1;
+			} else if (bytes_received == 0) {
+				printf("Connection closed by the peer.\n");
+				break;
+			} else {
+				perror("Error receiving data");
+			}
+
+		}
+		else
+		{
+			// get user input
+			printf("\n%s@demake$ ", client_user_state.username);
+			fgets(input_buffer, 4096, stdin);
+			input_buffer_length = strlen(input_buffer);
+		}
 
 		// remove newline and replace with null terminator
 		if(input_buffer_length == 0) continue;
@@ -665,6 +694,11 @@ int main(int argc, char **argv)
 				case DEVELOPER_TEST_MESSAGE:
 					// Receiving developer test message as a response for an attempt at signing in
 					if(client_user_state.last_thing_sent == LOGIN_ATTEMPT) {
+
+						if(use_gui)
+						{
+							send(*gui_socket, inbound_payloads[0]->data, sizeof(inbound_payloads[0]->data), 0);
+						}
 						// User entered wrong credentials
 						if(strcmp(inbound_payloads[0]->data, "FALSE") == 0) {
 							printf("[System] Sign-in credentials are incorrect.\n");
@@ -708,7 +742,7 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-
+	close(*gui_socket);
 	close(tcp_socket);
 	return 0;
 }
