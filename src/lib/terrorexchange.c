@@ -5,6 +5,30 @@
 #include <arpa/inet.h>
 #include <stdint.h>
 #include "terrorexchange.h"
+#include <sys/stat.h>
+
+bool professional_category_exists(char *professional_category) 
+{
+	if(professional_category == NULL) return false;
+
+	if(strcmp(professional_category, "programmer") == 0) return true;
+	else return false;
+}
+
+bool directory_exists(char *path) {
+	struct stat statbuf; 
+	if(stat(path, &statbuf) != 0) return false;
+
+	return S_ISDIR(statbuf.st_mode);
+}
+
+bool create_directory(char *path) {
+	int result = mkdir(path, 0777);
+	
+	if(result == 0) return true;
+
+	else return false;
+}
 
 struct request_header* request_header_create(enum ACTION action, enum SUBJECT subject, size_t parameter_count, size_t metadata_total_size, size_t parameters_total_size, size_t total_bytes)
 {
@@ -509,7 +533,7 @@ void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t f
 	
 	// Read the entire file
 	void *file_data = malloc(file_size);
-	size_t bytes_read = fread(file_data, file_size, 1, fh); 
+	size_t bytes_read = fread(file_data, 1, file_size, fh); 
 	if(bytes_read != file_size)
 	{
 		fprintf(stderr, "[read_binary_file] Failed to read %zu bytes from the file. Stopped reading after %zu bytes.\n", file_size, bytes_read);
@@ -1090,7 +1114,7 @@ bool send_verification_request(int socket, struct request_header *outbound_reque
 	// ensure NO strings point to NULL
 	for(int i = 0; i < file_paths_length; i++)
 	{
-		if(file_paths[file_paths_length] != NULL) continue;
+		if(file_paths[i] != NULL) continue;
 
 		fprintf(stderr, "[send_verification_request] Preemptive check - Cannot use a file path char pointer that points to NULL. Member #%d of the file paths buffer points to NULL.\n", i + 1);
 		return false;
@@ -1170,8 +1194,8 @@ bool send_verification_request(int socket, struct request_header *outbound_reque
 	
 	// Prepare payloads to be sent
 	int payloads_sent = 0;
-	int payloads_to_send = 1 + file_paths_length;
-	struct payload outbound_payloads[1 + file_paths_length]; 
+	int payloads_to_send = 3 + file_paths_length;
+	struct payload outbound_payloads[3 + file_paths_length]; 
 
 	// copy data of the username to the 1st outbound payload
 	outbound_payloads[0].member_size = 1;
