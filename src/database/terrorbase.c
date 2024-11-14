@@ -181,6 +181,7 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
     }
     else 
     {
+        results_table = realloc(results_table, sizeof(char)*5);
         printf("[mysql_database_query] No result...\n");
         if(mysql_field_count(conn) == 0)
         {
@@ -197,7 +198,7 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
         }
     }
     mysql_free_result(result);
-	mysql_close(conn);
+	// mysql_close(conn);
     printf("[mysql_database_query] Result freed and connection closed...\n");
     return results_table;
 }

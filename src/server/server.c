@@ -441,7 +441,7 @@ void* handle_client(void *arg)
 					if(!strcmp(mysql_result_table[0][0], "exists"))
 					{
 						unsigned char hash[20];
-						SHA1(inbound_payloads[1]->data, inbound_payloads[1]->member_size, hash);
+						SHA1(inbound_payloads[1]->data, inbound_payloads[1]->member_size * inbound_payloads[1]->member_count, hash);
 						char convert_hash[160]; //null terminator
 						for (int i = 0; i < 20; i++) {
 							snprintf(convert_hash+i*3, 4, "%02x ", hash[i]);
@@ -466,6 +466,8 @@ void* handle_client(void *arg)
 							default:
 								break;
 						}
+						printf("login with: %s\n", convert_hash);
+						printf("saved:      %s\n", mysql_result_table[0][1]);
 						if(!strcmp(mysql_result_table[0][1], convert_hash))
 						{
 							login_success = true;
@@ -536,8 +538,8 @@ void* handle_client(void *arg)
 					{
 						printf("[handle_client] Creating account for user: %s\n", (char *) inbound_payloads[0]->data);
 						unsigned char hash[20];
-						SHA1(inbound_payloads[2]->data, inbound_payloads[2]->member_size, hash);
-						char convert_hash[160]; //null terminator
+						SHA1(inbound_payloads[2]->data, inbound_payloads[2]->member_size * inbound_payloads[1]->member_count, hash);
+						char convert_hash[61]; //null terminator
 						for (int i = 0; i < 20; i++) {
 							snprintf(convert_hash+i*3, 4, "%02x ", hash[i]);
 						}
@@ -632,7 +634,7 @@ void* handle_client(void *arg)
 
 		// continue whole thing of receiving/sending data
 	}
-
+	mysql_cleanup();
 	close(client_socket);
 	return NULL;
 }
