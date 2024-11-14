@@ -57,32 +57,6 @@ void MainWindow::on_pushButton_login_clicked()
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_password->text();
 
-    // send to client to send to database to confirm login data
-
-    // send username
-    // send password
-
-    // if (client says "yes")
-    //     open window
-    // else
-    //     login failed
-
-    if(username == "test" && password == "test")
-    {
-        SecDialog secDialog;
-        //secDialog.setModal(true); // not needed
-        hide();
-        QMessageBox::information(this, "Login Successful", "<font size = 13>Login successful. Click OK to proceed</font>");
-        secDialog.showMaximized();
-        secDialog.exec();
-    }
-    else
-    {
-        QMessageBox::warning(this, "Login Failed", "<font size = 13>Incorrect username or password</font>");
-    }
-
-    /*
-     // Convert the QString to char*
     std::string username_str = username.toStdString();
     char* username_c_str = new char[username_str.size() + 1];
     strcpy(username_c_str, username_str.c_str());
@@ -91,17 +65,17 @@ void MainWindow::on_pushButton_login_clicked()
     char* password_c_str = new char[password_str.size() + 1];
     strcpy(password_c_str, password_str.c_str());
 
-    // Get Length of the username and password
-    size_t username_size = username_str.size();
-    size_t password_size = password_str.size();
+    char input_buffer[4096];
+    sprintf(input_buffer, "SEND LOGIN_ATTEMPT %s %s", username_c_str, password_c_str);
+    send(client_tcp_socket, &input_buffer, sizeof(input_buffer), 0);
 
-    //Request struct
-    struct request_header outbound_request_header;
 
-    // Send login attempt to client
-    bool login_attempt = gui_send_login_attempt(client_tcp_socket, &outbound_request_header, username_c_str, username_size, password_c_str, password_size);
+    char response[1024];
+    recv(client_tcp_socket, response, sizeof(response), 0);
 
-    if(login_attempt)
+    printf("Response from client: %s.\n", &response);
+
+    if(strcmp(response, "TRUE") == 0)
     {
         SecDialog secDialog;
         //secDialog.setModal(true); // not needed
@@ -110,11 +84,10 @@ void MainWindow::on_pushButton_login_clicked()
         secDialog.showMaximized();
         secDialog.exec();
     }
-    else
+    else if(strcmp(response, "FALSE") == 0)
     {
         QMessageBox::warning(this, "Login Failed", "<font size = 13>Incorrect username or password</font>");
     }
-    */
 }
 
 

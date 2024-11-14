@@ -2,6 +2,7 @@
 #include "ui_createaccount.h"
 #include "AccountCode.h"
 #include <QMessageBox>
+#include <arpa/inet.h>
 extern "C" {
 #include "terrorexchangegui.h"
 }
@@ -75,8 +76,29 @@ void createAccount::on_pushButton_createConfirm_clicked()
         printf("Error creating account...");
     }
     */
+
+    QString username = ui->lineEdit_accountNewUsername->text();
+    QString email = ui->lineEdit_accountNewEmail->text();
+    QString password = ui->lineEdit_accountNewPassword->text();
+
+    std::string username_str = username.toStdString();
+    char* username_c_str = new char[username_str.size() + 1];
+    strcpy(username_c_str, username_str.c_str());
+
+    std::string password_str = password.toStdString();
+    char* password_c_str = new char[password_str.size() + 1];
+    strcpy(password_c_str, password_str.c_str());
+
+    std::string email_str = email.toStdString();
+    char* email_c_str = new char[email_str.size() + 1];
+    strcpy(email_c_str, email_str.c_str());
+
+    char input_buffer[4096];
+    sprintf(input_buffer, "SEND ACCOUNT_CREATE %s %s %s", username_c_str, email_c_str, password_c_str);
+    //send(client_tcp_socket, &input_buffer, sizeof(input_buffer), 0);
+
     // if statements to check newPassword and newPasswordConfirm are equal
-    if (ui->lineEdit_accountNewEmail->text().length() < 7)
+    if (ui->lineEdit_accountNewEmail->text().length() < 4)
     {
         QMessageBox::critical(this, "Email problem", "<font size = 13>Your email is too short</font>");
 
@@ -85,10 +107,6 @@ void createAccount::on_pushButton_createConfirm_clicked()
         // QString emailFromDB = *email from client*
         // else if (ui->lineEdit_accountNewEmail->text().compare(emailFromDB) == 0)
         //QMessageBox::critical(this, "Email problem", "Your email already exists");
-
-    } else if (!(ui->lineEdit_accountNewEmail->text().contains("@gmail.com")))
-    {
-        QMessageBox::critical(this, "Email problem", "<font size = 13>Not a valid email</font>");
 
     } else if (ui->lineEdit_accountNewUsername->text().length() < 4)
     {
@@ -100,7 +118,7 @@ void createAccount::on_pushButton_createConfirm_clicked()
         // else if (ui->lineEdit_accountNewUsername->text().compare(usernameFromDB) == 0)
         //QMessageBox::critical(this, "Username problem", "Your username is too short");
 
-    } else if (ui->lineEdit_accountNewPassword->text().length() < 8)
+    } else if (ui->lineEdit_accountNewPassword->text().length() < 4)
     {
         QMessageBox::critical(this, "Password problem", "<font size = 13>Your password is too short</font>");
 
@@ -111,6 +129,9 @@ void createAccount::on_pushButton_createConfirm_clicked()
 
     } else if (ui->lineEdit_accountNewPassword->text().compare(ui->lineEdit_accountNewPasswordConfirm->text()) == 0)
     {
+        send(client_tcp_socket, &input_buffer, sizeof(input_buffer), 0);
+
+
         QMessageBox::information(this, "Account Created", "<font size = 13>Your account was created. Check your email for a verification link with a code.</font>");
     }
     // QString accountNewEmailClient = ui->lineEdit_accountNewEmail->text();

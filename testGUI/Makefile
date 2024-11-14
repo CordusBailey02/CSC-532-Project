@@ -40,7 +40,7 @@ DISTNAME      = newew1.0.0
 DISTDIR = /home/vboxuser/Desktop/repo/StackExchange-Demake-Project/testGUI/.tmp/newew1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/home/vboxuser/Qt/6.8.0/gcc_64/lib -Wl,-rpath-link,/home/vboxuser/Qt/6.8.0/gcc_64/lib
-LIBS          = $(SUBLIBS) -L../src/lib -lterrorexchangegui /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Widgets.so /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Gui.so /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Core.so -lpthread -lGL   
+LIBS          = $(SUBLIBS) -L../src/lib -lterrorexchangegui -lterrorexchange /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Widgets.so /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Gui.so /home/vboxuser/Qt/6.8.0/gcc_64/lib/libQt6Core.so -lpthread -lGL   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -10107,7 +10107,6 @@ profile.o: ../Qt_LinuxPrototypeGUI_v0.9/profile.cpp ../Qt_LinuxPrototypeGUI_v0.9
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QGridLayout \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QHBoxLayout \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QLabel \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QLineEdit \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QListWidget \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QPushButton \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QVBoxLayout \
@@ -10310,6 +10309,43 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qlocale.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qguiapplication_platform.h \
 		ui_requestverification.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtCore/QVariant \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QApplication \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qapplication.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QComboBox \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcombobox.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtGui/qvalidator.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtCore/qregularexpression.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qslider.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qstyle.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qtabbar.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qrubberband.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qframe.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QHBoxLayout \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qboxlayout.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlayout.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlayoutitem.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qgridlayout.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QLabel \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlabel.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtGui/qpicture.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtextdocument.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QLineEdit \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlineedit.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtextcursor.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtextformat.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtGui/qpen.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtextoption.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QPushButton \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QVBoxLayout \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QtWidgets \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QtWidgetsDepends \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/QtCore \
@@ -10322,7 +10358,6 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/q26numeric.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qabstractanimation.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qabstracteventdispatcher.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtCore/qabstractitemmodel.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qabstractnativeeventfilter.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qabstractproxymodel.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qanimationgroup.h \
@@ -10340,7 +10375,6 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qcborvalue.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qcborcommon.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qdatetime.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtCore/qregularexpression.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/quuid.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qcbormap.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qcborstream.h \
@@ -10432,7 +10466,6 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qurlquery.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qvarianthash.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/QHash \
-		../../../../Qt/6.8.0/gcc_64/include/QtCore/QVariant \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/QString \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qvariantlist.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtCore/qvariantmap.h \
@@ -10451,11 +10484,6 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qglyphrun.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qrawfont.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qfontdatabase.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtextcursor.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtextdocument.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtextformat.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtGui/qpen.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtextoption.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qaccessible.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qaccessible_base.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qaccessiblebridge.h \
@@ -10508,7 +10536,6 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qpainterpath.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qpdfoutputintent.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qpdfwriter.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtGui/qpicture.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qpixmapcache.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qrasterwindow.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/QPaintDeviceWindow \
@@ -10527,18 +10554,6 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qtguiversion.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qundogroup.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/qundostack.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtGui/qvalidator.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractbutton.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qstyleoption.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qslider.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractslider.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qstyle.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qtabbar.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qtabwidget.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qrubberband.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qframe.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractitemview.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qaccessiblewidget.h \
@@ -10546,20 +10561,13 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qactiongroup.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtGui/QActionGroup \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qapplication.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qboxlayout.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlayout.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlayoutitem.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qgridlayout.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qbuttongroup.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcalendarwidget.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcheckbox.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcolordialog.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcolormap.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcolumnview.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcombobox.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcommandlinkbutton.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qpushbutton.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcommonstyle.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qcompleter.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qdatawidgetmapper.h \
@@ -10600,11 +10608,9 @@ requestverification.o: ../Qt_LinuxPrototypeGUI_v0.9/requestverification.cpp ../Q
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qgroupbox.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qheaderview.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qinputdialog.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlineedit.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qitemdelegate.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qitemeditorfactory.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qkeysequenceedit.h \
-		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlabel.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlcdnumber.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlistview.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qlistwidget.h \
@@ -11200,6 +11206,7 @@ searchresults.o: ../Qt_LinuxPrototypeGUI_v0.9/searchresults.cpp ../Qt_LinuxProto
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/qwizard.h \
 		ui_searchresults.h \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QApplication \
+		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QHBoxLayout \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QLabel \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QListWidget \
 		../../../../Qt/6.8.0/gcc_64/include/QtWidgets/QVBoxLayout \

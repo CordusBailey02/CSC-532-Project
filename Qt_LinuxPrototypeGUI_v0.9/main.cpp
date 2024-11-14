@@ -7,6 +7,7 @@
 #define CLIENT_PROCESS_ADDR "127.0.0.1"
 extern "C" {
 #include "terrorexchangegui.h"
+#include "terrorexchange.h"
 }
 
 int main(int argc, char *argv[])
@@ -24,7 +25,7 @@ int main(int argc, char *argv[])
     client_addr.sin_port = htons(55000); // tcp port
     client_addr.sin_addr.s_addr = inet_addr(CLIENT_PROCESS_ADDR);
 
-    /*
+
     if(connect(client_tcp_socket, (struct sockaddr*) &client_addr, sizeof(client_addr)) < 0)
     {
         fprintf(stderr, "Connection to client failed.\n");
@@ -33,7 +34,8 @@ int main(int argc, char *argv[])
     }
 
     printf("Client connection established on tcp port: %d.\n", client_tcp_socket);
-    */
+
+
     QApplication a(argc, argv);
     MainWindow w;
     //w.show();
