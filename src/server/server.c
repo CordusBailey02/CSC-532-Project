@@ -542,6 +542,7 @@ void* handle_client(void *arg)
 						strcpy(inbound_payloads[2]->data, convert_hash);
 						printf("Converted hash: %s\n", (char *) inbound_payloads[2]->data);
 						mysql_result_table = mysql_database_query("add_new_user", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
+						printf("[handle client] Result returned...\n");
 						switch(*mysql_return_flag)
 						{
 							case SUCCESS:

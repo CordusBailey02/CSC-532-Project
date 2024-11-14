@@ -161,13 +161,12 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
     unsigned int table_index = 0;
 
     result = mysql_store_result(conn);
-    *num_rows = mysql_num_rows(result);
-    *num_fields = mysql_num_fields(result);
-    results_table = realloc(results_table, sizeof(row) * (*num_rows));
 
     if(result) 
     {
-        printf("[mysql_database_query] Gathering result...\n");
+        *num_rows = mysql_num_rows(result);
+        *num_fields = mysql_num_fields(result);
+        results_table = realloc(results_table, sizeof(row) * (*num_rows) + 5);
         while ((row = mysql_fetch_row(result)) != 0)
         {
             *(results_table + table_index) = row;
@@ -181,17 +180,19 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
         if(mysql_field_count(conn) == 0)
         {
             // *num_rows = mysql_affected_rows(conn);
-            **results_table = "OK";
+            results_table[0][0] = "OK";
+            printf("[mysql_database_query] %s\n", results_table[0][0]);
             // return results_table;
         }
         else 
         {
             fprintf(stderr, "[mysql_database_query] Error: %s\n", mysql_error(conn));
+            *return_flag = QUERY_ERROR;
             // return results_table;
         }
     }
     mysql_free_result(result);
-    printf("[mysql_database_query] Result freed...\n");
-	mysql_cleanup();
+	mysql_close(conn);
+    printf("[mysql_database_query] Result freed and connection closed...\n");
     return results_table;
 }
