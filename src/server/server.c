@@ -605,11 +605,20 @@ void* handle_client(void *arg)
 
 					// Check that verification category exists (e.g. "programmer")
 					if(inbound_payloads[0]->data == NULL) {
-						fprintf(stderr, "[handle_client] Inbound payload 0's data buffer is NULL. For a SEND VERIFICATION_REQUEST request header, at least 2 non-NULL parameters must be sent.\n");
+						fprintf(stderr, "[handle_client] Inbound payload 1's data buffer is NULL. For a SEND VERIFICATION_REQUEST request header, at least 2 non-NULL parameters must be sent.\n");
+						break;
+					}
+					if(inbound_payloads[1]->data == NULL) {
+						fprintf(stderr, "[handle_client] Inbound payload 2's data buffer is NULL. For a SEND VERIFICATION_REQUEST request header, at least 2 non-NULL parameters must be sent.\n");
 						break;
 					}
 
 					// Check for valid category
+					if(inbound_payloads[2]->data == NULL) {
+						fprintf(stderr, "[handle_client] Inbound payload 3's data buffer is NULL. For a SEND VERIFICATION_REQUEST request header, at least 2 non-NULL parameters must be sent.\n");
+						break;
+					}
+					printf("BREAKPOINT 1\n");
 					if(professional_category_exists( (char*) inbound_payloads[2]->data ) == false ) {
 						fprintf(stderr, "[handle_client] \"%s\" is not a valid professional category.\n", (char *) inbound_payloads[2]->data);
 						break;
@@ -617,6 +626,7 @@ void* handle_client(void *arg)
 					
 					// Check that the binary data of the files is not NULL
 					variable_arguments_are_not_null = true;
+					printf("BREAKPOINT 2\n");
 					for(int i = 3; i < inbound_payloads_length; i++) {
 						if(inbound_payloads[i]->data != NULL) continue;
 
@@ -628,6 +638,7 @@ void* handle_client(void *arg)
 					if(variable_arguments_are_not_null == false) 
 						break;
 					
+					printf("BREAKPOINT 3\n");
 					// Resolve file path on system to save it
 					sprintf(file_system_write_path_base, "%s/%s/%s", VERIFICATION_FS_ROOT, (char *) inbound_payloads[2]->data, (char *) inbound_payloads[0]->data);
 					if(directory_exists(file_system_write_path_base) == false) {
