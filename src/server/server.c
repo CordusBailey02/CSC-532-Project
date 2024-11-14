@@ -442,6 +442,10 @@ void* handle_client(void *arg)
 					{
 						unsigned char hash[20];
 						SHA1(inbound_payloads[1]->data, inbound_payloads[1]->member_size, hash);
+						char convert_hash[160]; //null terminator
+						for (int i = 0; i < 20; i++) {
+							snprintf(convert_hash+i*3, 4, "%02x ", hash[i]);
+						}
 						mysql_result_table = mysql_database_query("get_user_sha", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
 						switch(*mysql_return_flag)
 						{
@@ -462,7 +466,7 @@ void* handle_client(void *arg)
 							default:
 								break;
 						}
-						if(!strcmp(mysql_result_table[0][0], hash))
+						if(!strcmp(mysql_result_table[0][0], convert_hash))
 						{
 							login_success = true;
 						}
