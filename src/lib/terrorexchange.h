@@ -93,6 +93,9 @@ struct post
 
 bool professional_category_exists(char *professional_category);
 
+bool directory_exists(char *path);
+bool create_directory(char *path);
+
 struct payload* payload_create(size_t member_size, size_t member_count);
 
 bool send_request_header(int socket, struct request_header *header, uint32_t shared_secret);

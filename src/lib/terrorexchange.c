@@ -5,12 +5,28 @@
 #include <arpa/inet.h>
 #include <stdint.h>
 #include "terrorexchange.h"
+#include <sys/stat.h>
 
 bool professional_category_exists(char *professional_category) 
 {
 	if(professional_category == NULL) return false;
 
 	if(strcmp(professional_category, "programmer") == 0) return true;
+	else return false;
+}
+
+bool directory_exists(char *path) {
+	struct stat statbuf; 
+	if(stat(path, &statbuf) != 0) return false;
+
+	return S_ISDIR(statbuf.st_mode);
+}
+
+bool create_directory(char *path) {
+	int result = mkdir(path, 0777);
+	
+	if(result == 0) return true;
+
 	else return false;
 }
 
