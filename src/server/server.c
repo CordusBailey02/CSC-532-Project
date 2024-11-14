@@ -466,7 +466,7 @@ void* handle_client(void *arg)
 							default:
 								break;
 						}
-						if(!strcmp(mysql_result_table[0][0], convert_hash))
+						if(!strcmp(mysql_result_table[0][1], convert_hash))
 						{
 							login_success = true;
 						}
