@@ -341,6 +341,24 @@ int main(int argc, char **argv)
 					printf("Got category: \"%d\".\n", atoi(category));
 					// send the information off to the server
 					send_status = get_posts(tcp_socket, &outbound_request_header, category, strlen(category) + 1, shared_secret);
+
+					//BAD CODE...
+					if(use_gui)
+					{
+						char numOfPosts[1024];
+						recv(tcp_socket, numOfPosts, sizeof(numOfPosts), 0);
+						send(*gui_socket, numOfPosts, sizeof(numOfPosts), 0);
+
+						char buffers[2048];
+						for(int i = 0; i < atoi(numOfPosts); i++)
+						{
+							memset(buffers, 0, sizeof(buffers)); 
+							recv(tcp_socket, buffers, sizeof(buffers), 0);
+							send(*gui_socket, buffers, sizeof(buffers), 0);
+						}
+					}
+					
+
 					//send_status = send_account_create(tcp_socket, &outbound_request_header, username, username_length, email, email_length, password, password_length, shared_secret);
 					break;
 			}

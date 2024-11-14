@@ -418,22 +418,36 @@ void* handle_client(void *arg)
 						query_post_success = true;
 					}
 
-					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
-					temporary_response = malloc(40 + 3);
-					if(temporary_response == NULL)
-					{
-						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
-						break;
+					// BAD CODE FOR NOW... WE REPLACE IT LATER(this is for demo sake)...
+					// Says how many questions there are
+					printf("SENDING %d ROW.\n", *mysql_num_rows);
+					char numToSend[1024];
+					sprintf(numToSend, "%d", *mysql_num_rows);
+					send(client_socket, numToSend, sizeof(numToSend), 0);
+
+					char buffers[2048]; // Fixed-size buffer for the row
+					// Loop through each row
+					for (int i = 0; i < *mysql_num_rows; i++) {
+						strcpy(buffers, "[ "); // Start the row string
+
+						for (int j = 0; j < (*mysql_num_fields); j++) {
+							strcat(buffers, "\"");
+							strcat(buffers, mysql_result_table[i][j]); // Add the field
+							strcat(buffers, "\"");
+
+							if (j < (*mysql_num_fields) - 1) {
+								strcat(buffers, " "); // Add space between fields
+							}
+						}
+
+						strcat(buffers, " ]\n"); // End the row string
+
+						// Send the row over the socket
+						send(client_socket, buffers, strlen(buffers), 0);
+
+						memset(buffers, 0, sizeof(buffers));
 					}
-					sprintf(temporary_response, "%s", query_post_success ? "TRUE" : "FALSE");
-					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
-					free(temporary_response);
-					if(send_status == false)
-					{
-						fprintf(stderr, "[handle_client] Failed to send developer test message to client. Something might be wrong with the connection.\n");
-						break;
-					}
-					printf("Successfully sent temporary response to client with socket #%d for their SEND LOGIN_ATTEMPT message.\n", client_socket);
+
 
 					//printf("[UNIMPLEMENTED ERROR] Cannot fetch posts at the moment.\n");
 					break;

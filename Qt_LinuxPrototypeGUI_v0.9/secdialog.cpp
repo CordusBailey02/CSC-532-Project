@@ -9,12 +9,21 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QDebug>
+#include <arpa/inet.h>
+extern "C" {
+#include "terrorexchangegui.h"
+}
 
 SecDialog::SecDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SecDialog)
 {
     ui->setupUi(this);
+
+    char input_buffer[4096];
+    sprintf(input_buffer, "GET POST %d", 0);
+    send(client_tcp_socket, &input_buffer, sizeof(input_buffer), 0);
+
 
     QPixmap pix2("/home/vboxuser/Pictures/profilePic.jpg");
     QIcon ButtonIcon(pix2);
@@ -26,8 +35,67 @@ SecDialog::SecDialog(QWidget *parent)
 
 
     ui->listWidget_defaultList->clear();
-    QStringList items = {"Item 1", "Item 2", "Item 3", "Item 4"};
-    ui->listWidget_defaultList->addItems(items);
+
+    char numOfPosts[1024];
+    recv(client_tcp_socket, numOfPosts, sizeof(numOfPosts), 0);
+    printf("Got num of posts: %d.\n", atoi(numOfPosts));
+
+    char buffers[2024];
+    recv(client_tcp_socket, buffers, sizeof(buffers), 0);
+
+    // Convert char buffer to QString
+    QString inputString = QString::fromUtf8(buffers);
+
+    // Split the input into separate entries based on a newline delimiter
+    QStringList entries = inputString.split("\n");  // Adjust delimiter if needed
+
+    // Iterate through each entry
+    for (const QString &entry : entries) {
+        // Clean the input string by removing the square brackets and any unnecessary spaces
+        QString cleanedInput = entry.trimmed().remove(0, 1).remove(entry.length() - 1, 1);
+
+        // Split the string by the quotes and space delimiter
+        QStringList parts = cleanedInput.split("\" \"");
+
+        // Ensure there are enough parts to extract the necessary data
+        if (parts.size() >= 5) {
+            // Prepare the item with [] around "test" and the full question
+            QString item = QString("[%1] %2").arg(parts[1].trimmed()).arg(parts[4].trimmed());
+
+            // Add the item to the list widget
+            ui->listWidget_defaultList->addItem(item);
+        }
+    }
+
+    /*
+    char buffers[2048];
+    for(int i = 0; i < atoi(numOfPosts); i++)
+    {
+        memset(buffers, 0, sizeof(buffers));
+
+        recv(client_tcp_socket, buffers, sizeof(buffers), 0);
+        printf("Received post: %s.\n", buffers);
+
+        // Convert char buffer to QString
+        QString inputString = QString::fromUtf8(buffers);
+
+        // Clean the input string by removing the square brackets
+        QString cleanedInput = inputString.trimmed().remove(0, 1).remove(inputString.length() - 1, 1);
+
+        // Split the string by the quotes and space delimiter
+        QStringList parts = cleanedInput.split("\" \"");
+
+        // Prepare the item with [] around "test" and the full question
+        QString item = QString("[%1] %2").arg(parts[1].trimmed()).arg(parts[4].trimmed());
+
+        // Add the item to the list widget
+        ui->listWidget_defaultList->addItem(item);
+    }
+    */
+
+
+    //QStringList items = {"Item 1", "Item 2", "Item 3", "Item 4"};
+    //ui->listWidget_defaultList->addItems(items);
 
     /*
     int sendInt = send(int socket, void *data, size_t len, int flag);
