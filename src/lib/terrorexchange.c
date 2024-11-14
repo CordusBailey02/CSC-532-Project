@@ -953,7 +953,7 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 		fprintf(stderr, "[send_login_attempt] Failed to allocate memory buffer for outbound payload 3 (of 3). Needed to allocate %d bytes. Is the system low on memory?\n", password_length);
 		return false;
 	}
-	memcpy(outbound_payloads[2].data, password, username_length);
+	memcpy(outbound_payloads[2].data, password, password_length);
 	
 	// Send payload metadata and then actual payload
 	while(payloads_sent < payloads_to_send)

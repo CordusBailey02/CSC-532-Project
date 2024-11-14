@@ -27,10 +27,12 @@ enum SUBJECT { // Typical data objects
 
 	       VERIFICATION_REQUEST,
 
-	       SUBJECT_ERROR
+	       SUBJECT_ERROR,
+
+	       INITIAL_SUBJECT_CODE
 	     };
 
-// parameter_count member of outbound request header is used to signal the type of acknowledgement.
+// parameter_count member of outbound request header is used to signal the type of acknowledgement. 
 enum ACKNOWLEDGEMENT_TYPE {OK, MALFORMED, DUPLICATE, NOT_FOUND, UNAUTHORIZED, FAILED,
 			   INSUFFICIENT_MEMORY, 
 		 	   ACKNOWLEDGEMENT_TYPE_ERROR };
