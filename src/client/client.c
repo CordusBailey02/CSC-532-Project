@@ -215,7 +215,14 @@ int main(int argc, char **argv)
 		printf("Listening on port 55000 for a connection from the GUI.\n");
 		
 		// (4) spawn GUI process
-		system("../../LinuxProtoTypeGUI_v0.8/clientGUI");
+		pid_t gui_pid;
+
+		gui_pid = fork();
+		if(gui_pid == 0) 
+		{
+			system("../../testGUI/newew");
+		}
+		
 
 		// (5) Accept GUI connection
 		if(gui_socket == NULL)
@@ -733,7 +740,7 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-
+	close(*gui_socket);
 	close(tcp_socket);
 	return 0;
 }
