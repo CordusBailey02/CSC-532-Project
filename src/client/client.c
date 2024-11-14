@@ -11,6 +11,14 @@
 #include "../lib/terrorexchange.h"
 #include "../lib/secure_connection.h"
 
+struct client_state {
+	char *username;
+	char *email;
+	bool signed_in;
+	enum SUBJECT last_thing_sent;
+	enum SUBJECT last_thing_received;	
+};
+
 void clean_payload_buffer(struct payload **payload_buffer, size_t *length)
 {
 	if(length == NULL)
@@ -68,8 +76,7 @@ enum SUBJECT string_to_request_header_subject(char *str, size_t str_length)
 int main(int argc, char **argv)
 {
 	bool use_gui = true;
-	if(argc > 1)
-	{
+	if(argc > 1) {
 		if(strcmp(argv[1], "-n") == 0 || strcmp(argv[1], "--no-gui") == 0 )
 			use_gui = false;
 	}
@@ -158,9 +165,14 @@ int main(int argc, char **argv)
 	}
 	int file_paths_length = 0;
 	int file_paths_capacity = 5;
-
-	bool signed_in = false;
 	
+	struct client_state client_user_state;
+	client_user_state.username = default_username;
+	client_user_state.email = NULL;
+	client_user_state.signed_in = false;
+	client_user_state.last_thing_sent = INITIAL_SUBJECT_CODE;
+	client_user_state.last_thing_received = INITIAL_SUBJECT_CODE;
+		
 	// Used to prevent client from waiting to receive something when data was 
 	// input erroneously. If nothing was sent, it will never receive anything.
 	// So, it shouldn't enter the waiting logic as it will wait forever.
@@ -226,10 +238,10 @@ int main(int argc, char **argv)
 		// temporary. Later this doesnt have to get checked each time.
 		// The LOGIN_ATTEMPT and ACCOUNT_CREATE procedure will update the 
 		// username pointer.
-		if(signed_in == false) username = default_username;
+		if(client_user_state.signed_in == false) client_user_state.username = default_username;
 
 		// get user input
-		printf("\n%s@demake$ ", username);
+		printf("\n%s@demake$ ", client_user_state.username);
 		fgets(input_buffer, 4096, stdin);
 		input_buffer_length = strlen(input_buffer);
 
@@ -259,7 +271,24 @@ int main(int argc, char **argv)
 		printf("Got subject as \"%s\" (code %d).\n", subject_type, outbound_request_header.subject);
 		printf("Got data as \"%s\" (length %zu).\n", data, strlen(data));
 		memcpy(outbound_buffer, data, strlen(data) + 1);
-		
+
+		// exit the program when user enters "exit"
+		if(strcmp(action_type, "exit") == 0) {
+			for(int i = 0; i < inbound_payloads_length; i++) {
+				if(inbound_payloads[i]->data == NULL) continue;
+
+				free(inbound_payloads[i]->data);
+				free(inbound_payloads[i]);
+			}
+			free(inbound_payloads);
+			
+			if(client_user_state.username != default_username)
+				free(client_user_state.username);
+	
+			close(tcp_socket);
+			exit(EXIT_SUCCESS);
+		} 
+
 		// SEND SOMETHING TO THE SERVER BASED ON WHAT THE USER INPUT
 		if(outbound_request_header.action == GET)
 		{
@@ -280,6 +309,7 @@ int main(int argc, char **argv)
 						DATA_SENT_FLAG = false;
 					}
 					DATA_SENT_FLAG = true;
+					client_user_state.last_thing_sent = DEVELOPER_TEST_MESSAGE;
 					break;
 
 				case LOGIN_ATTEMPT:
@@ -316,6 +346,7 @@ int main(int argc, char **argv)
 						continue;
 					}
 					DATA_SENT_FLAG = true;
+					client_user_state.last_thing_sent = LOGIN_ATTEMPT;
 					break;
 
 				case ACCOUNT_CREATE:
@@ -382,10 +413,11 @@ int main(int argc, char **argv)
 						DATA_SENT_FLAG = false;
 					}
 					DATA_SENT_FLAG = true;
+					client_user_state.last_thing_sent = ACCOUNT_CREATE;
 					break;
 
 				case VERIFICATION_REQUEST:
-					if(signed_in == false) { 
+					if(client_user_state.signed_in == false) { 
 						fprintf(stderr, "\nSystem: You must be signed in to send a verification request.\n");
 						break;
 					}
@@ -440,6 +472,7 @@ int main(int argc, char **argv)
 						break;
 					}
 					DATA_SENT_FLAG = true;
+					client_user_state.last_thing_sent = VERIFICATION_REQUEST;
 					
 					// clean up strings within file paths buffer (leave buffer itself)
 					for(int i = 0; i < file_paths_length; i++)
@@ -623,20 +656,40 @@ int main(int argc, char **argv)
 			switch(inbound_request_header.subject)
 			{
 				case DEVELOPER_TEST_MESSAGE:
+					// Receiving developer test message as a response for an attempt at signing in
+					if(client_user_state.last_thing_sent == LOGIN_ATTEMPT) {
+						// User entered wrong credentials
+						if(strcmp(inbound_payloads[0]->data, "false") == 0) {
+							printf("[System] Sign-in credentials are incorrect.\n");
+							break;
+						}
+
+						// User entered valid credentials
+						if(client_user_state.username == default_username) {
+							client_user_state.username = malloc(sizeof(char) * (strlen(username) + 1));
+							if(client_user_state.username == NULL) {
+								fprintf(stderr, "[Fatal Error] Cannot allocate memory for username buffer in client state. Maybe the system has run out of memory?\n");
+								close(tcp_socket);
+								exit(EXIT_FAILURE);
+							}
+							strcpy(client_user_state.username, username);
+						}
+					}
+					// CASE (2): Receiving developer test message for other reason
 					printf("Received: ");
 					for(int i = 0; i < payloads_received; i++)
 						printf("\"%s\" ", (char *) inbound_payloads[i]->data);
 					break;
-
+			
 				case LOGIN_ATTEMPT_RESPONSE:
 					// check response
-					if(strcmp(inbound_payloads[0]->data, "not exists") == 0)
+					if(strcmp(inbound_payloads[0]->data, "false") == 0)
 					{
 						fprintf(stderr, "[sign in error] No user found with provided credentials.\n");
 						username = default_username;
 					}
 					else
-						signed_in = true;	
+						client_user_state.signed_in = true;	
 					// if valid sign-in, change username
 					break;
 
