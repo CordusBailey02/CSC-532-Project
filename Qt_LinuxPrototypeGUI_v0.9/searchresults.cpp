@@ -125,6 +125,7 @@ void searchResults::on_listWidget_answersFromSearch_itemDoubleClicked(QListWidge
 {
     item->text();
     answerWindow answerWindow_1;
+    answerWindow_1.showMaximized();
     answerWindow_1.exec();
 }
 
