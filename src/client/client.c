@@ -70,6 +70,7 @@ enum SUBJECT string_to_request_header_subject(char *str, size_t str_length)
 	else if(strcmp(str, "PASSWORD_CHANGE") == 0)		return PASSWORD_CHANGE;
 	else if(strcmp(str, "ACCOUNT_CREATE") == 0)		return ACCOUNT_CREATE;
 	else if(strcmp(str, "VERIFICATION_REQUEST") == 0)	return VERIFICATION_REQUEST;
+	else if(strcmp(str, "POST_CREATE") == 0)	return POST_CREATE;
 	else 							return SUBJECT_ERROR;
 }
 
@@ -153,6 +154,7 @@ int main(int argc, char **argv)
 	int password_length = 0;
 	int email_length = 0;
 	bool valid_email = false;
+	char *question;
 
 	char *verification_type;
 	int verification_type_length = 0;
@@ -325,6 +327,23 @@ int main(int argc, char **argv)
 		// SEND SOMETHING TO THE SERVER BASED ON WHAT THE USER INPUT
 		if(outbound_request_header.action == GET)
 		{
+			switch(outbound_request_header.subject)
+			{
+				case POST:
+					char *category = strtok(outbound_buffer, "");
+					if(category == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve category.\n");
+						continue;		
+					}
+					//int category_length = strlen(category) + 1;
+
+					printf("Got category: \"%d\".\n", atoi(category));
+					// send the information off to the server
+					send_status = get_posts(tcp_socket, &outbound_request_header, category, strlen(category) + 1, shared_secret);
+					//send_status = send_account_create(tcp_socket, &outbound_request_header, username, username_length, email, email_length, password, password_length, shared_secret);
+					break;
+			}
 			fprintf(stderr, "GET DATA ABILITY UNIMPLEMENTED.\n");
 			DATA_SENT_FLAG = false;
 			continue;
@@ -515,6 +534,46 @@ int main(int argc, char **argv)
 						free(file_paths[i]);
 					
 					break;
+
+				case POST_CREATE:
+					if(client_user_state.signed_in == false) { 
+						fprintf(stderr, "\nSystem: You must be signed in to send a verification request.\n");
+						break;
+					}
+
+					// Parse input for username
+					username = strtok(outbound_buffer, " ");
+					if(username == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve username.\n");
+						continue;
+					}
+					username_length = strlen(username) + 1;
+
+					char *category = strtok(NULL, " ");
+					if(category == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve category.\n");
+						continue;
+					}
+					int category_length = strlen(category) + 1;
+
+					char *question = strtok(NULL, "");
+					if(question == NULL)
+					{
+						fprintf(stderr, "Unable to tokenize user input to resolve question.\n");
+						continue;
+					}
+					int question_length = strlen(question) + 1;
+
+					printf("Username is: %s.\n", username);
+					printf("Category is: %s.\n", category);
+					printf("Question is: %s.\n", question);
+
+					send_post_create(tcp_socket, &outbound_request_header, username, username_length, category, category_length, question, question_length, shared_secret);
+
+					break;
+
 
 				default:
 					fprintf(stderr, "Unimplemented SEND case for subject %s.\n", subject_type);

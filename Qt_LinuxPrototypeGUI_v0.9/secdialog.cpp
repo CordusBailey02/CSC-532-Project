@@ -24,6 +24,11 @@ SecDialog::SecDialog(QWidget *parent)
 
     ui->pushButton_askAQuestion->setFocusPolicy(Qt::NoFocus);
 
+
+    ui->listWidget_defaultList->clear();
+    QStringList items = {"Item 1", "Item 2", "Item 3", "Item 4"};
+    ui->listWidget_defaultList->addItems(items);
+
     /*
     int sendInt = send(int socket, void *data, size_t len, int flag);
     -1 -> something wrong

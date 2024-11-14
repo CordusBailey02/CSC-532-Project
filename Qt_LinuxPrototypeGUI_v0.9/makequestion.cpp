@@ -3,6 +3,10 @@
 #include <QtWidgets>
 #include <QPixmap>
 #include <QIcon>
+#include <arpa/inet.h>
+extern "C" {
+#include "terrorexchangegui.h"
+}
 
 makeQuestion::makeQuestion(QWidget *parent)
     : QDialog(parent)
@@ -13,6 +17,8 @@ makeQuestion::makeQuestion(QWidget *parent)
     ui->pushButton_uploadQuestionImage->setFocusPolicy(Qt::NoFocus);
     ui->pushButton_postQuestion->setFocusPolicy(Qt::NoFocus);
     ui->pushButton_cancel->setFocusPolicy(Qt::NoFocus);
+
+    printf("The current user is: %s.\n", current_username);
 
     /*
 
@@ -34,7 +40,16 @@ void makeQuestion::on_pushButton_postQuestion_clicked()
 {
     QString postText = ui->plainTextEdit->toPlainText();
     postText = postText.toLower();
+
+    std::string question_str = postText.toStdString();
+    char* question_c_str = new char[question_str.size() + 1];
+    strcpy(question_c_str, question_str.c_str());
+
     // Send postText to client to display in question
+    char input_buffer[4096];
+    sprintf(input_buffer, "SEND POST_CREATE %s %d %s", current_username, 0, question_c_str);
+
+    send(client_tcp_socket, &input_buffer, sizeof(input_buffer), 0);
 }
 
 

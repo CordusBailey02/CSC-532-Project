@@ -58,6 +58,12 @@ struct payload
 	void *data;
 };
 
+enum categories {
+	Programmer,
+	Cook,
+	Math
+};
+
 struct category
 {
 	int id; // initial assumption that there will not be
@@ -120,6 +126,9 @@ bool send_developer_test_message(int socket, struct request_header *outbound_req
 bool send_login_attempt(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *password, int password_length, uint32_t shared_secret);
 bool send_account_create(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *email, int email_length, char *password, int password_length, uint32_t shared_secret);
 bool send_verification_request(int socket, struct request_header *outbound_request_header, char *username, char *email, char *verification_type, char **file_paths, int file_paths_length, uint32_t shared_secret);
+bool send_post_create(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *category, int category_length, char *question, int question_length, uint32_t shared_secret);
+
+bool get_posts(int socket, struct request_header *outbound_request_header, char *category, int category_length, uint32_t shared_secret);
 
 size_t get_file_size(char *file_path, enum FILE_IO_CODE *return_code);
 void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t file_size);

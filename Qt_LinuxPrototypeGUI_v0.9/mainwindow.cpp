@@ -77,6 +77,7 @@ void MainWindow::on_pushButton_login_clicked()
 
     if(strcmp(response, "TRUE") == 0)
     {
+        current_username = username_c_str;
         SecDialog secDialog;
         //secDialog.setModal(true); // not needed
         hide();

@@ -74,6 +74,8 @@ bool check_valid_request_header(struct request_header *header)
 			break;
 		case VERIFICATION_REQUEST:
 			break;
+		case POST_CREATE:
+			break;
 
 		default:
 			return false;
@@ -368,7 +370,72 @@ void* handle_client(void *arg)
 				case DEVELOPER_TEST_MESSAGE:
 					break;
 				case POST:
-					printf("[UNIMPLEMENTED ERROR] Cannot fetch posts at the moment.\n");
+					printf("GET POST received from client with client socket %d.\n", client_socket);
+					if(inbound_payloads[0] == NULL) 
+						printf("inbound payload 0 is null.\n");
+					else
+						printf("inbound payload 0 is NOT null.\n");
+					if(inbound_payloads[0]->data == NULL)
+						printf("inbound payload 0 data is null.\n");
+					else 
+						printf("inbound payload 0 data is NOT null.\n");
+
+					printf("Category number received from client was \"%s\"\n", (char *) inbound_payloads[0]->data);
+
+					// DO DATABASE THING HERE
+					mysql_result_table = mysql_database_query("get_all_category_posts", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
+					switch(*mysql_return_flag)
+					{
+						case SUCCESS:
+							printf("Got result: %d rows, %d fields.\n", (*mysql_num_rows), (*mysql_num_fields));
+							break;
+						case CONNECTION_ERROR:
+							fprintf(stderr,"[handle_client] Connection to MYSQL when running query produced an error. Check error given.\n");
+						case INEXISTENT_QUERY:
+							fprintf(stderr, "[handle_client] Attempted query given does not exist.\n");
+							break;
+						case INSUFFICIENT_PARAMETERS:
+							fprintf(stderr, "[handle_client] Attempted query requires more parameters than was given.\n");
+							break;
+						case QUERY_ERROR:
+							fprintf(stderr, "[handle client] The stored procedure errored. Information could not be pushed or pulled.\n");
+							break;
+						default:
+							break;
+					}
+					bool query_post_success = false;
+					for(int i = 0; i < *mysql_num_rows; i++)
+					{
+						
+						printf("[ ");
+						for(int j = 0; j < (*mysql_num_fields); j++)
+							printf("\"%s\" ", mysql_result_table[i][j]);
+						printf("]\n"); 	
+					}
+
+					if(!strcmp(mysql_result_table[0][0], "exists"))
+					{
+						query_post_success = true;
+					}
+
+					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
+					temporary_response = malloc(40 + 3);
+					if(temporary_response == NULL)
+					{
+						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
+						break;
+					}
+					sprintf(temporary_response, "%s", query_post_success ? "TRUE" : "FALSE");
+					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
+					free(temporary_response);
+					if(send_status == false)
+					{
+						fprintf(stderr, "[handle_client] Failed to send developer test message to client. Something might be wrong with the connection.\n");
+						break;
+					}
+					printf("Successfully sent temporary response to client with socket #%d for their SEND LOGIN_ATTEMPT message.\n", client_socket);
+
+					//printf("[UNIMPLEMENTED ERROR] Cannot fetch posts at the moment.\n");
 					break;
 				default:
 					break;
@@ -675,16 +742,21 @@ void* handle_client(void *arg)
 					printf("SEND ACCOUNT_CREATE received from client with client socket %d.\n", client_socket);
 					if(inbound_payloads[0]->data == NULL)
 					{
-						fprintf(stderr, "[handle_client] Inbound payload #%d's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously?\n", client_socket);
+						fprintf(stderr, "[handle_client] Inbound payload #%d's data buffer is NULL. For a SEND POST_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously?\n", client_socket);
 						break;
 					}
 					if(inbound_payloads[1]->data == NULL)
 					{
-						fprintf(stderr, "[handle_client] Inbound payload #2's data buffer is NULL. For a SEND ACCOUNT_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
+						fprintf(stderr, "[handle_client] Inbound payload #2's data buffer is NULL. For a SEND POST_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
+						break;
+					}
+					if(inbound_payloads[2]->data == NULL)
+					{
+						fprintf(stderr, "[handle_client] Inbound payload #3's data buffer is NULL. For a SEND POST_CREATE request header, 3 non-NULL payloads are expected. Maybe the data was sent erroneously from client with socket #%d?\n", client_socket);
 						break;
 					}
 					// Review what was received
-					printf("Got username: \"%s\", email: \"%s\", password: \"%s\" from client with socket #%d.\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data, client_socket);
+					printf("Got username: \"%s\", category: \"%s\" question: \"%s\" from client with socket #%d.\n", (char*) inbound_payloads[0]->data, (char*) inbound_payloads[1]->data, (char*) inbound_payloads[2]->data, client_socket);
 
 					mysql_result_table = mysql_database_query("create_new_post", inbound_payloads, mysql_result_table, mysql_return_flag, mysql_num_fields, mysql_num_rows);
 					switch(*mysql_return_flag)

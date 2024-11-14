@@ -7,6 +7,7 @@
 #include "terrorexchange.h"
 
 int client_tcp_socket = -1;
+char* current_username[1024];
 
 bool gui_send_request_header(int socket, struct request_header *header)
 {

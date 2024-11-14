@@ -136,9 +136,16 @@ char ***mysql_database_query(char *query_name, struct payload **inbound_payloads
     else if(!strcmp(query_name, "create_new_post"))
     {
         query = realloc(query, 8200);
-        int j = snprintf(query, 8200, "CALL create_new_post(\'%s\', \'%s\');",
+        int j = snprintf(query, 8200, "CALL create_new_post(\'%s\', \'%s\', \'%s\');",
             (char *) inbound_payloads[0]->data,
-            (char *) inbound_payloads[1]->data);
+            (char *) inbound_payloads[1]->data,
+            (char *) inbound_payloads[2]->data);
+    }
+    else if(!strcmp(query_name, "get_all_category_posts"))
+    {
+        query = realloc(query, 8200);
+        int j = snprintf(query, 8200, "CALL get_all_category_posts(\'%d\');", 
+            atoi((char *) inbound_payloads[0]->data));
     }
     else
     {

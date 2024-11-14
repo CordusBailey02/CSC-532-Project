@@ -6,6 +6,9 @@
 #include "requestverification.h"
 #include <QPixmap>
 #include <QIcon>
+extern "C" {
+#include "terrorexchangegui.h"
+}
 
 Profile::Profile(QWidget *parent)
     : QDialog(parent)
@@ -16,6 +19,8 @@ Profile::Profile(QWidget *parent)
     ui->pushButton_profilePic->setFocusPolicy(Qt::NoFocus);
     ui->pushButton_changeIcon->setFocusPolicy(Qt::NoFocus);
     ui->pushButton_requestVerification->setFocusPolicy(Qt::NoFocus);
+
+    //printf("Current user is %s.\n", current_username);
 
 
     /*
