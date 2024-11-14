@@ -469,6 +469,8 @@ int main(int argc, char **argv)
 						}
 						file_paths[file_paths_length] = strtok(NULL, " ");
 					}
+					for(int i = 0; i < file_paths_length; i++) 
+						printf("Got file path as \"%s\".\n", file_paths[i]);
 
 					// try to send this information off to the server
 					send_status = send_verification_request(tcp_socket, &outbound_request_header, username, email, verification_type, file_paths, file_paths_length, shared_secret);

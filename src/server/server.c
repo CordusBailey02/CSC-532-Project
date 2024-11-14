@@ -169,6 +169,11 @@ void* handle_client(void *arg)
 
 	bool variable_arguments_are_not_null = true;
 	char file_system_write_path[PATH_MAX_SIZE];
+	int file_system_write_path_length = 0;
+	char file_system_write_path_base[PATH_MAX_SIZE - 128];
+	int file_system_write_path_base_length = 0;
+	char file_name[128];
+	int file_name_length = 0;
 
 	// Maintain connection with client via loop
 	// The entire process of 1st receiving the request type and the number of
@@ -624,10 +629,33 @@ void* handle_client(void *arg)
 						break;
 					
 					// Resolve file path on system to save it
-
-
+					sprintf(file_system_write_path_base, "%s/%s/%s", VERIFICATION_FS_ROOT, (char *) inbound_payloads[2]->data, (char *) inbound_payloads[0]->data);
+					if(directory_exists(file_system_write_path_base) == false) {
+						fprintf(stderr, "[handle_client] Path \"%s\" does not exist. Trying to create it.\n", file_system_write_path_base);
+						if(create_directory(file_system_write_path_base) == false) {
+							fprintf(stderr, "[handle_client] Failed to create path \"%s\".\n", file_system_write_path_base);
+							break;
+						}
+					}
+	
 					// Write files into file system
-
+					for(int i = 3; i < inbound_payloads_length; i++) {
+						sprintf(file_system_write_path, "%s/%d", file_system_write_path_base, i - 2);
+						FILE *fh = fopen(file_system_write_path, "wb");
+						if(fh == NULL) {
+							fprintf(stderr, "[handle_client] Failed to open \"%s\" to write bytes.\n", file_system_write_path);
+							break;
+						} 
+						size_t file_size = inbound_payloads[i]->member_count * inbound_payloads[i]->member_size;
+						size_t written = fwrite(inbound_payloads[i]->data, file_size, 1, fh);
+						if(written != file_size) {
+							fprintf(stderr, "[handle_client] Expected to write %zu bytes, but wrote %zu instead.\n", file_size, written);
+							fclose(fh);
+							break;
+						}
+						fclose(fh);
+					}
+					printf("All files written successfully.\n");
 
 					break;
 
