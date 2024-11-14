@@ -461,16 +461,16 @@ void* handle_client(void *arg)
 							login_success = true;
 						}
 					}
-					printf("Login Success: %s\n", login_success ? "false" : "true");
+					printf("Login Success: %s\n", login_success ? "TRUE" : "FALSE");
 					
 					// TEMPORARY RESPONSE UNTIL DATABASE BEHAVIOR IS IMPLEMENTED
-					temporary_response = malloc(40 + strlen(inbound_payloads[0]->data) + strlen(inbound_payloads[1]->data) + 3);
+					temporary_response = malloc(40 + 3);
 					if(temporary_response == NULL)
 					{
 						fprintf(stderr, "[handle_client] Failed to allocate memory for a temporary message to send back to the client until the database connection is implemented.\n");
 						break;
 					}
-					sprintf(temporary_response, "Got username as \"%s\" and password as \"%s\"\n", (char *) inbound_payloads[0]->data, (char *) inbound_payloads[1]->data);
+					sprintf(temporary_response, "%s \n", login_success ? "TRUE" : "FALSE");
 					send_status = send_developer_test_message(client_socket, &outbound_request_header, temporary_response, shared_secret);
 					free(temporary_response);
 					if(send_status == false)
