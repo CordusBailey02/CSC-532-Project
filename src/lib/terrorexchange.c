@@ -1059,10 +1059,18 @@ bool send_account_create(int socket, struct request_header *outbound_request_hea
 	return true;
 }
 
-bool send_verification_request(int socket, struct request_header *outbound_request_header, char *verification_type, char **file_paths, int file_paths_length, uint32_t shared_secret)
+bool send_verification_request(int socket, struct request_header *outbound_request_header, char *username, char *email, char *verification_type, char **file_paths, int file_paths_length, uint32_t shared_secret)
 { 
 	if(outbound_request_header == NULL){
 		fprintf(stderr, "[send_verification_request] Cannot use request header struct that points to NULL for an outbound request header. Bad argument provided.\n");
+		return false;
+	}
+	if(username == NULL) {
+		fprintf(stderr, "[send_verification_request] Cannot use username char* that points to NULL.\n");
+		return false;
+	}
+	if(email == NULL) {
+		fprintf(stderr, "[send_verification_request] Cannot use email char* that points to NULL.\n");
 		return false;
 	}
 	if(verification_type == NULL) {
@@ -1078,6 +1086,7 @@ bool send_verification_request(int socket, struct request_header *outbound_reque
 		fprintf(stderr, "[send_verification_request] Cannot use a buffer for file paths that is reported to be 0 length or less (length parameter was given as %d). Bad argument provided.\n", file_paths_length);
 		return false;
 	}
+
 	// ensure NO strings point to NULL
 	for(int i = 0; i < file_paths_length; i++)
 	{
@@ -1118,7 +1127,7 @@ bool send_verification_request(int socket, struct request_header *outbound_reque
 	outbound_request_header->action = SEND;
 	outbound_request_header->subject = VERIFICATION_REQUEST;
 	outbound_request_header->parameter_count = 1 + file_paths_length; // +1 for verification type (e.g. "programmer")
-	outbound_request_header->metadata_total_size = (2 * sizeof(size_t)) * (1 + file_paths_length); // metadata is 2 size_t variables
+	outbound_request_header->metadata_total_size = (2 * sizeof(size_t)) * (3 + file_paths_length); // metadata is 2 size_t variables, +3 for username, email, and verification type
 	outbound_request_header->parameters_total_size = sum_of_file_sizes;
 	outbound_request_header->total_bytes = sum_of_file_sizes + outbound_request_header->metadata_total_size;
 	
@@ -1163,17 +1172,39 @@ bool send_verification_request(int socket, struct request_header *outbound_reque
 	int payloads_sent = 0;
 	int payloads_to_send = 1 + file_paths_length;
 	struct payload outbound_payloads[1 + file_paths_length]; 
+
+	// copy data of the username to the 1st outbound payload
 	outbound_payloads[0].member_size = 1;
-	outbound_payloads[0].member_count = strlen(verification_type) + 1;
+	outbound_payloads[0].member_count = strlen(username) + 1; // we want to copy null terminator too
 	outbound_payloads[0].data = malloc(outbound_payloads[0].member_count);
 	if(outbound_payloads[0].data == NULL)
 	{
-		fprintf(stderr, "[send_verification_request] Failed to allocate memory for a buffer to store the verification type in the 1st outbound payload. Needed %zu bytes. Is the system low on memory?\n", outbound_payloads[0].member_count);
+		fprintf(stderr, "[send_verification_request] Failed to allocate memory for a buffer to store the username in the 1st outbound payload. Needed %zu bytes. Is the system low on memory?\n", outbound_payloads[0].member_count);
 		return false;
 	}
-	memcpy(outbound_payloads[0].data, verification_type, outbound_payloads[0].member_count - 1);
-	char *verification_payload_buffer = (char*) outbound_payloads[0].data;
-	verification_payload_buffer[outbound_payloads[0].member_count - 1] = '\0';
+	memcpy(outbound_payloads[0].data, username, outbound_payloads[0].member_count);
+
+	// copy data of the email into the 2nd outbound payload
+	outbound_payloads[1].member_size = 1;
+	outbound_payloads[1].member_count = strlen(email) + 1;
+	outbound_payloads[1].data = malloc(outbound_payloads[1].member_count);
+	if(outbound_payloads[1].data == NULL)
+	{
+		fprintf(stderr, "[send_verification_request] Failed to allocate memory for a buffer to store the email in the 2nd outbound payload. Needed %zu bytes. Is the system low on memory?\n", outbound_payloads[1].member_count);
+		return false;
+	}
+	memcpy(outbound_payloads[1].data, email, outbound_payloads[1].member_count);
+	
+	// copy data of the verification type into the 3rd outbound payload
+	outbound_payloads[2].member_size = 1;
+	outbound_payloads[2].member_count = strlen(verification_type) + 1;
+	outbound_payloads[2].data = malloc(outbound_payloads[2].member_count);
+	if(outbound_payloads[2].data == NULL)
+	{
+		fprintf(stderr, "[send_verification_request] Failed to allocate memory for a buffer to store the verification type in the 3rd outbound payload. Needed %zu bytes. Is the system low on memory?\n", outbound_payloads[2].member_count);
+		return false;
+	}
+	memcpy(outbound_payloads[2].data, verification_type, outbound_payloads[2].member_count);
 
 	// read the binary data of the files to be sent off
 	for(int i = 0; i < file_paths_length; i++){

@@ -110,7 +110,7 @@ void print_acknowledgement_type_mismatch_error(int socket, char *function_name, 
 bool send_developer_test_message(int socket, struct request_header *outbound_request_header, char *message, uint32_t shared_secret);
 bool send_login_attempt(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *password, int password_length, uint32_t shared_secret);
 bool send_account_create(int socket, struct request_header *outbound_request_header, char *username, int username_length, char *email, int email_length, char *password, int password_length, uint32_t shared_secret);
-bool send_verification_request(int socket, struct request_header *outbound_request_header, char *verification_type, char **file_paths, int file_paths_length, uint32_t shared_secret);
+bool send_verification_request(int socket, struct request_header *outbound_request_header, char *username, char *email, char *verification_type, char **file_paths, int file_paths_length, uint32_t shared_secret);
 
 size_t get_file_size(char *file_path, enum FILE_IO_CODE *return_code);
 void* read_binary_file(char *file_path, enum FILE_IO_CODE *return_code, size_t file_size);

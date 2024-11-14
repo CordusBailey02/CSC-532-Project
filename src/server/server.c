@@ -511,14 +511,13 @@ void* handle_client(void *arg)
 						fprintf(stderr, "[handle_client] Inbound payload 0's data buffer is NULL. For a SEND VERIFICATION_REQUEST request header, at least 2 non-NULL parameters must be sent.\n");
 						break;
 					}
-					
-					
+						
 					// Check that the binary data of the files is not NULL
 					variable_arguments_are_not_null = true;
 					for(int i = 1; i < inbound_payloads_length; i++) {
 						if(inbound_payloads[i]->data != NULL) continue;
 
-						fprintf(stderr, "[handle_client] Inbound payload #%d has a data buffer that is NULL. Expected file binary data, but there is nothing there. No files can be stored and reviewed later.\n");
+						fprintf(stderr, "[handle_client] Inbound payload #%d has a data buffer that is NULL. Expected file binary data, but there is nothing there. No files can be stored and reviewed later.\n", i + 1);
 						variable_arguments_are_not_null = false;
 					}
 					

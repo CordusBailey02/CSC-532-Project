@@ -269,6 +269,7 @@ int main(int argc, char **argv)
 		}
 		else // SENDing data to the server
 		{
+			DATA_SENT_FLAG = false;
 			switch(outbound_request_header.subject)
 			{
 				case DEVELOPER_TEST_MESSAGE:
@@ -287,39 +288,32 @@ int main(int argc, char **argv)
 					if(username == NULL)
 					{
 						fprintf(stderr, "Unable to tokenize user input to resolve username.\n");
-						DATA_SENT_FLAG = false;
 						continue;		
 					}
 					username_length = strlen(username) + 1;
 					if(username_length >= USERNAME_MAX_LENGTH)
 					{
 						fprintf(stderr, "Username is too long (%d+ characters).\n", USERNAME_MAX_LENGTH);
-						DATA_SENT_FLAG = false;
 						continue;
 					}
 					// Parse input for password
 					password = strtok(NULL, " ");
-					if(password == NULL)
-					{
+					if(password == NULL) {
 						fprintf(stderr, "Unable to tokenize user input to resolve password.\n");
-						DATA_SENT_FLAG = false;
 						continue;
 					}
 					password_length = strlen(password) + 1;
-					if(password_length >= PASSWORD_MAX_LENGTH)
-					{
+					if(password_length >= PASSWORD_MAX_LENGTH) {
 						fprintf(stderr, "Password is too long (%d+ characters).\n", PASSWORD_MAX_LENGTH);
-						DATA_SENT_FLAG = false;
 						continue;
 					}
 					printf("Got username: \"%s\", password: \"%s\".\n", username, password);
 
 					// Try to send off to the server (UNIMPLEMENTED)
 					send_status = send_login_attempt(tcp_socket, &outbound_request_header, username, username_length, password, password_length, shared_secret);
-					if(send_status == false)
-					{	
+					if(send_status == false) {	
 						fprintf(stderr, "[ERROR] Failed to send login attempt to the server. send_login_attempt returned false.\n");
-						DATA_SENT_FLAG = false;
+						continue;
 					}
 					DATA_SENT_FLAG = true;
 					break;
@@ -330,14 +324,12 @@ int main(int argc, char **argv)
 					if(username == NULL)
 					{
 						fprintf(stderr, "Unable to tokenize user input to resolve username.\n");
-						DATA_SENT_FLAG = false;
 						continue;
 					}
 					username_length = strlen(username) + 1;
 					if(username_length > USERNAME_MAX_LENGTH)
 					{
 						fprintf(stderr, "Username is too long (%d+ characters).\n", USERNAME_MAX_LENGTH);
-						DATA_SENT_FLAG = false;
 						continue;
 					}
 					// Parse input for email
@@ -345,26 +337,22 @@ int main(int argc, char **argv)
 					if(email == NULL)
 					{
 						fprintf(stderr, "Unable to tokenize user input to resolve email.\n");
-						DATA_SENT_FLAG = false;
 						continue;
 					}
 					email_length = strlen(email) + 1;
 					if(email_length >= 64)
 					{
 						fprintf(stderr, "Email is too long (64+ characters).\n");
-						DATA_SENT_FLAG = false;
 						continue;
 					}
 					for(int email_i = 0; email_i < email_length; email_i++)
 					{
-						if(email[email_i] == '@') 
-						{
+						if(email[email_i] == '@') {
 							valid_email = true;
 							break;
 						}
 					} 
-					if(valid_email == false)
-					{ 
+					if(valid_email == false) { 
 						fprintf(stderr, "Email address \"%s\" does not have a domain (no @ symbol found).\n", email);
 						DATA_SENT_FLAG = false;
 						continue;
@@ -372,8 +360,7 @@ int main(int argc, char **argv)
 
 					// Parse input for password
 					password = strtok(NULL, " ");
-					if(password == NULL)
-					{
+					if(password == NULL) {
 						fprintf(stderr, "Unable to tokenize password to resolve password.\n");
 						DATA_SENT_FLAG = false;
 						continue;
@@ -398,13 +385,31 @@ int main(int argc, char **argv)
 					break;
 
 				case VERIFICATION_REQUEST:
+					if(signed_in == false) { 
+						fprintf(stderr, "\nSystem: You must be signed in to send a verification request.\n");
+						break;
+					}
+
 					printf("WARNING: File paths cannot contain spaces! Replace spaces with hyphens (-) until a better parsing system is created.\n");
 					DATA_SENT_FLAG = false;
 					file_paths_length = 0;
+					// Parse for username
+					username = strtok(outbound_buffer, " ");
+					if(username == NULL) {
+						fprintf(stderr, "Unable to tokenize user input to resolve username.\n");
+						continue;
+					}
+				
+					// Parse for email
+					email = strtok(NULL, " ");
+					if(email == NULL) {
+						fprintf(stderr, "Unable to tokenize user input to resolve email.\n");
+						continue;
+					}
+
 					// Parse for type of verification
-					verification_type = strtok(outbound_buffer, " ");
-					if(verification_type == NULL)
-					{
+					verification_type = strtok(NULL, " ");
+					if(verification_type == NULL) {
 						fprintf(stderr, "Unable to tokenize user input to resolve type of verification request.\n");
 						continue;
 					}
@@ -418,8 +423,8 @@ int main(int argc, char **argv)
 						{
 							file_paths_capacity += 5;
 							file_paths = realloc(file_paths, sizeof(char *) * file_paths_capacity);
-							if(file_paths == NULL)
-							{
+
+							if(file_paths == NULL) {
 								fprintf(stderr, "Failed to allocate more memory for the file paths buffer. Current length is %d and the call to realloc tried to expand it to %d. Maybe the system is low on memory?\n", file_paths_length, file_paths_capacity);
 								close(tcp_socket);
 								exit(EXIT_FAILURE);
@@ -429,6 +434,16 @@ int main(int argc, char **argv)
 					}
 
 					// try to send this information off to the server
+					send_status = send_verification_request(tcp_socket, &outbound_request_header, username, email, verification_type, file_paths, file_paths_length, shared_secret);
+					if(send_status == false) {
+						fprintf(stderr, "[ERROR] Failed to send verification request to the server. The function send_verification_request() returned false.\n");
+						break;
+					}
+					DATA_SENT_FLAG = true;
+					
+					// clean up strings within file paths buffer (leave buffer itself)
+					for(int i = 0; i < file_paths_length; i++)
+						free(file_paths[i]);
 					
 					break;
 
